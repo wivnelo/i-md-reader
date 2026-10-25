@@ -110,6 +110,10 @@ struct ReaderWebView: UIViewRepresentable {
                 return .allow
             }
             if url.scheme == "reader-resource" {
+                guard !parent.document.isStandalone else {
+                    parent.onError("请先添加所在文件夹，再打开相对图片或文档链接。")
+                    return .cancel
+                }
                 do {
                     let target = try LocalDocuments.resourceURL(url, root: parent.document.access.url)
                     if LocalDocuments.markdownExtensions.contains(target.pathExtension.lowercased()) {

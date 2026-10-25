@@ -53,3 +53,7 @@
 ## 四套配色 · 2026-10-25
 
 `palette-mist-light.png`、`palette-mist-dark.png`：正式雾蓝浅深色与四项配色选择器。`palette-mountain-dark.png`、`palette-moss-dark.png`、`palette-sand-dark.png`：实际从外观面板切换远山、青苔、暖砂后的深色画面。均为 simctl 保存的原始 PNG。字号保持 17pt，阅读文档不变；另验证暖砂浅色重启恢复。
+
+## 独立文件 · 2026-10-25
+
+`single-file-dark.png`：专用iPad Air M4模拟器通过系统选择器授权目录外的合成MD，显示最近文件和权限范围提示；同级链接实际被阻止，重启恢复通过。Device Hub原生截图，未改图；不代表iCloud或默认类型实机验收。

@@ -5,7 +5,7 @@ updated: 2026-10-25
 
 # 单文件打开与默认应用设计
 
-**状态：设计方案，尚未实现。** 不将注册类型、系统默认应用或单文件读取提前标为完成。
+**状态：首轮实现已接入，完整实机验收待完成。** 文件选择、系统 URL 接收、Markdown Viewer、独立书签和最近文件已实现；不自动替用户设定默认 App。
 
 ## 推荐交互
 
@@ -38,9 +38,9 @@ Apple当前iPad用户指南确认“打开方式”及“始终以此方式打�
 
 ## 实现与验收顺序
 
-- [ ] 类型声明与外部URL接收；验证MD/markdown候选，不接管无关文件。
-- [ ] App内“打开Markdown文件”、文件书签与最近文件分区。
-- [ ] 未获目录授权时阻止相对资源，并验证授权目录复用。
+- [x] Markdown Viewer 声明与外部 URL 接收；模拟器系统候选和实际热启动传入通过，不接管无关文件。
+- [x] App 内文件选择、独立书签、最近文件（最多20项）、重复打开复用和移除记录。
+- [x] 单文件阻止同级图片和文档；复用已有目录授权。状态测试与模拟器相对链接阻止检查通过。
 - [ ] 实机分别验证冷启动、热启动、iCloud下载、重复打开、取消、重启恢复、改名/移动、断网及权限撤销。
 - [ ] 验证用户在系统里选择单文件/整个类型默认后，点击文件可进入App；不擅自改变用户当前默认应用。
 - [ ] 文件打开、刷新及移除记录前后原文件内容哈希不变；当前字号/配色/语言/来源排序保留。
@@ -50,3 +50,13 @@ Apple当前iPad用户指南确认“打开方式”及“始终以此方式打�
 - [Apple：在iPad“文件”中选择打开方式与默认App](https://support.apple.com/en-ie/guide/ipad/ipadb3b759ed/ipados)。
 - [Apple Developer：CFBundleDocumentTypes](https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundledocumenttypes)。
 - [Apple Developer：LSSupportsOpeningDocumentsInPlace](https://developer.apple.com/documentation/bundleresources/information-property-list/lssupportsopeningdocumentsinplace)。
+
+## 本轮验证 · 2026-10-25
+
+实际执行39项测试通过（核心17、状态22），2项真实网络跳过。新增5项状态测试覆盖独立文件范围/只读、书签/进度恢复、去重、目录复用、新请求优先、丢失文件保留记录及明确添加所在文件夹后的权限升级。
+
+模拟器已通过系统选择器打开此前授权目录外的合成MD，产生最近记录；相对文档链接被阻止，图片占位，重启恢复通过，两个源文件哈希不变。系统“文件”的打开方式实际出现iMDReader，选择后热启动打开另一份合成文档。未修改系统默认打开设置。
+
+模拟器与实机签名构建通过，开发版已覆盖安装并成功启动。产物已核对Markdown Viewer、md/markdown与原地打开声明。真实iCloud、移动/撤销、默认类型设置及最近记录上限等完整原生场景仍待验收。
+
+另已结束模拟器进程后，从系统“文件”选择另一篇合成MD冷启动：新文件成功成为当前文档，没有被旧记录覆盖。最终产物明确关闭多窗口，单窗口版本启动通过。该冷启动结果仍不代替不同文件提供方和实机系统默认设置验收。

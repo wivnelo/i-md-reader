@@ -20,7 +20,7 @@ struct SavedSource: Codable, Identifiable {
     var bookmark: Data
 }
 
-final class FolderAccess: @unchecked Sendable {
+final class ScopedAccess: @unchecked Sendable {
     let url: URL
     private let scoped: Bool
     init(_ url: URL) { self.url = url; scoped = url.startAccessingSecurityScopedResource() }
@@ -37,10 +37,23 @@ struct SavedGitHubSource: Codable, Identifiable, Sendable {
 struct FolderSource: Identifiable {
     let id: UUID
     let name: String
-    let access: FolderAccess?
+    let access: ScopedAccess?
     let isSample: Bool
     var remote: SavedGitHubSource? = nil
     var url: URL? { access?.url }
+}
+
+struct SavedRecentFile: Codable, Identifiable {
+    let id: UUID
+    var name: String
+    var bookmark: Data
+}
+
+struct RecentFile: Identifiable {
+    let id: UUID
+    let name: String
+    let access: ScopedAccess?
+    var key: String { "file:" + id.uuidString }
 }
 
 struct OpenDocument {
@@ -48,13 +61,17 @@ struct OpenDocument {
     let key: String
     let url: URL
     let sourceID: UUID
-    let access: FolderAccess
+    let access: ScopedAccess
     let rendered: RenderedDocument
     let initialProgress: Double
+    var isStandalone = false
 }
 
 @MainActor final class ReaderStore: ObservableObject {
     @Published private(set) var sources: [FolderSource] = []
+    @Published private(set) var recentFiles: [RecentFile] = []
+    private var savedFiles: [SavedRecentFile] = []
+    private var handledIncomingFile = false
     @Published private(set) var nodes: [String: [FileNode]] = [:]
     @Published private(set) var directoryErrors: [String: String] = [:]
     @Published private(set) var loadingDirectories: Set<String> = []
@@ -85,6 +102,21 @@ struct OpenDocument {
         expanded = Set(defaults.stringArray(forKey: "expanded") ?? [])
         positions = defaults.dictionary(forKey: "positions") as? [String: Double] ?? [:]
         bookmarks = (try? JSONDecoder().decode([SavedSource].self, from: defaults.data(forKey: "sources") ?? Data())) ?? []
+        savedFiles = (try? JSONDecoder().decode([SavedRecentFile].self, from: defaults.data(forKey: "recentFiles") ?? Data())) ?? []
+        for index in savedFiles.indices {
+            let saved = savedFiles[index]
+            var stale = false
+            do {
+                let url = try URL(resolvingBookmarkData: saved.bookmark, options: [], relativeTo: nil, bookmarkDataIsStale: &stale)
+                let access = ScopedAccess(url)
+                if stale { savedFiles[index].bookmark = try url.bookmarkData(options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil) }
+                recentFiles.append(RecentFile(id: saved.id, name: url.lastPathComponent, access: access))
+            } catch {
+                // Keep recent records for temporary provider/network failures.
+                recentFiles.append(RecentFile(id: saved.id, name: saved.name, access: nil))
+            }
+        }
+        if let data = try? JSONEncoder().encode(savedFiles) { defaults.set(data, forKey: "recentFiles") }
         var refreshedBookmarks = false
         var deniedBookmarks: Set<UUID> = []
         for index in bookmarks.indices {
@@ -92,7 +124,7 @@ struct OpenDocument {
             var stale = false
             do {
                 let url = try URL(resolvingBookmarkData: saved.bookmark, options: [], relativeTo: nil, bookmarkDataIsStale: &stale)
-                let access = FolderAccess(url)
+                let access = ScopedAccess(url)
                 if stale {
                     bookmarks[index].bookmark = try url.bookmarkData(options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil)
                     refreshedBookmarks = true
@@ -109,7 +141,7 @@ struct OpenDocument {
             sources.append(Self.remoteSource(saved, link: link))
         }
         if let sample = Bundle.main.url(forResource: "Samples", withExtension: nil) {
-            sources.append(FolderSource(id: Self.sampleID, name: "阅读示例", access: FolderAccess(sample), isSample: true))
+            sources.append(FolderSource(id: Self.sampleID, name: "阅读示例", access: ScopedAccess(sample), isSample: true))
         }
         if !deniedBookmarks.isEmpty {
             bookmarks.removeAll { deniedBookmarks.contains($0.id) }
@@ -163,7 +195,7 @@ struct OpenDocument {
         do {
             var stale = false
             let url = try URL(resolvingBookmarkData: saved.bookmark, options: [], relativeTo: nil, bookmarkDataIsStale: &stale)
-            let restored = FolderSource(id: saved.id, name: saved.name, access: FolderAccess(url), isSample: false)
+            let restored = FolderSource(id: saved.id, name: saved.name, access: ScopedAccess(url), isSample: false)
             guard let index = sources.firstIndex(where: { $0.id == source.id }) else { return }
             sources[index] = restored
             await refresh(restored)
@@ -354,7 +386,7 @@ struct OpenDocument {
     }
 
     func addFolder(_ url: URL) {
-        let access = FolderAccess(url)
+        let access = ScopedAccess(url)
         do {
             let bookmark = try url.bookmarkData(options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil)
             // Re-selecting the same location should not create duplicate roots.
@@ -382,6 +414,13 @@ struct OpenDocument {
             expanded.insert(id.uuidString + "|")
             sourceVersions[id, default: 0] += 1
             persistSources(); persistExpanded()
+            if let current = document, current.isStandalone, selectedKey == current.key, !isLoading,
+               (try? LocalDocuments.confined(current.url, to: url)) != nil,
+               let source = sources.first(where: { $0.id == id }) {
+                positions[key(source: source, url: current.url)] = progress
+                defaults.set(positions, forKey: "positions")
+                open(current.url, source: source)
+            }
         } catch { self.error = "无法保留文件夹授权：\(error.localizedDescription)" }
     }
     func remove(_ source: FolderSource) {
@@ -463,6 +502,11 @@ struct OpenDocument {
         }
     }
     func restoreLastDocument() {
+        guard !handledIncomingFile else { return }
+        if let last = defaults.string(forKey: "lastDocument"), let recent = recentFiles.first(where: { $0.key == last }) {
+            openRecent(recent)
+            return
+        }
         if let id = defaults.string(forKey: "lastDocument"), let separator = id.firstIndex(of: "|"),
            let source = sources.first(where: { $0.id.uuidString == String(id[..<separator]) }), let root = source.url {
             let relative = String(id[id.index(after: separator)...]).trimmingCharacters(in: CharacterSet(charactersIn: "/"))
@@ -472,10 +516,106 @@ struct OpenDocument {
             open(root.appendingPathComponent("为阅读留一点空间.md"), source: sample)
         }
     }
+    private func persistRecentFiles() {
+        if let data = try? JSONEncoder().encode(savedFiles) { defaults.set(data, forKey: "recentFiles") }
+    }
+
+    func openRecent(_ recent: RecentFile) {
+        if let access = recent.access { openFileURL(access.url); return }
+        guard let saved = savedFiles.first(where: { $0.id == recent.id }) else { return }
+        do {
+            var stale = false
+            let url = try URL(resolvingBookmarkData: saved.bookmark, options: [], relativeTo: nil, bookmarkDataIsStale: &stale)
+            openFileURL(url, existingID: saved.id)
+        } catch { self.error = "文件暂时无法访问，记录已保留，请稍后重试。" }
+    }
+
+    func removeRecent(_ recent: RecentFile) {
+        if selectedKey == recent.key {
+            readingTask?.cancel(); isLoading = false
+            selectedKey = document?.key == recent.key ? nil : document?.key
+        }
+        if document?.key == recent.key { document = nil }
+        recentFiles.removeAll { $0.id == recent.id }
+        savedFiles.removeAll { $0.id == recent.id }
+        positions[recent.key] = nil
+        if defaults.string(forKey: "lastDocument") == recent.key { defaults.removeObject(forKey: "lastDocument") }
+        defaults.set(positions, forKey: "positions")
+        persistRecentFiles()
+    }
+
+    /// Receive either a document picker grant or a system open-in-place URL.
+    /// The security scope is held on the FILE, never its ungranted parent.
+    func openFileURL(_ input: URL, existingID: UUID? = nil) {
+        guard input.isFileURL, LocalDocuments.markdownExtensions.contains(input.pathExtension.lowercased()) else {
+            error = "请选择 Markdown 文件（.md 或 .markdown）。"
+            return
+        }
+        handledIncomingFile = true
+        var components = URLComponents(url: input, resolvingAgainstBaseURL: false)
+        components?.fragment = nil
+        let url = components?.url ?? input
+        let access = ScopedAccess(url)
+        // Existing directory grants keep full relative-resource behavior.
+        if let source = sources.first(where: {
+            $0.remote == nil && $0.url != nil && (try? LocalDocuments.confined(url, to: $0.url!)) != nil
+        }) {
+            open(input, source: source)
+            return
+        }
+        let canonical = url.standardizedFileURL.resolvingSymlinksInPath()
+        let previous = recentFiles.first { $0.access?.url.standardizedFileURL.resolvingSymlinksInPath() == canonical }
+        let id = existingID ?? previous?.id ?? UUID()
+        let key = "file:" + id.uuidString
+        readingTask?.cancel()
+        selectedKey = key; isLoading = true; error = nil
+        readingTask = Task {
+            do {
+                let result = try await Task.detached(priority: .userInitiated) {
+                    try withExtendedLifetime(access) {
+                        var coordinationError: NSError?
+                        var output: Result<(RenderedDocument, Data), Error>?
+                        NSFileCoordinator().coordinate(readingItemAt: url, options: [], error: &coordinationError) { coordinated in
+                            output = Result {
+                                let text = try LocalDocuments.read(coordinated, root: coordinated)
+                                let bookmark = try url.bookmarkData(options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil)
+                                return (MarkdownRenderer().render(text, allowRelativeImages: false), bookmark)
+                            }
+                        }
+                        if let coordinationError { throw coordinationError }
+                        guard let output else { throw CocoaError(.fileReadUnknown) }
+                        return try output.get()
+                    }
+                }.value
+                guard !Task.isCancelled else { return }
+                savedFiles.removeAll { $0.id == id }
+                savedFiles.insert(SavedRecentFile(id: id, name: url.lastPathComponent, bookmark: result.1), at: 0)
+                recentFiles.removeAll { $0.id == id }
+                recentFiles.insert(RecentFile(id: id, name: url.lastPathComponent, access: access), at: 0)
+                for discarded in recentFiles.dropFirst(20) {
+                    positions[discarded.key] = nil
+                    savedFiles.removeAll { $0.id == discarded.id }
+                }
+                recentFiles = Array(recentFiles.prefix(20))
+                defaults.set(positions, forKey: "positions")
+                persistRecentFiles()
+                document = OpenDocument(key: key, url: input, sourceID: id, access: access,
+                                        rendered: result.0, initialProgress: positions[key] ?? 0, isStandalone: true)
+                progress = positions[key] ?? 0
+                defaults.set(key, forKey: "lastDocument")
+            } catch {
+                guard !Task.isCancelled else { return }
+                self.error = error.localizedDescription
+                selectedKey = document?.key
+            }
+            if !Task.isCancelled { isLoading = false }
+        }
+    }
+
     private static func remoteSource(_ saved: SavedGitHubSource, link: GitHubLink) -> FolderSource {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("iMDReader-GitHub", isDirectory: true)
             .appendingPathComponent(saved.id.uuidString, isDirectory: true)
-        return FolderSource(id: saved.id, name: "\(link.owner)/\(link.repository)" + (link.kind == .repository ? "" : " · " + (link.components.last ?? "")), access: FolderAccess(root), isSample: false, remote: saved)
+        return FolderSource(id: saved.id, name: "\(link.owner)/\(link.repository)" + (link.kind == .repository ? "" : " · " + (link.components.last ?? "")), access: ScopedAccess(root), isSample: false, remote: saved)
     }
 
     private func persistRemoteSources() {

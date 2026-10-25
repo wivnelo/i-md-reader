@@ -1479,6 +1479,166 @@
           }
         }
       }
+    },
+    "打开 Markdown 文件": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Markdown File"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 Markdown 文件"
+          }
+        }
+      }
+    },
+    "最近文件": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recent Files"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近文件"
+          }
+        }
+      }
+    },
+    "重新打开": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reopen"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新打开"
+          }
+        }
+      }
+    },
+    "移除记录": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove from Recents"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除记录"
+          }
+        }
+      }
+    },
+    "单文件不包含同级图片和文档的访问权限": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This file does not grant access to nearby images or documents"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "单文件不包含同级图片和文档的访问权限"
+          }
+        }
+      }
+    },
+    "添加所在文件夹": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Containing Folder"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加所在文件夹"
+          }
+        }
+      }
+    },
+    "单个文件": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Single File"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "单个文件"
+          }
+        }
+      }
+    },
+    "请先添加所在文件夹，再打开相对图片或文档链接。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add the containing folder before opening relative images or document links."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先添加所在文件夹，再打开相对图片或文档链接。"
+          }
+        }
+      }
+    },
+    "请选择 Markdown 文件（.md 或 .markdown）。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a Markdown file (.md or .markdown)."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请选择 Markdown 文件（.md 或 .markdown）。"
+          }
+        }
+      }
+    },
+    "文件暂时无法访问，记录已保留，请稍后重试。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The file is temporarily unavailable. Its record is kept; try again later."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文件暂时无法访问，记录已保留，请稍后重试。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

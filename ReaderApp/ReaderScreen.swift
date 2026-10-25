@@ -5,18 +5,21 @@ import ReaderCore
 struct ReaderScreen: View {
     @StateObject private var store = ReaderStore()
     @State private var visibility: NavigationSplitViewVisibility = .detailOnly
+    @State private var compactColumn: NavigationSplitViewColumn = .detail
     @State private var importing = false
+    @State private var selectingMarkdown = false
     @State private var addingGitHub = false
     @State private var showAppearance = false
     @State private var draggingFolder: String?
     @State private var sourceInsertion: SourceInsertion?
     @State private var anchor: String?
-    @State private var isPortrait = false
+    @State private var prefersSingleColumn = false
     @State private var renderingID: UUID?
     @AppStorage("fontSize") private var fontSize = 17.0
     @AppStorage("readerLanguage") private var languageValue = ReaderLanguage.system.rawValue
     @AppStorage("readerPalette") private var paletteValue = ReaderPalette.mist.rawValue
     @AppStorage("readerTheme") private var theme = "system"
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.colorScheme) private var systemScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private var dark: Bool { theme == "dark" || (theme == "system" && systemScheme == .dark) }
@@ -29,19 +32,20 @@ struct ReaderScreen: View {
 
     private var documentFolderName: String {
         guard let document = store.document else { return "" }
+        if document.isStandalone { return ReaderLanguage.message("单个文件", locale: language.locale) }
         if let source = store.sources.first(where: { $0.id == document.sourceID }), source.remote != nil { return source.name }
         return document.url.deletingLastPathComponent().lastPathComponent
     }
 
     var body: some View {
-        NavigationSplitView(columnVisibility: $visibility) {
+        NavigationSplitView(columnVisibility: $visibility, preferredCompactColumn: $compactColumn) {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 8, pinnedViews: [.sectionHeaders]) {
                     Text("资料来源").font(.caption).foregroundStyle(.secondary).padding(.horizontal, 14).padding(.top, 16)
                     ForEach(store.orderedSources) { source in
                         Section {
                             if let root = source.url {
-                                TreeDirectory(store: store, source: source, url: root, level: 0, selection: colors.selection, draggingFolder: $draggingFolder)
+                                TreeDirectory(store: store, source: source, url: root, level: 0, selection: colors.selection, draggingFolder: $draggingFolder, onOpenDocument: showReadingColumn)
                             } else {
                                 Text("文件夹暂时无法访问，请稍后重试。")
                                     .font(.caption).foregroundStyle(.secondary).padding(14)
@@ -49,6 +53,26 @@ struct ReaderScreen: View {
                         } header: {
                             SourceHeader(store: store, source: source, background: colors.sidebar, selection: colors.selection, draggingFolder: $draggingFolder, insertion: $sourceInsertion)
                                 .background(colors.sidebar)
+                        }
+                    }
+                    if !store.recentFiles.isEmpty {
+                        Section {
+                            ForEach(store.recentFiles) { file in
+                                HStack {
+                                    Button { showReadingColumn(); store.openRecent(file) } label: {
+                                        Label(file.name, systemImage: "doc.text").lineLimit(1).truncationMode(.middle)
+                                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                                    }.buttonStyle(.plain)
+                                    Menu {
+                                        Button("重新打开", systemImage: "arrow.clockwise") { store.openRecent(file) }
+                                        Button("移除记录", systemImage: "minus.circle", role: .destructive) { store.removeRecent(file) }
+                                    } label: { Image(systemName: "ellipsis").frame(width: 44, height: 44) }
+                                }.font(.subheadline).padding(.leading, 10)
+                                    .background(store.selectedKey == file.key ? colors.selection : .clear, in: RoundedRectangle(cornerRadius: 9))
+                            }
+                        } header: {
+                            Text("最近文件").font(.caption).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(12).background(colors.sidebar)
                         }
                     }
                     Text("仅阅读，不修改源文件").font(.footnote).foregroundStyle(.secondary).padding(16)
@@ -80,7 +104,8 @@ struct ReaderScreen: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Button("本地文件夹", systemImage: "folder") { importing = true }
+                        Button("打开 Markdown 文件", systemImage: "doc.text") { selectingMarkdown = true; importing = true }
+                        Button("本地文件夹", systemImage: "folder") { selectingMarkdown = false; importing = true }
                         Button("公开 GitHub 链接", systemImage: "link") { addingGitHub = true }
                     } label: { Label("添加来源", systemImage: "plus") }
                 }
@@ -91,6 +116,13 @@ struct ReaderScreen: View {
                 readerBackground.ignoresSafeArea()
                 if let document = store.document {
                     VStack(spacing: 0) {
+                        if document.isStandalone {
+                            HStack(spacing: 12) {
+                                Text("单文件不包含同级图片和文档的访问权限").font(.caption).foregroundStyle(.secondary)
+                                Spacer(minLength: 4)
+                                Button("添加所在文件夹") { selectingMarkdown = false; importing = true }.font(.caption)
+                            }.padding(.horizontal, 20).padding(.vertical, 8)
+                        }
                         ReaderWebView(document: document, fontSize: scaledSize, dark: dark, palette: palette, language: language.resolved(), reduceMotion: reduceMotion, anchor: $anchor,
                                       onProgress: { store.recordProgress($0, documentKey: document.key) },
                                       onInternalLink: { url in
@@ -112,7 +144,8 @@ struct ReaderScreen: View {
                         Text("从左侧选择文章，或添加文件夹与公开 GitHub 链接。")
                     } actions: {
                         Menu {
-                            Button("本地文件夹", systemImage: "folder") { importing = true }
+                            Button("打开 Markdown 文件", systemImage: "doc.text") { selectingMarkdown = true; importing = true }
+                        Button("本地文件夹", systemImage: "folder") { selectingMarkdown = false; importing = true }
                             Button("公开 GitHub 链接", systemImage: "link") { addingGitHub = true }
                         } label: { Label("添加来源", systemImage: "plus") }.buttonStyle(.bordered)
                     }
@@ -147,24 +180,32 @@ struct ReaderScreen: View {
         .preferredColorScheme(theme == "system" ? nil : (dark ? .dark : .light))
         .background {
             GeometryReader { geometry in
-                Color.clear.onAppear {
-                    isPortrait = geometry.size.width < geometry.size.height
-                    visibility = isPortrait ? .detailOnly : .all
-                }
-                    .onChange(of: geometry.size) { _, size in isPortrait = size.width < size.height }
+                Color.clear.onAppear { adaptLayout(to: geometry.size) }
+                    .onChange(of: geometry.size) { _, size in adaptLayout(to: size) }
+            }
+        }
+        .onChange(of: horizontalSizeClass) { _, sizeClass in
+            if sizeClass == .compact {
+                prefersSingleColumn = true
+                if store.selectedKey != nil { showReadingColumn() }
             }
         }
         .onChange(of: store.selectedKey) { _, key in
-            if key != nil && isPortrait { visibility = .detailOnly }
+            if key != nil { showReadingColumn() }
         }
-        .onChange(of: store.document?.id) { _, id in renderingID = id }
-        .onChange(of: isPortrait) { _, portrait in
-            visibility = portrait ? .detailOnly : .all
+        .onChange(of: store.document?.id) { _, id in
+            renderingID = id
+            if id != nil { showReadingColumn() }
         }
         .sheet(isPresented: $addingGitHub) { GitHubAddSheet(store: store) }
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.folder], allowsMultipleSelection: false) { result in
+        .onOpenURL { store.openFileURL($0); showReadingColumn() }
+        .fileImporter(isPresented: $importing, allowedContentTypes: selectingMarkdown ? [UTType(importedAs: "net.daringfireball.markdown")] : [.folder], allowsMultipleSelection: false) { result in
             switch result {
-            case .success(let urls): if let url = urls.first { store.addFolder(url) }
+            case .success(let urls):
+                if let url = urls.first {
+                    if selectingMarkdown { store.openFileURL(url) }
+                    else { store.addFolder(url) }
+                }
             case .failure(let error): store.error = error.localizedDescription
             }
         }
@@ -174,6 +215,20 @@ struct ReaderScreen: View {
         .task { store.restoreLastDocument() }
         .environment(\.locale, language.locale)
 
+    }
+
+    private func showReadingColumn() {
+        guard prefersSingleColumn else { return }
+        compactColumn = .detail
+        visibility = .detailOnly
+    }
+
+    private func adaptLayout(to size: CGSize) {
+        prefersSingleColumn = size.width < 900 || size.width < size.height || horizontalSizeClass == .compact
+        if prefersSingleColumn {
+            if store.document != nil || store.selectedKey != nil { showReadingColumn() }
+            else { compactColumn = .sidebar; visibility = .all }
+        } else { visibility = .all }
     }
 
     private var fontSliderPosition: Binding<Double> {
@@ -373,11 +428,13 @@ private struct SourceHeader: View {
 private struct CollapseAllIcon: Shape {
     func path(in rect: CGRect) -> Path {
         let scale = min(rect.width, rect.height) / 20
+        let box = CGRect(x: rect.midX - 7.5 * scale, y: rect.midY - 7.5 * scale,
+                         width: 15 * scale, height: 15 * scale)
         var path = Path()
-        path.addRoundedRect(in: CGRect(x: 1, y: 1, width: 15, height: 15), cornerSize: CGSize(width: 3, height: 3))
-        path.move(to: CGPoint(x: 5, y: 8.5))
-        path.addLine(to: CGPoint(x: 12, y: 8.5))
-        return path.applying(CGAffineTransform(scaleX: scale, y: scale))
+        path.addRoundedRect(in: box, cornerSize: CGSize(width: 3 * scale, height: 3 * scale))
+        path.move(to: CGPoint(x: rect.midX - 3.5 * scale, y: rect.midY))
+        path.addLine(to: CGPoint(x: rect.midX + 3.5 * scale, y: rect.midY))
+        return path
     }
 }
 
@@ -389,6 +446,7 @@ private struct TreeDirectory: View {
     let level: Int
     let selection: Color
     @Binding var draggingFolder: String?
+    var onOpenDocument: () -> Void = {}
     var key: String { store.key(source: source, url: url) }
     var isExpanded: Bool { store.expanded.contains(key) }
     private var accessibleName: String { source.isSample ? ReaderLanguage.message(source.name, locale: locale) : source.name }
@@ -431,6 +489,8 @@ private struct TreeDirectory: View {
                   .disabled(!store.hasExpandedSubdirectories(in: source))
                   .accessibilityLabel("收起全部子目录")
                   .help("收起全部子目录")
+              } else if level == 0 {
+                  Color.clear.frame(width: 44, height: 44).accessibilityHidden(true)
               }
               if level == 0 && !source.isSample {
                   Button {
@@ -438,12 +498,15 @@ private struct TreeDirectory: View {
                   } label: {
                       Group {
                           if store.refreshingSources.contains(source.id) { ProgressView().controlSize(.small) }
-                          else { Image(systemName: "arrow.triangle.2.circlepath").foregroundStyle(.secondary) }
-                      }.frame(width: 44, height: 44).contentShape(Rectangle())
+                          else { Image(systemName: "arrow.triangle.2.circlepath").font(.system(size: 18)).foregroundStyle(.secondary) }
+                      }.frame(width: 20, height: 20)
+                          .frame(width: 44, height: 44).contentShape(Rectangle())
                   }
                   .buttonStyle(.plain).disabled(store.refreshingSources.contains(source.id))
                   .accessibilityLabel("刷新来源：\(accessibleName)")
                   .accessibilityHint(source.remote == nil ? Text("重新读取目录和当前文档，不修改源文件") : Text("拉取最新目录和当前文档，不上传任何修改"))
+              } else if level == 0 {
+                  Color.clear.frame(width: 44, height: 44).accessibilityHidden(true)
               }
             }
     }
@@ -463,10 +526,10 @@ private struct TreeDirectory: View {
                     ForEach(nodes) { node in
                         if node.isDirectory {
                             // Type erase only the recursive edge; the tree is loaded one directory at a time.
-                            AnyView(TreeDirectory(store: store, source: source, url: node.url, level: level + 1, selection: selection, draggingFolder: $draggingFolder))
+                            AnyView(TreeDirectory(store: store, source: source, url: node.url, level: level + 1, selection: selection, draggingFolder: $draggingFolder, onOpenDocument: onOpenDocument))
                         } else {
                             let selected = store.selectedKey == store.key(source: source, url: node.url)
-                            Button { store.open(node.url, source: source) } label: {
+                            Button { onOpenDocument(); store.open(node.url, source: source) } label: {
                                 HStack(spacing: 10) {
                                     Image(systemName: "doc.text").foregroundStyle(.secondary)
                                     Text(node.name).lineLimit(1).truncationMode(.middle)

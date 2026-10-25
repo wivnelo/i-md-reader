@@ -460,3 +460,115 @@ private actor RemoteFixture {
     #expect(store.error == nil)
     #expect(!store.isAddingGitHub)
 }
+
+@Test @MainActor func standaloneFilesKeepExactFileScopeAndNeverModifyOriginals() async throws {
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let store = fixture.store
+    let file = fixture.root.appendingPathComponent("单独 文件.md")
+    let sibling = fixture.root.appendingPathComponent("neighbor.md")
+    let bytes = Data("# Standalone\n\n![private](image.png)\n\n[neighbor](neighbor.md)".utf8)
+    try bytes.write(to: file)
+    try Data("# Neighbor".utf8).write(to: sibling)
+    store.openFileURL(file)
+    try await fixture.waitForReading()
+    let document = try #require(store.document)
+    #expect(document.isStandalone)
+    #expect(document.access.url == file)
+    #expect(document.rendered.body.contains("<img") == false)
+    #expect(throws: ReaderError.self) { try LocalDocuments.confined(sibling, to: document.access.url) }
+    #expect(store.sources.isEmpty)
+    #expect(store.recentFiles.count == 1)
+    store.removeRecent(try #require(store.recentFiles.first))
+    #expect(store.document == nil)
+    #expect(store.recentFiles.isEmpty)
+    #expect(try Data(contentsOf: file) == bytes)
+    #expect(FileManager.default.fileExists(atPath: sibling.path))
+}
+
+@Test @MainActor func standaloneBookmarksReuseRecordsAndRestoreProgress() async throws {
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let store = fixture.store
+    let file = fixture.root.appendingPathComponent("recent.markdown")
+    try Data("# Recent".utf8).write(to: file)
+    store.openFileURL(file)
+    try await fixture.waitForReading()
+    let original = try #require(store.document)
+    store.recordProgress(0.37, documentKey: original.key)
+    store.openFileURL(file)
+    try await fixture.waitForReading()
+    #expect(store.recentFiles.count == 1)
+    #expect(store.document?.key == original.key)
+    #expect(store.document?.initialProgress == 0.37)
+    let restored = ReaderStore(defaults: fixture.defaults)
+    restored.restoreLastDocument()
+    for _ in 0..<500 where restored.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+    #expect(restored.document?.isStandalone == true)
+    #expect(restored.document?.key == original.key)
+    #expect(restored.document?.initialProgress == 0.37)
+}
+
+@Test @MainActor func externalFilesReuseGrantedFoldersAndNewRequestsWin() async throws {
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let store = fixture.store
+    let source = try fixture.add("Existing")
+    let file = try #require(source.url).appendingPathComponent("in-folder.md")
+    try Data("# Existing folder".utf8).write(to: file)
+    store.openFileURL(file)
+    try await fixture.waitForReading()
+    #expect(store.document?.sourceID == source.id)
+    #expect(store.document?.isStandalone == false)
+    #expect(store.recentFiles.isEmpty)
+    let first = fixture.root.appendingPathComponent("first.md")
+    let latest = fixture.root.appendingPathComponent("latest.md")
+    try Data("# First".utf8).write(to: first)
+    try Data("# Latest".utf8).write(to: latest)
+    store.openFileURL(first)
+    store.openFileURL(latest)
+    store.restoreLastDocument() // A late startup task must not replace the external URL.
+    try await fixture.waitForReading()
+    #expect(store.document?.url == latest)
+    #expect(store.document?.rendered.body.contains("Latest") == true)
+    #expect(store.recentFiles.count == 1)
+    store.openFileURL(URL(string: "https://example.com/remote.md")!)
+    #expect(store.document?.url == latest)
+    #expect(store.error != nil)
+}
+
+@Test @MainActor func missingStandaloneFilesRetainTheirRecentRecord() async throws {
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let store = fixture.store
+    let file = fixture.root.appendingPathComponent("moved.md")
+    try Data("# Kept".utf8).write(to: file)
+    store.openFileURL(file)
+    try await fixture.waitForReading()
+    let id = store.document?.id
+    let recent = try #require(store.recentFiles.first)
+    try FileManager.default.removeItem(at: file)
+    store.openRecent(recent)
+    try await fixture.waitForReading()
+    #expect(store.recentFiles.count == 1)
+    #expect(store.document?.id == id)
+    #expect(store.error != nil)
+}
+
+@Test @MainActor func explicitlyAddingContainingFolderUpgradesTheOpenFileScope() async throws {
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let store = fixture.store
+    let file = fixture.root.appendingPathComponent("note.md")
+    try Data("# Scope upgrade\n\n![picture](picture.png)".utf8).write(to: file)
+    store.openFileURL(file)
+    try await fixture.waitForReading()
+    #expect(store.document?.isStandalone == true)
+    store.recordProgress(0.23, documentKey: try #require(store.document?.key))
+    store.addFolder(fixture.root)
+    try await fixture.waitForReading()
+    #expect(store.document?.isStandalone == false)
+    #expect(store.document?.access.url == fixture.root)
+    #expect(store.document?.initialProgress == 0.23)
+    #expect(store.document?.rendered.body.contains("<img") == true)
+}
