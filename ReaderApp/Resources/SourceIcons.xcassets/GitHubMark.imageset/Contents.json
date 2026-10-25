@@ -1,0 +1,25 @@
+{
+  "images": [
+    {
+      "filename": "Black.pdf",
+      "idiom": "universal"
+    },
+    {
+      "filename": "White.pdf",
+      "idiom": "universal",
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ]
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  },
+  "properties": {
+    "preserves-vector-representation": true
+  }
+}

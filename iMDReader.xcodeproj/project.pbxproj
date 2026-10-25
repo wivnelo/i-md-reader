@@ -1,0 +1,48 @@
+// !$*UTF8*$!
+{archiveVersion = 1; classes = {}; objectVersion = 56; objects = {
+2AE9A62FB9064D69A82FFFDE = { isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+43A53C62141F4DC9907C9982 = { isa = PBXBuildFile; fileRef = 2AE9A62FB9064D69A82FFFDE; };
+7C39C7D350A74138B0AAEE47 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderLanguage.swift; sourceTree = "<group>"; };
+FB156D3403264C478DB190E3 = { isa = PBXBuildFile; fileRef = 7C39C7D350A74138B0AAEE47; };
+1D4CBD419F4B4338B8D9530F = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderPalette.swift; sourceTree = "<group>"; };
+A28E1954B88349B783A28327 = { isa = PBXBuildFile; fileRef = 1D4CBD419F4B4338B8D9530F; };
+2D763E8155E478B971DA0622 = { isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = SourceIcons.xcassets; sourceTree = "<group>"; };
+53B84C0394C19B626D784101 = { isa = PBXBuildFile; fileRef = 2D763E8155E478B971DA0622; };
+0E8377325D1F072189F7E0CE = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderApp.swift; sourceTree = "<group>"; };
+4C97D8BDCB6A7A4E3A064606 = { isa = PBXBuildFile; fileRef = 0E8377325D1F072189F7E0CE; };
+B9E6E5F8AE5CAD19341DB6D0 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderStore.swift; sourceTree = "<group>"; };
+78C9F82E21183A4B6E853E0A = { isa = PBXBuildFile; fileRef = B9E6E5F8AE5CAD19341DB6D0; };
+F65A8BCBEEEED8A00BCA08A6 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderScreen.swift; sourceTree = "<group>"; };
+73E66D9A565F037C2ACA96E1 = { isa = PBXBuildFile; fileRef = F65A8BCBEEEED8A00BCA08A6; };
+776781A46A6F701E65F625ED = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderWebView.swift; sourceTree = "<group>"; };
+287908AEA17BB8C7BC844B5A = { isa = PBXBuildFile; fileRef = 776781A46A6F701E65F625ED; };
+9FF214E856734BF8A8B2EA42 = { isa = PBXFileReference; lastKnownFileType = text.css; path = reader.css; sourceTree = "<group>"; };
+299B8BA599EC9E23DEF6D369 = { isa = PBXBuildFile; fileRef = 9FF214E856734BF8A8B2EA42; };
+8C545750C8565159BBB38417 = { isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = reader.js; sourceTree = "<group>"; };
+3FB716126A8ACC0739BEAC56 = { isa = PBXBuildFile; fileRef = 8C545750C8565159BBB38417; };
+BC228B269CE0D87FC0DDEAED = { isa = PBXFileReference; lastKnownFileType = folder; path = Samples; sourceTree = "<group>"; };
+95556436FCE858395D0D1365 = { isa = PBXBuildFile; fileRef = BC228B269CE0D87FC0DDEAED; };
+F8AA82B42D07D108ED357335 = { isa = PBXFileReference; lastKnownFileType = folder; path = Vendor; sourceTree = "<group>"; };
+3FF96CCF6B594BCDBC7F7F69 = { isa = PBXBuildFile; fileRef = F8AA82B42D07D108ED357335; };
+39B094970D276CB11C8BF4CD = { isa = PBXFileReference; lastKnownFileType = text; path = ThirdPartyNotices.txt; sourceTree = "<group>"; };
+969307346474F581A2BD6585 = { isa = PBXBuildFile; fileRef = 39B094970D276CB11C8BF4CD; };
+41D311A605520FC7B8B9A980 = { isa = PBXGroup; path = Resources; sourceTree = "<group>"; children = (2AE9A62FB9064D69A82FFFDE,2D763E8155E478B971DA0622,9FF214E856734BF8A8B2EA42,8C545750C8565159BBB38417,BC228B269CE0D87FC0DDEAED,F8AA82B42D07D108ED357335,39B094970D276CB11C8BF4CD,); };
+E17E80AD8E2103CF3FC3FD96 = { isa = PBXGroup; path = ReaderApp; sourceTree = "<group>"; children = (7C39C7D350A74138B0AAEE47,1D4CBD419F4B4338B8D9530F,0E8377325D1F072189F7E0CE,B9E6E5F8AE5CAD19341DB6D0,F65A8BCBEEEED8A00BCA08A6,776781A46A6F701E65F625ED,41D311A605520FC7B8B9A980,); };
+A8792157CB4F27FB949C035F = { isa = PBXFileReference; explicitFileType = wrapper.application; path = iMDReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+0A3E27B8CA818264D75C8D81 = { isa = PBXGroup; name = Products; sourceTree = "<group>"; children = (A8792157CB4F27FB949C035F,); };
+0D6E4079E36703EBD37C0072 = { isa = PBXGroup; sourceTree = "<group>"; children = (E17E80AD8E2103CF3FC3FD96,0A3E27B8CA818264D75C8D81,); };
+BC4A71180870F7945155FBB0 = { isa = XCLocalSwiftPackageReference; relativePath = ReaderCore; };
+8CE3E71EF8635D2BF27913BB = { isa = XCSwiftPackageProductDependency; package = BC4A71180870F7945155FBB0; productName = ReaderCore; };
+72F02CC62F1D97B34BF99D39 = { isa = PBXBuildFile; productRef = 8CE3E71EF8635D2BF27913BB; };
+878A52FC5FF6A57D50B7B870 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (FB156D3403264C478DB190E3,A28E1954B88349B783A28327,4C97D8BDCB6A7A4E3A064606,78C9F82E21183A4B6E853E0A,73E66D9A565F037C2ACA96E1,287908AEA17BB8C7BC844B5A,); runOnlyForDeploymentPostprocessing = 0; };
+E2AA269EB967A8853A258BFA = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (72F02CC62F1D97B34BF99D39,); runOnlyForDeploymentPostprocessing = 0; };
+3CFB531B63424146A7338AEA = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (43A53C62141F4DC9907C9982,53B84C0394C19B626D784101,299B8BA599EC9E23DEF6D369,3FB716126A8ACC0739BEAC56,95556436FCE858395D0D1365,3FF96CCF6B594BCDBC7F7F69,969307346474F581A2BD6585,); runOnlyForDeploymentPostprocessing = 0; };
+73EBF6644258C120893E685D = { isa = XCBuildConfiguration; name = Debug; buildSettings = {SWIFT_VERSION = 6.0; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; CLANG_ENABLE_MODULES = YES; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; DEBUG_INFORMATION_FORMAT = dwarf;}; };
+0B0C687DF8B6B8DC790B519C = { isa = XCBuildConfiguration; name = Release; buildSettings = {SWIFT_VERSION = 6.0; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; CLANG_ENABLE_MODULES = YES; SWIFT_OPTIMIZATION_LEVEL = "-O"; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";}; };
+76F8DEC3DFE0BDB465198890 = { isa = XCConfigurationList; buildConfigurations = (73EBF6644258C120893E685D,0B0C687DF8B6B8DC790B519C,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+6C7EFF6369083C8E1F2B1994 = { isa = XCBuildConfiguration; name = Debug; buildSettings = {SWIFT_VERSION = 6.0; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; CLANG_ENABLE_MODULES = YES; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; DEBUG_INFORMATION_FORMAT = dwarf; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; PRODUCT_NAME = "$(TARGET_NAME)"; PRODUCT_BUNDLE_IDENTIFIER = com.example.ipadmarkdownreader; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = "iMDReader"; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books"; INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES; INFOPLIST_KEY_UILaunchScreen_Generation = YES; INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES; INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"; TARGETED_DEVICE_FAMILY = 2; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; MARKETING_VERSION = 0.1.0; SWIFT_EMIT_LOC_STRINGS = YES;}; };
+DD75E2CB1C510A828AC72D96 = { isa = XCBuildConfiguration; name = Release; buildSettings = {SWIFT_VERSION = 6.0; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; CLANG_ENABLE_MODULES = YES; SWIFT_OPTIMIZATION_LEVEL = "-O"; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; PRODUCT_NAME = "$(TARGET_NAME)"; PRODUCT_BUNDLE_IDENTIFIER = com.example.ipadmarkdownreader; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = "iMDReader"; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books"; INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES; INFOPLIST_KEY_UILaunchScreen_Generation = YES; INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES; INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"; TARGETED_DEVICE_FAMILY = 2; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; MARKETING_VERSION = 0.1.0; SWIFT_EMIT_LOC_STRINGS = YES;}; };
+1B672BF3DA427763BF644BE3 = { isa = XCConfigurationList; buildConfigurations = (6C7EFF6369083C8E1F2B1994,DD75E2CB1C510A828AC72D96,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+34A04005BCAF206EEC990BD9 = { isa = PBXNativeTarget; name = iMDReader; productName = iMDReader; productType = "com.apple.product-type.application"; productReference = A8792157CB4F27FB949C035F; buildConfigurationList = 1B672BF3DA427763BF644BE3; buildPhases = (878A52FC5FF6A57D50B7B870,E2AA269EB967A8853A258BFA,3CFB531B63424146A7338AEA,); buildRules = (); dependencies = (); packageProductDependencies = (8CE3E71EF8635D2BF27913BB,); };
+244210E48437B6556980A702 = { isa = PBXProject; attributes = { LastUpgradeCheck = 2710; }; buildConfigurationList = 76F8DEC3DFE0BDB465198890; compatibilityVersion = "Xcode 14.0"; developmentRegion = zh-Hans; knownRegions = (en, Base, "zh-Hans"); mainGroup = 0D6E4079E36703EBD37C0072; productRefGroup = 0A3E27B8CA818264D75C8D81; projectDirPath = ""; projectRoot = ""; targets = (34A04005BCAF206EEC990BD9,); packageReferences = (BC4A71180870F7945155FBB0,); };
+}; rootObject = 244210E48437B6556980A702; }
