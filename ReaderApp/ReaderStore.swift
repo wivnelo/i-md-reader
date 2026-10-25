@@ -530,6 +530,23 @@ struct OpenDocument {
         } catch { self.error = "文件暂时无法访问，记录已保留，请稍后重试。" }
     }
 
+    func clearRecentFiles() {
+        // Cancel a pending standalone open so it cannot recreate cleared history.
+        if selectedKey?.hasPrefix("file:") == true && isLoading {
+            readingTask?.cancel(); isLoading = false
+            selectedKey = document?.key
+        }
+        for recent in recentFiles { positions[recent.key] = nil }
+        if defaults.string(forKey: "lastDocument")?.hasPrefix("file:") == true {
+            defaults.removeObject(forKey: "lastDocument")
+        }
+        recentFiles.removeAll()
+        savedFiles.removeAll()
+        defaults.set(positions, forKey: "positions")
+        persistRecentFiles()
+        // Keep the current document and its exact file grant alive for reading.
+    }
+
     func removeRecent(_ recent: RecentFile) {
         if selectedKey == recent.key {
             readingTask?.cancel(); isLoading = false

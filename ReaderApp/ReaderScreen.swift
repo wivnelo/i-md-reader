@@ -23,6 +23,7 @@ struct ReaderScreen: View {
     @State private var showAppearance = false
     @State private var draggingFolder: String?
     @State private var sourceInsertion: SourceInsertion?
+    @State private var findRequest = 0
     @State private var anchor: String?
     @State private var prefersSingleColumn = false
     @State private var renderingID: UUID?
@@ -82,8 +83,13 @@ struct ReaderScreen: View {
                                     .background(store.selectedKey == file.key ? colors.selection : .clear, in: RoundedRectangle(cornerRadius: 9))
                             }
                         } header: {
-                            Text("最近文件").font(.caption).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(12).background(colors.sidebar)
+                            HStack {
+                                Text("最近文件").font(.caption).foregroundStyle(.secondary)
+                                Spacer()
+                                Button("清空") { store.clearRecentFiles() }
+                                    .font(.caption).accessibilityLabel("清空最近文件")
+                                    .frame(minWidth: 44, minHeight: 44)
+                            }.padding(.horizontal, 12).background(colors.sidebar)
                         }
                     }
                     Text("仅阅读，不修改源文件").font(.footnote).foregroundStyle(.secondary).padding(16)
@@ -134,7 +140,7 @@ struct ReaderScreen: View {
                                 Button("添加所在文件夹") { selectingMarkdown = false; importing = true }.font(.caption)
                             }.padding(.horizontal, 20).padding(.vertical, 8)
                         }
-                        ReaderWebView(document: document, fontSize: scaledSize, dark: dark, palette: palette, language: language.resolved(), reduceMotion: reduceMotion, anchor: $anchor,
+                        ReaderWebView(document: document, fontSize: scaledSize, dark: dark, palette: palette, language: language.resolved(), reduceMotion: reduceMotion, findRequest: findRequest, anchor: $anchor,
                                       onProgress: { store.recordProgress($0, documentKey: document.key) },
                                       onInternalLink: { url in
                                           if let source = store.sources.first(where: { $0.id == document.sourceID }) { store.open(url, source: source) }
@@ -170,6 +176,9 @@ struct ReaderScreen: View {
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     if let document = store.document {
+                        Button { findRequest += 1 } label: { Label("文内查找", systemImage: "magnifyingglass") }
+                            .keyboardShortcut("f", modifiers: .command)
+                            .disabled(store.isLoading || renderingID != nil)
                         Menu {
                             if document.rendered.headings.isEmpty { Text("这篇文章没有标题") }
                             ForEach(document.rendered.headings) { heading in

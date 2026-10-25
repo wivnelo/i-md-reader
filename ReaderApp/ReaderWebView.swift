@@ -9,6 +9,7 @@ struct ReaderWebView: UIViewRepresentable {
     let palette: ReaderPalette
     let language: String
     let reduceMotion: Bool
+    let findRequest: Int
     @Binding var anchor: String?
     let onProgress: (Double) -> Void
     let onInternalLink: (URL) -> Void
@@ -31,6 +32,7 @@ struct ReaderWebView: UIViewRepresentable {
             configuration.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true, in: .defaultClient))
         }
         let web = WKWebView(frame: .zero, configuration: configuration)
+        web.isFindInteractionEnabled = true
         web.isOpaque = false
         web.backgroundColor = .clear
         web.scrollView.backgroundColor = .clear
@@ -54,6 +56,11 @@ struct ReaderWebView: UIViewRepresentable {
     }
     func updateUIView(_ web: WKWebView, context: Context) {
         context.coordinator.parent = self
+        if context.coordinator.lastFindRequest != findRequest {
+            context.coordinator.lastFindRequest = findRequest
+            // ShowingReplace is always false: the reader never offers editing.
+            web.findInteraction?.presentFindNavigator(showingReplace: false)
+        }
         let appearance = "\(fontSize)-\(dark)-\(palette.rawValue)-\(language)"
         if appearance != context.coordinator.appearance {
             context.coordinator.appearance = appearance
@@ -71,6 +78,7 @@ struct ReaderWebView: UIViewRepresentable {
         return "document.documentElement.dataset.uiLanguage='\(language)';document.documentElement.dataset.theme='\(theme)';document.documentElement.style.cssText='\(palette.colors(dark: dark).cssVariables)';document.body.style.fontSize='\(fontSize)px';"
     }
     static func dismantleUIView(_ web: WKWebView, coordinator: Coordinator) {
+        web.findInteraction?.dismissFindNavigator()
         web.stopLoading()
         web.configuration.userContentController.removeScriptMessageHandler(forName: "reader", contentWorld: .defaultClient)
         web.navigationDelegate = nil
@@ -79,8 +87,9 @@ struct ReaderWebView: UIViewRepresentable {
     @MainActor final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         var parent: ReaderWebView
         var appearance: String?
+        var lastFindRequest: Int
         var lastAnchor: String?
-        init(_ parent: ReaderWebView) { self.parent = parent }
+        init(_ parent: ReaderWebView) { self.parent = parent; lastFindRequest = parent.findRequest }
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             guard message.frameInfo.isMainFrame, let body = message.body as? [String: Any], let type = body["type"] as? String else { return }
             if type == "progress", let value = body["value"] as? Double { parent.onProgress(value) }

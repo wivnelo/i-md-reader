@@ -572,3 +572,31 @@ private actor RemoteFixture {
     #expect(store.document?.initialProgress == 0.23)
     #expect(store.document?.rendered.body.contains("<img") == true)
 }
+
+@Test @MainActor func clearingRecentsPreservesReadingAndFilesButClearsPersistedHistory() async throws {
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let store = fixture.store
+    let first = fixture.root.appendingPathComponent("first.md")
+    let second = fixture.root.appendingPathComponent("second.md")
+    let bytes = Data("# Unchanged".utf8)
+    try bytes.write(to: first)
+    try bytes.write(to: second)
+    store.openFileURL(first)
+    try await fixture.waitForReading()
+    store.openFileURL(second)
+    try await fixture.waitForReading()
+    let documentID = store.document?.id
+    store.clearRecentFiles()
+    #expect(store.recentFiles.isEmpty)
+    #expect(store.document?.id == documentID)
+    #expect(ReaderStore(defaults: fixture.defaults).recentFiles.isEmpty)
+    #expect(fixture.defaults.string(forKey: "lastDocument") == nil)
+    #expect(try Data(contentsOf: first) == bytes)
+    #expect(try Data(contentsOf: second) == bytes)
+    store.openFileURL(first)
+    store.clearRecentFiles()
+    try await Task.sleep(for: .milliseconds(100))
+    #expect(store.recentFiles.isEmpty)
+    #expect(store.document?.id == documentID)
+}
