@@ -76,9 +76,12 @@ import Testing
     try fm.createDirectory(at: root.appendingPathComponent("Folder"), withIntermediateDirectories: true)
     try Data("# 你好".utf8).write(to: root.appendingPathComponent("note.md"))
     try Data().write(to: root.appendingPathComponent("photo.png"))
+    try Data().write(to: root.appendingPathComponent(".hidden.md"))
     try fm.createSymbolicLink(at: root.appendingPathComponent("escape"), withDestinationURL: root.deletingLastPathComponent())
     let children = try LocalDocuments.children(of: root, root: root)
-    #expect(children.map(\.name) == ["Folder", "note.md"])
+    #expect(children.map(\.name) == ["Folder", ".hidden.md", "note.md", "photo.png"])
+    #expect(children.first { $0.name == "photo.png" }?.isMarkdown == false)
+    #expect(children.first { $0.name == "note.md" }?.isMarkdown == true)
     #expect(try LocalDocuments.read(root.appendingPathComponent("note.md"), root: root) == "# 你好")
     #expect(throws: ReaderError.self) { try LocalDocuments.confined(root.appendingPathComponent("escape/secret.md"), to: root) }
     #expect(throws: ReaderError.self) { try LocalDocuments.confined(URL(fileURLWithPath: root.path + "-other/file.md"), to: root) }

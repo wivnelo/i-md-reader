@@ -161,7 +161,7 @@ public struct GitHubReader: Sendable {
             guard entry.submoduleGitURL == nil, entry.type == "dir" || entry.type == "file" else { return false }
             let expected = (path.isEmpty ? "" : path + "/") + entry.name
             guard GitHubLink.validSegment(entry.name), entry.path == expected else { throw GitHubReadError.invalidResponse }
-            return entry.isDirectory || LocalDocuments.markdownExtensions.contains((entry.name as NSString).pathExtension.lowercased())
+            return true
         }.sorted {
             if $0.isDirectory != $1.isDirectory { return $0.isDirectory }
             return $0.name.localizedStandardCompare($1.name) == .orderedAscending
@@ -175,6 +175,15 @@ public struct GitHubReader: Sendable {
                                      accept: "application/vnd.github.raw+json", limit: 10 * 1_024 * 1_024)
         guard let text = String(data: data, encoding: .utf8) else { throw ReaderError.invalidEncoding }
         return text
+    }
+
+    /// Read raster assets from the same immutable commit as the document.
+    public func image(_ location: GitHubLocation, path: String) async throws -> Data {
+        guard ["png", "jpg", "jpeg", "gif", "webp"].contains((path as NSString).pathExtension.lowercased()) else {
+            throw ReaderError.unsupportedFile
+        }
+        return try await request(location.link, endpoint: ["contents"] + (try segments(path)), ref: location.commit,
+                                 accept: "application/vnd.github.raw+json", limit: 8 * 1_024 * 1_024)
     }
 
     private func segments(_ path: String) throws -> [String] {

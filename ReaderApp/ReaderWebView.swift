@@ -21,7 +21,7 @@ struct ReaderWebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .nonPersistent()
-        configuration.setURLSchemeHandler(LocalResourceHandler(root: document.access.url), forURLScheme: "reader-resource")
+        configuration.setURLSchemeHandler(LocalResourceHandler(root: document.access.url, imageLoader: document.imageLoader), forURLScheme: "reader-resource")
         let bridge = WeakScriptHandler(context.coordinator)
         configuration.userContentController.add(bridge, contentWorld: .defaultClient, name: "reader")
         if let url = Bundle.main.url(forResource: "highlight.min", withExtension: "js", subdirectory: "Vendor"),
@@ -151,7 +151,10 @@ struct ReaderWebView: UIViewRepresentable {
 @MainActor private final class LocalResourceHandler: NSObject, WKURLSchemeHandler {
     let root: URL
     private var tasks: [ObjectIdentifier: Task<Void, Never>] = [:]
-    init(root: URL) { self.root = root }
+    let imageLoader: (@Sendable (String) async throws -> Data)?
+    init(root: URL, imageLoader: (@Sendable (String) async throws -> Data)?) {
+        self.root = root; self.imageLoader = imageLoader
+    }
     func webView(_ webView: WKWebView, start urlSchemeTask: any WKURLSchemeTask) {
         let id = ObjectIdentifier(urlSchemeTask)
         let root = self.root
@@ -162,13 +165,19 @@ struct ReaderWebView: UIViewRepresentable {
                 let file = try LocalDocuments.resourceURL(url, root: root)
                 let mimeTypes = ["png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "gif": "image/gif", "webp": "image/webp"]
                 guard let mime = mimeTypes[file.pathExtension.lowercased()] else { throw ReaderError.unsupportedFile }
-                let data = try await Task.detached(priority: .utility) {
+                let data: Data
+                if let imageLoader {
+                    let relative = try LocalDocuments.relativePath(of: file, to: root)
+                    data = try await imageLoader(relative)
+                } else {
+                data = try await Task.detached(priority: .utility) {
                     let handle = try FileHandle(forReadingFrom: file)
                     defer { try? handle.close() }
                     let data = try handle.read(upToCount: 20 * 1024 * 1024 + 1) ?? Data()
                     guard data.count <= 20 * 1024 * 1024 else { throw ReaderError.tooLarge }
                     return data
                 }.value
+                }
                 guard !Task.isCancelled else { return }
                 urlSchemeTask.didReceive(URLResponse(url: url, mimeType: mime, expectedContentLength: data.count, textEncodingName: nil))
                 urlSchemeTask.didReceive(data)

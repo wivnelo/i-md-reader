@@ -81,7 +81,7 @@ private func response(_ value: String, status: Int = 200, headers: [String: Stri
         """)
     }
     let location = try await reader.resolve(GitHubLink("https://github.com/o/r/tree/main/docs"), explicitReference: "main")
-    #expect(try await reader.children(location).map(\.name) == ["A", "z.md"])
+    #expect(try await reader.children(location).map(\.name) == ["A", "photo.png", "z.md"])
     let invalid = GitHubReader { _, _ in response("[{\"name\":\"a.md\",\"path\":\"../a.md\",\"sha\":\"1\",\"type\":\"file\"}]") }
     await #expect(throws: GitHubReadError.invalidResponse) { try await invalid.children(location) }
 }
@@ -128,4 +128,21 @@ func readsPublicGitHubThroughRealTransport() async throws {
     #expect(directory.path == "Sources")
     let text = try await reader.markdown(document)
     #expect(text.contains("Markdown"))
+}
+
+@Test func repositoryImagesUsePinnedCommitAndBoundedRawRequest() async throws {
+    let bytes = Data([137, 80, 78, 71, 13, 10, 26, 10])
+    let reader = GitHubReader { request, limit in
+        #expect(request.url?.host == "api.github.com")
+        #expect(request.url?.path == "/repos/o/r/contents/docs/图.png")
+        #expect(URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems?.first?.value == commitSHA)
+        #expect(limit == 8 * 1_024 * 1_024)
+        #expect(request.value(forHTTPHeaderField: "Accept") == "application/vnd.github.raw+json")
+        return .init(data: bytes, status: 200, headers: [:])
+    }
+    let location = GitHubLocation(link: try GitHubLink("https://github.com/o/r"), reference: "main", commit: commitSHA, path: "")
+    #expect(try await reader.image(location, path: "docs/图.png") == bytes)
+    for path in ["../secret.png", "a/../../secret.png", "a.svg", "a.md"] {
+        await #expect(throws: (any Error).self) { try await reader.image(location, path: path) }
+    }
 }

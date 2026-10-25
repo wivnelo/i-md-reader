@@ -342,6 +342,8 @@ private actor RemoteFixture {
             ]
             if version > 1 { entries.append(["name":"added.md", "path":"docs/added.md", "sha":"x", "type":"file"]) }
             return .init(data: try JSONSerialization.data(withJSONObject: entries), status: 200)
+        } else if path == "/repos/test/repo/contents/docs/image.png" {
+            return .init(data: Data([137, 80, 78, 71]), status: 200)
         } else if path.hasSuffix(".md") {
             let ref = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems?.first?.value ?? ""
             text = "# Version \(ref.first.map(String.init) ?? "?")\n\n[Next](nested/linked.md)\n\n![Image](image.png)"
@@ -364,8 +366,9 @@ private actor RemoteFixture {
     store.open(root.appendingPathComponent("readme.md"), source: source)
     try await fixture.waitForReading()
     #expect(store.document?.rendered.body.contains("Version 1") == true)
-    #expect(store.document?.rendered.body.contains("图片暂未加载") == true)
-    #expect(store.document?.rendered.body.contains("<img") == false)
+    #expect(store.document?.rendered.body.contains("<img") == true)
+    let loadImage = try #require(store.document?.imageLoader)
+    #expect(try await loadImage("image.png") == Data([137, 80, 78, 71]))
     store.open(root.appendingPathComponent("nested/linked.md"), source: source)
     try await fixture.waitForReading()
     #expect(store.expanded.contains(store.key(source: source, url: root.appendingPathComponent("nested"))))

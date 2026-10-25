@@ -65,6 +65,7 @@ struct OpenDocument {
     let rendered: RenderedDocument
     let initialProgress: Double
     var isStandalone = false
+    var imageLoader: (@Sendable (String) async throws -> Data)? = nil
 }
 
 @MainActor final class ReaderStore: ObservableObject {
@@ -460,12 +461,19 @@ struct OpenDocument {
         readingTask = Task {
             do {
                 let rendered: RenderedDocument
+                var imageLoader: (@Sendable (String) async throws -> Data)?
                 if source.remote != nil {
                     let location = try await remoteLocation(source)
                     let path = try remotePath(url, source: source, location: location)
                     let text = try await github.markdown(location, path: path)
+                    let base = remoteBase(location)
+                    let reader = github
+                    imageLoader = { relative in
+                        let path = [base, relative].filter { !$0.isEmpty }.joined(separator: "/")
+                        return try await reader.image(location, path: path)
+                    }
                     rendered = await Task.detached(priority: .userInitiated) {
-                        MarkdownRenderer().render(text, allowRelativeImages: false)
+                        MarkdownRenderer().render(text)
                     }.value
                 } else {
                 rendered = try await Task.detached(priority: .userInitiated) {
@@ -484,7 +492,7 @@ struct OpenDocument {
                 }
                 guard !Task.isCancelled, sources.contains(where: { $0.id == source.id && $0.access === access }) else { return }
                 reveal(url, source: source)
-                document = OpenDocument(key: id, url: url, sourceID: source.id, access: access, rendered: rendered, initialProgress: positions[id] ?? 0)
+                document = OpenDocument(key: id, url: url, sourceID: source.id, access: access, rendered: rendered, initialProgress: positions[id] ?? 0, imageLoader: imageLoader)
                 progress = positions[id] ?? 0
                 defaults.set(id, forKey: "lastDocument")
             } catch {

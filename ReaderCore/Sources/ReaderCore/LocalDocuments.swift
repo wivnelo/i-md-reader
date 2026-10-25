@@ -17,6 +17,7 @@ public struct FileNode: Identifiable, Sendable {
     public let isDirectory: Bool
     public var id: String { url.path }
     public var name: String { url.lastPathComponent }
+    public var isMarkdown: Bool { !isDirectory && LocalDocuments.markdownExtensions.contains(url.pathExtension.lowercased()) }
     public init(url: URL, isDirectory: Bool) { self.url = url; self.isDirectory = isDirectory }
 }
 
@@ -65,13 +66,13 @@ public enum LocalDocuments {
     public static func children(of directory: URL, root: URL) throws -> [FileNode] {
         let directory = try confined(directory, to: root)
         let keys: Set<URLResourceKey> = [.isDirectoryKey, .isRegularFileKey, .isSymbolicLinkKey]
-        return try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: Array(keys), options: [.skipsHiddenFiles])
+        return try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: Array(keys), options: [])
             .compactMap { url -> FileNode? in
                 let values = try url.resourceValues(forKeys: keys)
                 // Do not recurse into symlinks; this also prevents directory cycles.
                 guard values.isSymbolicLink != true else { return nil }
                 if values.isDirectory == true { return FileNode(url: url, isDirectory: true) }
-                guard values.isRegularFile == true, markdownExtensions.contains(url.pathExtension.lowercased()) else { return nil }
+                guard values.isRegularFile == true else { return nil }
                 return FileNode(url: url, isDirectory: false)
             }.sorted {
                 if $0.isDirectory != $1.isDirectory { return $0.isDirectory }

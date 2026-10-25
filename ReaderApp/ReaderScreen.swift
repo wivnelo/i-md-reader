@@ -542,7 +542,6 @@ private struct TreeDirectory: View {
                         }
                     }.padding(.leading, 24)
                 } else if let nodes = store.nodes[key] {
-                    if nodes.isEmpty { Text("没有 Markdown 文档").font(.caption).foregroundStyle(.secondary).padding(.leading, 30).padding(.vertical, 8) }
                     ForEach(nodes) { node in
                         if node.isDirectory {
                             // Type erase only the recursive edge; the tree is loaded one directory at a time.
@@ -551,12 +550,14 @@ private struct TreeDirectory: View {
                             let selected = store.selectedKey == store.key(source: source, url: node.url)
                             Button { onOpenDocument(); store.open(node.url, source: source) } label: {
                                 HStack(spacing: 10) {
-                                    Image(systemName: "doc.text").foregroundStyle(.secondary)
+                                    Image(systemName: node.isMarkdown ? "doc.text" : "doc").foregroundStyle(.secondary)
                                     Text(node.name).lineLimit(1).truncationMode(.middle)
                                     Spacer(minLength: 0)
                                 }.font(.subheadline).padding(.leading, CGFloat(min(level + 1, 5) * 14 + 32)).padding(.trailing, 12)
                                     .frame(minHeight: 44).contentShape(Rectangle())
                             }.buttonStyle(.plain)
+                                .disabled(!node.isMarkdown)
+                                .foregroundStyle(node.isMarkdown ? .primary : .tertiary)
                                 .background(selected ? selection : .clear, in: RoundedRectangle(cornerRadius: 9))
                                 .accessibilityAddTraits(selected ? .isSelected : [])
                                 .accessibilityHint(node.url.path)
