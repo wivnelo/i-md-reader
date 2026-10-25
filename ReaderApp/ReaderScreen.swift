@@ -3,6 +3,17 @@ import UniformTypeIdentifiers
 import ReaderCore
 
 struct ReaderScreen: View {
+    // Other installed apps can register the same extension under another UTI.
+    // Include every system-resolved Markdown type; the store still validates the
+    // actual extension before reading, rather than trusting a third-party UTI.
+    private static var markdownPickerTypes: [UTType] {
+        var types = [UTType(importedAs: "net.daringfireball.markdown")]
+        for ext in ["md", "markdown"] {
+            types += UTType.types(tag: ext, tagClass: .filenameExtension, conformingTo: nil)
+        }
+        return Array(Set(types))
+    }
+
     @StateObject private var store = ReaderStore()
     @State private var visibility: NavigationSplitViewVisibility = .detailOnly
     @State private var compactColumn: NavigationSplitViewColumn = .detail
@@ -199,7 +210,7 @@ struct ReaderScreen: View {
         }
         .sheet(isPresented: $addingGitHub) { GitHubAddSheet(store: store) }
         .onOpenURL { store.openFileURL($0); showReadingColumn() }
-        .fileImporter(isPresented: $importing, allowedContentTypes: selectingMarkdown ? [UTType(importedAs: "net.daringfireball.markdown")] : [.folder], allowsMultipleSelection: false) { result in
+        .fileImporter(isPresented: $importing, allowedContentTypes: selectingMarkdown ? Self.markdownPickerTypes : [.folder], allowsMultipleSelection: false) { result in
             switch result {
             case .success(let urls):
                 if let url = urls.first {
