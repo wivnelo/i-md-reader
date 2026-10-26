@@ -135,3 +135,25 @@ private func requestLocation(_ sha: String = String(repeating: "a", count: 40)) 
     _ = try await reader.markdown(location, path: "note.md")
     #expect(await counter.count == 2)
 }
+
+@Test func directoryListingsHideDotNamesAtEveryLevelWithoutBlockingDirectReads() async throws {
+    let reader = GitHubReader { request, _ in
+        if request.value(forHTTPHeaderField: "Accept") == "application/vnd.github.raw+json" {
+            return .init(data: Data("# Hidden document".utf8), status: 200)
+        }
+        let nested = request.url!.path.hasSuffix("/Folder")
+        let prefix = nested ? "Folder/" : ""
+        let entries = [
+            ["name": ".github", "path": prefix + ".github", "type": "dir", "sha": "fixture"],
+            ["name": ".hidden.md", "path": prefix + ".hidden.md", "type": "file", "sha": "fixture"],
+            ["name": "Folder", "path": prefix + "Folder", "type": "dir", "sha": "fixture"],
+            ["name": "visible.md", "path": prefix + "visible.md", "type": "file", "sha": "fixture"]
+        ]
+        return .init(data: try JSONSerialization.data(withJSONObject: entries), status: 200)
+    }
+    let location = try requestLocation()
+    for path in ["", "Folder"] {
+        #expect(try await reader.children(location, path: path).map(\.name) == ["Folder", "visible.md"])
+    }
+    #expect(try await reader.markdown(location, path: ".hidden.md") == "# Hidden document")
+}

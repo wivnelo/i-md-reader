@@ -2,13 +2,11 @@
 
 轻量、原生、只读的 Markdown 阅读器，支持 Mac、iPad 和 iPhone。
 
-**首个 Mac 正式发行包：0.1.0（build27）。** Universal 二进制支持 Apple Silicon 与 Intel，最低 macOS 14。已通过 Developer ID 签名、Apple 公证、staple 和 Gatekeeper 验证。Apple Silicon 已完成主要真实流程检查；Intel 与 macOS 14 本机运行尚未实测。移动端保留现有源码与功能，本次不发布 App Store 版本。
+**Mac 0.2.0（46）正式包**：Universal 支持 Apple Silicon 与 Intel，最低 macOS 14；Developer ID 签名、Apple 公证及 Gatekeeper 验证通过。iPhone/iPad 当前为开发设备测试版，尚未上架 App Store。
 
-独立审查发现的原生自定义菜单语言问题已按最小范围修复并复测；本版功能冻结，新增需求进入下一版本。
+[0.2.0 发布页面](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.0) · [版本状态与验证限制](docs/STATUS.md)
 
-[发布页面](https://github.com/wivnelo/i-md-reader/releases/tag/v0.1.0) · [验证结果与限制](docs/STATUS.md)
-
-解压后将 iMDReader.app 放入“应用程序”即可使用。已有用户应保留原App标识及数据，不卸载清空沙箱；可用 `shasum -a 256` 与Release附带的SHA256SUMS.txt核对ZIP。无需关闭Gatekeeper。
+推荐下载 DMG，打开后将 iMDReader.app 拖入 Applications。已有安装直接覆盖，保留资料库；不必卸载或关闭 Gatekeeper。另提供 ZIP 与 SHA256SUMS.txt 供校验。[0.1.0 历史版本](https://github.com/wivnelo/i-md-reader/releases/tag/v0.1.0)保持不变。
 
 ![iMDReader 原生界面](design/previews/imdreader-name.png)
 
@@ -21,11 +19,21 @@
 - **GitHub**：公开仓库及持有细粒度只读令牌的选定私有仓库、子目录、单篇 Markdown 链接；分支解析、固定提交读取、相对 Markdown 导航及每来源刷新。
 - **阅读**：GFM、表格、任务列表、代码高亮/复制、本地和GitHub相对位图、MATLAB等代码块高亮、文章目录、阅读位置、隐藏侧栏。
 - **外观**：浅色/深色、四套低饱和配色；默认 17pt，字号滑杆以 17pt 为中点（范围 12–26pt）。
-- **来源管理**：根标题吸顶、左滑移除、未置顶的顶层长按排序并保存顺序、可折叠置顶分组、收起全部子目录、无障碍上移/下移；移除来源不删除源文件。
+- **来源管理**：根标题吸顶、Mac右键移除/移动端左滑移除、未置顶的顶层长按排序并保存顺序、始终展开的置顶分组、收起全部子目录、无障碍上移/下移；移除来源不删除源文件。
 - **界面语言**：跟随系统、简体中文、English；保存选择，不翻译文档正文或文件名。
 - **刷新保护**：并发请求合并、固定提交响应的受限内存缓存、限流冷却和恢复时间提示。
 
 本期已交付功能用户确认通过；完整平台、异常、性能与无障碍检查按后续计划单独记录。
+
+## 0.2.0 更新
+
+- Mac 顶层来源右键移除，置顶分组三端始终展开；目录树隐藏所有层级点前缀条目。
+- Mac 固定深色图标；启动检查正式更新，点击下载后手动安装。
+- Mac 查找去蓝框，GitHub授权/添加弹窗修复裁切，添加菜单向下展开避开品牌。
+- Mac 保留自动缓存并取消缓存设置；移动端缓存页精简说明。
+- 移动窄屏配色去除重复底色；iPad 品牌与独立加号固定在侧栏顶部。
+
+Mac正式包已安装验证；iPhone/iPad已安装0.2.0（44）。移动缩窗/配色等真机专项仍待验收，Intel/macOS14运行及完整性能/无障碍测试未覆盖；详见STATUS。
 
 ## 下一阶段与专项检查
 
@@ -37,7 +45,7 @@
 
 不开发编辑器、Git 提交/推送、AI、协作或自建服务。
 
-入口：“＋”直接添加MD文件、本地文件夹、GitHub链接；阅读区右上“•••”管理授权和离线缓存；Aa管理阅读外观及语言。
+入口：“＋”直接添加MD文件、本地文件夹、GitHub链接；阅读区右上“•••”管理授权，移动端另保留离线缓存设置；Aa管理阅读外观及语言。
 
 ## 构建与测试
 

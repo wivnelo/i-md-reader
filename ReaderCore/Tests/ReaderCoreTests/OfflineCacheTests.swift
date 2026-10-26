@@ -21,7 +21,7 @@ private actor OfflineServer {
         let text: String
         if path == "/repos/test/repo" { text = "{\"default_branch\":\"main\"}" }
         else if path.contains("/commits/") { text = "{\"sha\":\"" + String(repeating: "a", count: 40) + "\"}" }
-        else if path.hasSuffix("/contents") { text = "[{\"name\":\"note.md\",\"path\":\"note.md\",\"type\":\"file\",\"sha\":\"x\"}]" }
+        else if path.hasSuffix("/contents") { text = "[{\"name\":\"note.md\",\"path\":\"note.md\",\"type\":\"file\",\"sha\":\"x\"},{\"name\":\".hidden.md\",\"path\":\".hidden.md\",\"type\":\"file\",\"sha\":\"y\"}]" }
         else if path.hasSuffix(".png") { return .init(data: Data([137, 80, 78, 71]), status: 200) }
         else { text = "# Private offline marker" }
         return .init(data: Data(text.utf8), status: 200, headers: ["ETag": "test-etag"])
@@ -51,7 +51,7 @@ private func savedFiles(_ root: URL) -> [URL] {
     let reopened = server.reader(cache: GitHubOfflineCache(directory: root))
     let restored = try await reopened.resolve(link)
     #expect(restored.commit == location.commit)
-    #expect(try await reopened.children(restored).first?.name == "note.md")
+    #expect(try await reopened.children(restored).map(\.name) == ["note.md"])
     #expect(try await reopened.markdown(restored, path: "note.md") == text)
     #expect(try await reopened.image(restored, path: "image.png") == image)
     #expect(await reopened.isUsingOfflineCache)

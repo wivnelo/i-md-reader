@@ -174,7 +174,7 @@ public struct GitHubReader: Sendable {
             guard entry.submoduleGitURL == nil, entry.type == "dir" || entry.type == "file" else { return false }
             let expected = (path.isEmpty ? "" : path + "/") + entry.name
             guard GitHubLink.validSegment(entry.name), entry.path == expected else { throw GitHubReadError.invalidResponse }
-            return true
+            return !entry.name.hasPrefix(".")
         }.sorted {
             if $0.isDirectory != $1.isDirectory { return $0.isDirectory }
             return $0.name.localizedStandardCompare($1.name) == .orderedAscending

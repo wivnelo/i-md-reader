@@ -27,3 +27,15 @@ Tinted：Create a monochrome TINTED appearance iOS app icon resource matching th
 ## App 内品牌区
 
 侧栏导航栏采用 32pt 圆角图标 + iMDReader，移除原“资料库”大标题，保留添加来源按钮。ReaderBrand 图片集复用已确认的浅深色图标，跟随 App 当前外观。构建通过；模拟器已检查深色横屏。
+
+## Mac固定深色图标 · 0.2.0正式资源
+
+用户已取消Dock跟随系统明暗，固定使用已确认的深色图标。此决定取代此前运行时方案A；不再保留切换监听、App delegate或DockIconLight/Dark两套冗余imageset。
+
+MacAppIcon.appiconset/AppIcon.png由原AppIcon-Dark.png复用生成：1024×1024画布，将原图绘制至x/y=100、824×824区域，185圆角，保留透明外边距。这与此前已确认运行时深色图的几何参数一致，中间纸页M不重绘。图标通过静态asset catalog打包，Dock/Finder无需等待应用运行时赋值；旧系统图标缓存可能延迟更新，不自动重启Dock或清缓存。
+
+build41源图检查通过，最终build46 Universal正式包已签名公证并安装，已查看源PNG；实际Dock/Finder最终显示待用户确认，不将资源正确等同于缓存已刷新。系统明暗切换不再是需求或验收项目。App内ReaderBrand、iPhone/iPad Light/Dark/Tinted资源未改。
+
+历史：build37–39曾使用运行时方案A，实际Dock切换未完成验收，工具读取超时；此方案已被用户撤回。Icon Composer方案B从未选择或实施。
+
+安装版本与剩余验证见[STATUS](../../docs/STATUS.md)。

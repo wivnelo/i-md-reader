@@ -68,6 +68,7 @@ public enum LocalDocuments {
         let keys: Set<URLResourceKey> = [.isDirectoryKey, .isRegularFileKey, .isSymbolicLinkKey]
         return try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: Array(keys), options: [])
             .compactMap { url -> FileNode? in
+                guard !url.lastPathComponent.hasPrefix(".") else { return nil }
                 let values = try url.resourceValues(forKeys: keys)
                 // Do not recurse into symlinks; this also prevents directory cycles.
                 guard values.isSymbolicLink != true else { return nil }

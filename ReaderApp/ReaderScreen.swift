@@ -24,7 +24,9 @@ struct ReaderScreen: View {
     @State private var selectingMarkdown = false
     @State private var addingGitHub = false
     @State private var managingGitHubAccess = false
+    #if os(iOS)
     @State private var managingOfflineCache = false
+    #endif
     #if os(iOS)
     @State private var appearanceAvailableSize = CGSize(width: 375, height: 667)
     private var mobileAppearanceWidth: CGFloat { min(456, max(0, appearanceAvailableSize.width - 32)) }
@@ -37,7 +39,6 @@ struct ReaderScreen: View {
     @State private var showAppearance = false
     @State private var draggingFolder: String?
     @State private var sourceInsertion: SourceInsertion?
-    @AppStorage("pinnedSourcesExpanded") private var pinnedSourcesExpanded = true
     @State private var findRequest = 0
     @State private var anchor: String?
     @State private var prefersSingleColumn = false
@@ -119,6 +120,17 @@ struct ReaderScreen: View {
                     }
     }
 
+    #if os(iOS)
+    private var mobileAddMenu: some View {
+        Menu {
+            Button("打开 Markdown 文件", systemImage: "doc.text") { selectingMarkdown = true; importing = true }
+            Button("本地文件夹", systemImage: "folder") { selectingMarkdown = false; importing = true }
+            Button("GitHub 链接", systemImage: "link") { addingGitHub = true }
+        } label: { Image(systemName: "plus") }
+            .accessibilityLabel("添加来源")
+    }
+    #endif
+
     private var brandSpacing: CGFloat {
         #if os(macOS)
         8
@@ -156,18 +168,11 @@ struct ReaderScreen: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 8, pinnedViews: [.sectionHeaders]) {
                     if store.orderedSources.contains(where: { store.isPinned($0) }) {
-                        Button { pinnedSourcesExpanded.toggle() } label: {
-                            HStack {
-                                Text("置顶").font(.headline)
-                                Spacer()
-                                Image(systemName: pinnedSourcesExpanded ? "chevron.down" : "chevron.right")
-                                    .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-                            }.padding(.horizontal, 14).frame(minHeight: 44).contentShape(Rectangle())
-                        }.buttonStyle(.plain)
-                            .accessibilityValue(pinnedSourcesExpanded ? Text("已展开") : Text("已收起"))
-                        if pinnedSourcesExpanded {
-                            sourceSections(store.orderedSources.filter { store.isPinned($0) })
-                        }
+                        Text("置顶").font(.headline)
+                            .padding(.horizontal, 14)
+                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                            .accessibilityAddTraits(.isHeader)
+                        sourceSections(store.orderedSources.filter { store.isPinned($0) })
                     }
                     Text("资料库").font(SidebarTypography.caption).foregroundStyle(.secondary).padding(.horizontal, 14).padding(.top, 16)
                     sourceSections(store.orderedSources.filter { !store.isPinned($0) })
@@ -207,8 +212,8 @@ struct ReaderScreen: View {
         #endif
             .toolbar {
                 #if os(iOS)
-                ToolbarItem(placement: leadingToolbar) {
-                    readerBrand
+                if UIDevice.current.userInterfaceIdiom != .pad {
+                    ToolbarItem(placement: leadingToolbar) { readerBrand }
                 }
                 #endif
                 #if os(macOS)
@@ -220,16 +225,28 @@ struct ReaderScreen: View {
                     ToolbarItem(placement: .primaryAction) { macNativeAddButton }
                 }
                 #else
-                ToolbarItem(placement: trailingToolbar) {
-                    Menu {
-                        Button("打开 Markdown 文件", systemImage: "doc.text") { selectingMarkdown = true; importing = true }
-                        Button("本地文件夹", systemImage: "folder") { selectingMarkdown = false; importing = true }
-                        Button("GitHub 链接", systemImage: "link") { addingGitHub = true }
-                    } label: { Image(systemName: "plus") }
-                        .accessibilityLabel("添加来源")
+                if UIDevice.current.userInterfaceIdiom != .pad {
+                    ToolbarItem(placement: trailingToolbar) { mobileAddMenu }
                 }
                 #endif
             }
+            #if os(iOS)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    HStack(spacing: 8) {
+                        readerBrand
+                        Spacer(minLength: 0)
+                        mobileAddMenu
+                            .buttonStyle(.plain)
+                            .frame(width: 44, height: 44)
+                            .background(.regularMaterial, in: Circle())
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(colors.sidebar)
+                }
+            }
+            #endif
             .navigationSplitViewColumnWidth(min: 280, ideal: 300, max: 360)
         } detail: {
             ZStack {
@@ -315,7 +332,8 @@ struct ReaderScreen: View {
                         MacFindField(text: $findText, focusRequest: findFocusRequest,
                                      placeholder: ReaderLanguage.message("文内查找", locale: language.locale),
                                      submit: { findRequest += 1 })
-                            .frame(width: 140)
+                            .padding(.leading, 8)
+                            .frame(width: 140, height: 24)
                         Button { findFocusRequest += 1; findRequest += 1 } label: { Label("查找下一个", systemImage: "magnifyingglass") }
                         #else
                         Button { findRequest += 1 } label: { Label("文内查找", systemImage: "magnifyingglass") }
@@ -342,7 +360,9 @@ struct ReaderScreen: View {
                     }
                     Menu {
                         Button("GitHub 授权", systemImage: "key") { managingGitHubAccess = true }
+                        #if os(iOS)
                         Button("离线缓存", systemImage: "internaldrive") { managingOfflineCache = true }
+                        #endif
                     } label: { Image(systemName: "ellipsis") }
                         .accessibilityLabel("应用设置")
                 }
@@ -378,7 +398,9 @@ struct ReaderScreen: View {
         }
         .sheet(isPresented: $addingGitHub) { GitHubAddSheet(store: store) }
         .sheet(isPresented: $managingGitHubAccess) { GitHubAccessSheet(store: store) }
+        #if os(iOS)
         .sheet(isPresented: $managingOfflineCache) { OfflineCacheSheet(store: store) }
+        #endif
         .onOpenURL { store.openFileURL($0); showReadingColumn() }
         .fileImporter(isPresented: $importing, allowedContentTypes: selectingMarkdown ? Self.markdownPickerTypes : [.folder], allowsMultipleSelection: false) { result in
             switch result {
@@ -525,8 +547,6 @@ struct ReaderScreen: View {
                             }
                             .buttonStyle(.bordered)
                             .tint(paletteValue == option.rawValue ? readerTint : .secondary)
-                            .background(paletteValue == option.rawValue ? readerTint.opacity(0.18) : .clear,
-                                        in: RoundedRectangle(cornerRadius: 8))
                             .accessibilityAddTraits(paletteValue == option.rawValue ? .isSelected : [])
                         }
                     }
@@ -689,11 +709,14 @@ private struct SourceHeader: View {
     let selection: Color
     @Binding var draggingFolder: String?
     @Binding var insertion: SourceInsertion?
+    #if !os(macOS)
     @State private var showingRemove = false
     @GestureState private var drag: CGFloat = 0
     private let actionWidth: CGFloat = 104
+    #endif
     var body: some View {
         ZStack(alignment: .trailing) {
+            #if !os(macOS)
             if !source.isSample {
                 Button(role: .destructive) { store.remove(source) } label: {
                     Text("移除来源").font(.subheadline).foregroundStyle(.white)
@@ -702,6 +725,7 @@ private struct SourceHeader: View {
                 }.buttonStyle(.plain)
                     .accessibilityHidden(!showingRemove)
             }
+            #endif
             Group {
                 if let root = source.url {
                     TreeDirectory(store: store, source: source, url: root, level: 0, selection: selection, draggingFolder: $draggingFolder).directoryHeader
@@ -716,6 +740,7 @@ private struct SourceHeader: View {
             }
             .frame(maxWidth: .infinity)
             .background { SourceHeaderBackground() }
+            #if !os(macOS)
             .offset(x: source.isSample ? 0 : min(0, max(-actionWidth, (showingRemove ? -actionWidth : 0) + drag)))
             .simultaneousGesture(DragGesture(minimumDistance: 24)
                 .updating($drag) { value, state, _ in
@@ -726,6 +751,7 @@ private struct SourceHeader: View {
                     guard !source.isSample, abs(value.translation.width) > abs(value.translation.height) * 1.5 else { return }
                     showingRemove = value.translation.width < -35 || (showingRemove && value.translation.width < 35)
                 })
+            #endif
         }
         .transaction { $0.animation = nil; $0.disablesAnimations = true }
         .clipped()
@@ -735,6 +761,11 @@ private struct SourceHeader: View {
             Button { store.togglePin(source) } label: {
                 Label(store.isPinned(source) ? "取消置顶" : "置顶来源", systemImage: store.isPinned(source) ? "pin.slash" : "pin")
             }
+            #if os(macOS)
+            if !source.isSample {
+                Button("移除来源", systemImage: "minus.circle", role: .destructive) { store.remove(source) }
+            }
+            #endif
         }
         .accessibilityAction(named: "移除来源") { if !source.isSample { store.remove(source) } }
     }
@@ -873,6 +904,7 @@ private struct TreeDirectory: View {
     }
 }
 
+#if os(iOS)
 private struct OfflineCacheSheet: View {
     @State private var failure: String?
     @ObservedObject var store: ReaderStore
@@ -900,19 +932,20 @@ private struct OfflineCacheSheet: View {
                 } footer: {
                     Text("自动缓存读过的 GitHub 文章、已列举目录和加载过的图片。断网或限流时使用已有缓存，不下载整个仓库。清空后保留当前页面、来源和授权，未缓存内容仍需联网。")
                 }
-                Section {
-                    Text("私有缓存按令牌隔离并加密；清除授权会删除对应缓存。本地原文件不复制到缓存。缓存仅保留在本机，不是跨设备同步。")
-                        .foregroundStyle(.secondary)
-                }
             }
+            .modifier(ReaderSheetFormStyle())
             .navigationTitle(ReaderLanguage.message("离线缓存", locale: locale))
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
         #endif
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("完成") { dismiss() } } }
-        }.task { await store.refreshCacheUsage() }
+        }
+        .modifier(ReaderSheetSize())
+        .task { await store.refreshCacheUsage() }
     }
 }
+
+#endif
 
 private struct GitHubAccessSheet: View {
     @ObservedObject var store: ReaderStore
@@ -927,7 +960,8 @@ private struct GitHubAccessSheet: View {
             Form {
                 Section {
                     Label(store.hasGitHubCredential ? "已保存授权" : "尚未保存授权", systemImage: "key")
-                    SecureField("细粒度访问令牌", text: $token)
+                    SecureField("细粒度访问令牌", text: $token, prompt: Text("细粒度访问令牌"))
+                        .modifier(ReaderSheetInputStyle())
         #if os(iOS)
                         .textInputAutocapitalization(.never).autocorrectionDisabled()
         #endif
@@ -953,12 +987,14 @@ private struct GitHubAccessSheet: View {
                 if working { ProgressView() }
             }
             .disabled(working)
+            .modifier(ReaderSheetFormStyle())
             .navigationTitle(ReaderLanguage.message("GitHub 授权", locale: locale))
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
         #endif
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("完成") { token = ""; dismiss() }.disabled(working) } }
         }
+        .modifier(ReaderSheetSize())
         .interactiveDismissDisabled(working)
         .onDisappear { token = "" }
     }
@@ -989,16 +1025,18 @@ private struct GitHubAddSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("https://github.com/owner/repository", text: $url)
+                    TextField("https://github.com/owner/repository", text: $url, prompt: Text("https://github.com/owner/repository"))
         #if os(iOS)
                         .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
         #endif
+                        .modifier(ReaderSheetInputStyle())
                         .accessibilityLabel("GitHub 链接")
                 } footer: {
                     Text("支持仓库、目录或 Markdown 文件。私有仓库需先在“GitHub 授权”中保存只读令牌。")
                 }
                 DisclosureGroup("指定分支或标签（可选）") {
-                    TextField("例如 main 或 feature/notes", text: $reference)
+                    TextField("例如 main 或 feature/notes", text: $reference, prompt: Text("例如 main 或 feature/notes"))
+                        .modifier(ReaderSheetInputStyle())
         #if os(iOS)
                         .textInputAutocapitalization(.never).autocorrectionDisabled()
         #endif
@@ -1009,6 +1047,7 @@ private struct GitHubAddSheet: View {
                 if store.isAddingGitHub { HStack { ProgressView(); Text("正在读取来源…").foregroundStyle(.secondary) } }
             }
             .disabled(store.isAddingGitHub)
+            .modifier(ReaderSheetFormStyle())
             .navigationTitle(ReaderLanguage.message("添加 GitHub 来源", locale: locale))
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -1028,8 +1067,41 @@ private struct GitHubAddSheet: View {
                 }
             }
         }
+        .modifier(ReaderSheetSize())
         .interactiveDismissDisabled(store.isAddingGitHub)
         .onDisappear { task?.cancel() }
+    }
+}
+
+// Bound Mac form labels and wrap long help text within a scrollable grouped form.
+// Mobile presentation and controls remain unchanged.
+private struct ReaderSheetInputStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        #if os(macOS)
+        content.labelsHidden().textFieldStyle(.roundedBorder)
+        #else
+        content
+        #endif
+    }
+}
+
+private struct ReaderSheetFormStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        #if os(macOS)
+        content.formStyle(.grouped)
+        #else
+        content
+        #endif
+    }
+}
+
+private struct ReaderSheetSize: ViewModifier {
+    func body(content: Content) -> some View {
+        #if os(macOS)
+        content.frame(width: 560, height: 480)
+        #else
+        content
+        #endif
     }
 }
 
@@ -1100,8 +1172,12 @@ private struct MacFindField: NSViewRepresentable {
     func makeCoordinator() -> Coordinator { Coordinator(self) }
     func makeNSView(context: Context) -> NSTextField {
         let field = NSTextField(string: text)
+        field.cell = InsetFindCell(textCell: text)
+        field.isEditable = true
+        field.isSelectable = true
         field.isBordered = false
         field.drawsBackground = false
+        field.focusRingType = .none
         field.font = .systemFont(ofSize: NSFont.systemFontSize)
         field.delegate = context.coordinator
         field.target = context.coordinator
@@ -1117,6 +1193,17 @@ private struct MacFindField: NSViewRepresentable {
         if context.coordinator.lastFocusRequest != focusRequest {
             context.coordinator.lastFocusRequest = focusRequest
             field.window?.makeFirstResponder(field)
+        }
+    }
+    private final class InsetFindCell: NSTextFieldCell {
+        override func drawingRect(forBounds rect: NSRect) -> NSRect {
+            super.drawingRect(forBounds: rect).insetBy(dx: 6, dy: 0)
+        }
+        override func edit(withFrame rect: NSRect, in view: NSView, editor: NSText, delegate: Any?, event: NSEvent?) {
+            super.edit(withFrame: rect.insetBy(dx: 6, dy: 0), in: view, editor: editor, delegate: delegate, event: event)
+        }
+        override func select(withFrame rect: NSRect, in view: NSView, editor: NSText, delegate: Any?, start: Int, length: Int) {
+            super.select(withFrame: rect.insetBy(dx: 6, dy: 0), in: view, editor: editor, delegate: delegate, start: start, length: length)
         }
     }
     final class Coordinator: NSObject, NSTextFieldDelegate {
@@ -1228,7 +1315,9 @@ private struct NativeAddMenu: NSViewRepresentable {
                 item.target = self
                 menu.addItem(item)
             }
-            menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.minY), in: sender)
+            // Anchor below the button in either AppKit coordinate orientation.
+            let bottom = sender.isFlipped ? sender.bounds.maxY + 6 : sender.bounds.minY - 6
+            menu.popUp(positioning: nil, at: NSPoint(x: sender.bounds.minX, y: bottom), in: sender)
         }
         @objc func openFile() { parent.openFile() }
         @objc func openFolder() { parent.openFolder() }
