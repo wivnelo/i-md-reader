@@ -2,7 +2,7 @@ import Foundation
 
 public enum GitHubReadError: LocalizedError, Equatable {
     case invalidURL, invalidPath, ambiguousReference, missingReference, directoryLimit
-    case unauthorized, notFound, rateLimited, responseTooLarge, invalidResponse, http(Int)
+    case offlineNotCached, credentialRejected, unauthorized, notFound, rateLimited, responseTooLarge, invalidResponse, http(Int)
     case rateLimitedUntil(Date)
     public var isRateLimited: Bool {
         switch self { case .rateLimited, .rateLimitedUntil: true; default: false }
@@ -14,7 +14,9 @@ public enum GitHubReadError: LocalizedError, Equatable {
         case .ambiguousReference: "链接的分支与路径有歧义，请明确指定分支或标签。"
         case .missingReference: "未找到链接对应的分支、标签或提交。"
         case .directoryLimit: "目录达到 GitHub Contents API 的 1,000 项上限，暂不能保证完整展示。"
-        case .unauthorized: "此仓库需要有效的只读授权；当前仅接入公开读取。"
+        case .offlineNotCached: "网络不可用，且此内容尚未缓存。请联网打开一次后再离线阅读。"
+        case .credentialRejected: "GitHub 授权已失效，请重新保存令牌。"
+        case .unauthorized: "无法读取此仓库，请检查 GitHub 授权是否有效及所选仓库的读取权限。"
         case .notFound: "未找到仓库或文件，也可能没有访问权限。"
         case .rateLimited: "GitHub 请求过于频繁，请至少等待一分钟后再试。"
         case .rateLimitedUntil(let date):
@@ -99,10 +101,9 @@ private final class NoGitHubRedirects: NSObject, URLSessionTaskDelegate, Sendabl
     }
 }
 
-/// Public GET-only client. Immutable commit responses are held in bounded memory;
-/// authentication and persistent offline storage are not connected yet.
+/// GET-only client with a credential-scoped, bounded memory cache.
 public struct GitHubReader: Sendable {
-    public struct Response: Sendable {
+    public struct Response: Sendable, Codable {
         public let data: Data
         public let status: Int
         public let headers: [String: String]
@@ -113,7 +114,17 @@ public struct GitHubReader: Sendable {
     }
     public typealias Transport = @Sendable (URLRequest, Int) async throws -> Response
     private let requests: GitHubRequests
-    public init(transport: @escaping Transport = GitHubReader.fetch) { requests = GitHubRequests(transport: transport) }
+    public init(token: String? = nil, offlineCache: GitHubOfflineCache? = nil, transport: @escaping Transport = GitHubReader.fetch) {
+        requests = GitHubRequests(token: token, offlineCache: offlineCache, transport: transport)
+    }
+
+    /// Permanently disables this session, including copies held by image loaders.
+    @discardableResult public func invalidate() async -> Bool { await requests.invalidate() }
+    public var isUsingOfflineCache: Bool { get async { await requests.usingOfflineCache } }
+    public func clearOfflineCache() async throws { try await requests.clearOfflineCache() }
+    @discardableResult public func removeOfflineRepository(_ link: GitHubLink) async -> Bool { await requests.removeOfflineRepository(link) }
+
+    public func clearMemoryCache() async { await requests.clearMemoryCache() }
 
     public func resolve(_ link: GitHubLink, explicitReference: String? = nil) async throws -> GitHubLocation {
         if link.kind == .repository {
@@ -137,6 +148,7 @@ public struct GitHubReader: Sendable {
                                   path: link.components.dropFirst(segments.count).joined(separator: "/"))
         }
         var matches: [GitHubLocation] = []
+        var offlineMiss = false
         let count = link.components.count - (link.kind == .document ? 1 : 0)
         for split in 1...count {
             try Task.checkCancellation()
@@ -147,8 +159,9 @@ public struct GitHubReader: Sendable {
                                               path: link.components.dropFirst(split).joined(separator: "/")))
                 if matches.count > 1 { throw GitHubReadError.ambiguousReference }
             } catch GitHubReadError.notFound { continue }
+            catch GitHubReadError.offlineNotCached { offlineMiss = true; continue }
         }
-        guard let location = matches.first else { throw GitHubReadError.missingReference }
+        guard let location = matches.first else { throw offlineMiss ? GitHubReadError.offlineNotCached : GitHubReadError.missingReference }
         return location
     }
 
@@ -223,7 +236,7 @@ public struct GitHubReader: Sendable {
         guard response.data.count <= limit else { throw GitHubReadError.responseTooLarge }
         switch response.status {
         case 200: return response.data
-        case 401: throw GitHubReadError.unauthorized
+        case 401: throw GitHubReadError.credentialRejected
         case 403 where response.headers["x-ratelimit-remaining"] == "0" || response.headers["retry-after"] != nil: throw GitHubReadError.rateLimited
         case 403: throw GitHubReadError.unauthorized
         case 404: throw GitHubReadError.notFound
@@ -251,36 +264,119 @@ public struct GitHubReader: Sendable {
     }
 }
 
-/// Per-reader request coordination. Only commit-pinned successful contents are
-/// cached; ref resolution always goes to GitHub on an explicit refresh.
+/// Per-reader coordination with bounded memory and optional persistent storage.
+/// Mutable metadata uses conditional network reads with explicit offline fallback.
 private actor GitHubRequests {
     let transport: GitHubReader.Transport
+    let offlineCache: GitHubOfflineCache?
+    private let session = UUID()
     var cached: [String: GitHubReader.Response] = [:]
     var order: [String] = []
     var cachedBytes = 0
     struct Flight { let id = UUID(); let task: Task<GitHubReader.Response, Error> }
     var flights: [String: Flight] = [:]
     var blockedUntil: Date?
-    init(transport: @escaping GitHubReader.Transport) { self.transport = transport }
+    private var token: String?
+    private var invalidated = false
+    private var invalidationSucceeded: Bool?
+    private var generation = UUID()
+    private(set) var usingOfflineCache = false
+    init(token: String?, offlineCache: GitHubOfflineCache?, transport: @escaping GitHubReader.Transport) {
+        self.token = token; self.offlineCache = offlineCache; self.transport = transport
+    }
+
+    func invalidate() async -> Bool {
+        if invalidated { return invalidationSucceeded ?? false }
+        invalidated = true
+        let previousToken = token
+        token = nil
+        clearMemoryCache()
+        do {
+            try await offlineCache?.revoke(token: previousToken, session: session)
+            invalidationSucceeded = true
+            return true
+        } catch { invalidationSucceeded = false; return false }
+    }
+    func clearMemoryCache() {
+        generation = UUID()
+        for flight in flights.values { flight.task.cancel() }
+        flights.removeAll(); cached.removeAll(); order.removeAll(); cachedBytes = 0
+    }
+    func clearOfflineCache() async throws {
+        clearMemoryCache()
+        try await offlineCache?.clear()
+    }
+    func removeOfflineRepository(_ link: GitHubLink) async -> Bool {
+        clearMemoryCache()
+        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-._~"))
+        let owner = link.owner.addingPercentEncoding(withAllowedCharacters: allowed)!
+        let repo = link.repository.addingPercentEncoding(withAllowedCharacters: allowed)!
+        // Include the slash/query/key separator so repo names with a common prefix do not collide.
+        do {
+            for suffix in ["/", "?", "|"] {
+                try await offlineCache?.removeRepository("https://api.github.com/repos/" + owner + "/" + repo + suffix, token: token)
+            }
+            return true
+        } catch { return false }
+    }
+    private func remember(_ response: GitHubReader.Response, key: String) {
+        guard cached[key] == nil else { return }
+        cached[key] = response; order.append(key); cachedBytes += response.data.count
+        while cachedBytes > 32 * 1_024 * 1_024 || order.count > 128 {
+            let oldest = order.removeFirst()
+            if let removed = cached.removeValue(forKey: oldest) { cachedBytes -= removed.data.count }
+        }
+    }
+    private func canUseOffline(_ error: Error) -> Bool {
+        guard let error = error as? URLError else { return false }
+        return [.notConnectedToInternet, .networkConnectionLost, .timedOut, .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed].contains(error.code)
+    }
 
     func send(_ request: URLRequest, limit: Int, immutable: Bool) async throws -> GitHubReader.Response {
+        guard !invalidated else { throw CancellationError() }
+        guard request.httpMethod == "GET", request.url?.scheme == "https", request.url?.host == "api.github.com" else {
+            throw GitHubReadError.invalidURL
+        }
+        var authenticatedRequest = request
+        if let token {
+            guard !token.isEmpty, token.utf8.allSatisfy({ (48...57).contains($0) || (65...90).contains($0) || (97...122).contains($0) || $0 == 95 }) else {
+                throw GitHubReadError.unauthorized
+            }
+            authenticatedRequest.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
+        }
+        let requestGeneration = generation
         let key = (request.url?.absoluteString ?? "") + "|" + (request.value(forHTTPHeaderField: "Accept") ?? "")
         if immutable, let response = cached[key] {
             guard response.data.count <= limit else { throw GitHubReadError.responseTooLarge }
             return response
         }
-        if let date = blockedUntil, date > Date() { throw GitHubReadError.rateLimitedUntil(date) }
+        let lookup = await offlineCache?.lookup(key, token: token, session: session)
+        guard !invalidated, generation == requestGeneration else { throw CancellationError() }
+        let saved = lookup?.response.flatMap { $0.data.count <= limit ? $0 : nil }
+        if immutable, let saved { remember(saved, key: key); return saved }
+        if let date = blockedUntil, date > Date() {
+            if let saved { usingOfflineCache = true; return saved }
+            throw GitHubReadError.rateLimitedUntil(date)
+        }
+        if let etag = saved?.headers["etag"] { authenticatedRequest.setValue(etag, forHTTPHeaderField: "If-None-Match") }
+        else if let modified = saved?.headers["last-modified"] { authenticatedRequest.setValue(modified, forHTTPHeaderField: "If-Modified-Since") }
         let flight: Flight
         if let existing = flights[key] { flight = existing }
         else {
             let transport = self.transport
-            flight = Flight(task: Task { try await transport(request, limit) })
+            let outgoing = authenticatedRequest
+            flight = Flight(task: Task { try await transport(outgoing, limit) })
             flights[key] = flight
         }
         defer { if flights[key]?.id == flight.id { flights[key] = nil } }
         do {
-            let response = try await flight.task.value
+            var response = try await flight.task.value
+            guard !invalidated, generation == requestGeneration else { throw CancellationError() }
+            try Task.checkCancellation()
             guard response.data.count <= limit else { throw GitHubReadError.responseTooLarge }
+            if response.status == 304, let saved {
+                response = .init(data: saved.data, status: 200, headers: saved.headers.merging(response.headers) { _, new in new })
+            }
             if response.status == 429 || (response.status == 403 && (response.headers["x-ratelimit-remaining"] == "0" || response.headers["retry-after"] != nil)) {
                 let now = Date()
                 let retry: Date?
@@ -291,18 +387,29 @@ private actor GitHubRequests {
                 } else { retry = nil }
                 let date = max(retry ?? now.addingTimeInterval(60), now.addingTimeInterval(1))
                 blockedUntil = date
-                // Preserve the generic classification when no server reset time
-                // exists; subsequent attempts still honor a minimum cooldown.
+                if let saved { usingOfflineCache = true; return saved }
                 if retry != nil { throw GitHubReadError.rateLimitedUntil(date) }
             }
-            if immutable && response.status == 200 && cached[key] == nil {
-                cached[key] = response; order.append(key); cachedBytes += response.data.count
-                while cachedBytes > 32 * 1_024 * 1_024 || order.count > 128 {
-                    let oldest = order.removeFirst()
-                    if let removed = cached.removeValue(forKey: oldest) { cachedBytes -= removed.data.count }
+            if [500, 502, 503, 504].contains(response.status), let saved { usingOfflineCache = true; return saved }
+            // Permission failures, redirects, invalid responses and cancellation never use stale fallback.
+            if response.status == 401 { _ = await invalidate(); return response }
+            if response.status == 200 {
+                usingOfflineCache = false
+                if immutable { remember(response, key: key) }
+                if let lookup {
+                    await offlineCache?.store(response, key: key, token: token, session: session, revision: lookup.revision)
+                    guard !invalidated, generation == requestGeneration else { throw CancellationError() }
                 }
             }
             return response
-        } catch { throw error }
+        } catch {
+            guard !invalidated, generation == requestGeneration else { throw CancellationError() }
+            try Task.checkCancellation()
+            if canUseOffline(error) {
+                if let saved { usingOfflineCache = true; return saved }
+                if offlineCache != nil { throw GitHubReadError.offlineNotCached }
+            }
+            throw error
+        }
     }
 }

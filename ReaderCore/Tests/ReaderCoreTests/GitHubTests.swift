@@ -89,7 +89,7 @@ private func response(_ value: String, status: Int = 200, headers: [String: Stri
 @Test func classifiesGitHubErrorsWithoutIncludingResponseBodies() async throws {
     let location = GitHubLocation(link: try GitHubLink("https://github.com/o/r"), reference: "main", commit: commitSHA, path: "")
     let cases: [(Int, [String: String], GitHubReadError)] = [
-        (401, [:], .unauthorized), (403, [:], .unauthorized), (404, [:], .notFound),
+        (401, [:], .credentialRejected), (403, [:], .unauthorized), (404, [:], .notFound),
         (403, ["X-RateLimit-Remaining":"0"], .rateLimited), (403, ["Retry-After":"30"], .rateLimited),
         (429, [:], .rateLimited), (500, [:], .http(500)), (302, [:], .http(302))
     ]

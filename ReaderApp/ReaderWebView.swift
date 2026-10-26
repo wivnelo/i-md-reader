@@ -24,9 +24,11 @@ struct ReaderWebView: UIViewRepresentable {
         configuration.setURLSchemeHandler(LocalResourceHandler(root: document.access.url, imageLoader: document.imageLoader), forURLScheme: "reader-resource")
         let bridge = WeakScriptHandler(context.coordinator)
         configuration.userContentController.add(bridge, contentWorld: .defaultClient, name: "reader")
-        if let url = Bundle.main.url(forResource: "highlight.min", withExtension: "js", subdirectory: "Vendor"),
-           let script = try? String(contentsOf: url, encoding: .utf8) {
-            configuration.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true, in: .defaultClient))
+        for resource in ["highlight.min", "matlab.min"] {
+            if let url = Bundle.main.url(forResource: resource, withExtension: "js", subdirectory: "Vendor"),
+               let script = try? String(contentsOf: url, encoding: .utf8) {
+                configuration.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true, in: .defaultClient))
+            }
         }
         if let url = Bundle.main.url(forResource: "reader", withExtension: "js"), let script = try? String(contentsOf: url, encoding: .utf8) {
             configuration.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true, in: .defaultClient))

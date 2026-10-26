@@ -1,6 +1,65 @@
 import SwiftUI
 import UniformTypeIdentifiers
 import ReaderCore
+import Security
+
+@MainActor protocol GitHubCredentialStorage {
+    func read() throws -> String?
+    func write(_ token: String?) throws
+}
+
+private enum CredentialError: LocalizedError {
+    case unavailable, invalidToken
+    var errorDescription: String? {
+        switch self {
+        case .unavailable: "无法访问安全凭据，请解锁设备后重试。"
+        case .invalidToken: "请输入细粒度 GitHub 访问令牌。"
+        }
+    }
+}
+
+@MainActor final class GitHubKeychain: GitHubCredentialStorage {
+    private var query: [String: Any] {
+        [kSecClass as String: kSecClassGenericPassword,
+         kSecAttrService as String: (Bundle.main.bundleIdentifier ?? "i-md-reader") + ".github",
+         kSecAttrAccount as String: "fine-grained-token",
+         kSecAttrSynchronizable as String: false]
+    }
+    func read() throws -> String? {
+        var query = query
+        query[kSecReturnData as String] = true
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
+        var result: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        if status == errSecItemNotFound { return nil }
+        guard status == errSecSuccess, let data = result as? Data, let token = String(data: data, encoding: .utf8) else {
+            throw CredentialError.unavailable
+        }
+        return token
+    }
+    func write(_ token: String?) throws {
+        if let token {
+            let values: [String: Any] = [kSecValueData as String: Data(token.utf8),
+                kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly]
+            let status = SecItemUpdate(query as CFDictionary, values as CFDictionary)
+            if status == errSecItemNotFound {
+                guard SecItemAdd(query.merging(values) { _, new in new } as CFDictionary, nil) == errSecSuccess else {
+                    throw CredentialError.unavailable
+                }
+            } else if status != errSecSuccess { throw CredentialError.unavailable }
+        } else {
+            let status = SecItemDelete(query as CFDictionary)
+            guard status == errSecSuccess || status == errSecItemNotFound else { throw CredentialError.unavailable }
+        }
+    }
+}
+
+// Injected transports never touch the user's Keychain during automated checks.
+@MainActor final class EphemeralGitHubCredentials: GitHubCredentialStorage {
+    var token: String?
+    func read() throws -> String? { token }
+    func write(_ token: String?) throws { self.token = token }
+}
 
 enum ReaderFontScale {
     // Separate slopes keep 17 at the center without losing the existing 26pt maximum.
@@ -84,11 +143,23 @@ struct OpenDocument {
     @Published var error: String?
     @Published var progress: Double = 0
     @Published var selectedKey: String?
+    @Published private var pinnedSources: [String]
     @Published private var sourceOrder: [String]
     private var bookmarks: [SavedSource]
     private var readingTask: Task<Void, Never>?
     private let defaults: UserDefaults
-    private let github: GitHubReader
+    private var github: GitHubReader
+    private let credentials: any GitHubCredentialStorage
+    private let githubFactory: @Sendable (String?) -> GitHubReader
+    private let offlineCache: GitHubOfflineCache?
+    @Published private(set) var cachedBytes = 0
+    @Published private(set) var cachedItems = 0
+    @Published private(set) var cacheCapacityMB = 128
+    @Published private(set) var isClearingCache = false
+    @Published private(set) var isReadingOffline = false
+    private var authenticationGeneration = UUID()
+    @Published private(set) var hasGitHubCredential = false
+    @Published private(set) var isUpdatingGitHubCredential = false
     private var remoteLocations: [UUID: GitHubLocation] = [:]
     @Published private(set) var isAddingGitHub = false
     private var positions: [String: Double]
@@ -96,14 +167,31 @@ struct OpenDocument {
     private var refreshRequests: [UUID: UUID] = [:]
     static let sampleID = UUID(uuidString: "E4072B41-1284-4D82-82BE-846370D11759")!
 
-    init(defaults: UserDefaults = .standard, github: GitHubReader = GitHubReader()) {
+    init(defaults: UserDefaults = .standard, github: GitHubReader? = nil,
+         credentials: (any GitHubCredentialStorage)? = nil,
+         githubFactory: (@Sendable (String?) -> GitHubReader)? = nil,
+         offlineCache: GitHubOfflineCache? = nil) {
         self.defaults = defaults
-        self.github = github
+        let vault = credentials ?? (github == nil ? GitHubKeychain() : EphemeralGitHubCredentials())
+        self.credentials = vault
+        let cache = offlineCache ?? (github == nil ? GitHubOfflineCache.shared : nil)
+        self.offlineCache = cache
+        let factory = githubFactory ?? { @Sendable token in GitHubReader(token: token, offlineCache: cache) }
+        self.githubFactory = factory
+        let token: String?
+        var credentialFailure = false
+        do { token = try vault.read() }
+        catch { token = nil; credentialFailure = true }
+        hasGitHubCredential = token != nil
+        self.github = github ?? factory(token)
+        cacheCapacityMB = [64, 128, 256].contains(defaults.integer(forKey: "offlineCacheCapacityMB")) ? defaults.integer(forKey: "offlineCacheCapacityMB") : 128
         sourceOrder = defaults.stringArray(forKey: "sourceOrder") ?? []
+        pinnedSources = defaults.stringArray(forKey: "pinnedSources") ?? []
         expanded = Set(defaults.stringArray(forKey: "expanded") ?? [])
         positions = defaults.dictionary(forKey: "positions") as? [String: Double] ?? [:]
         bookmarks = (try? JSONDecoder().decode([SavedSource].self, from: defaults.data(forKey: "sources") ?? Data())) ?? []
         savedFiles = (try? JSONDecoder().decode([SavedRecentFile].self, from: defaults.data(forKey: "recentFiles") ?? Data())) ?? []
+        if credentialFailure { error = CredentialError.unavailable.localizedDescription }
         for index in savedFiles.indices {
             let saved = savedFiles[index]
             var stale = false
@@ -207,8 +295,124 @@ struct OpenDocument {
         }
     }
 
+    func configureOfflineCache() async {
+        await offlineCache?.setCapacity(cacheCapacityMB * 1_024 * 1_024)
+        await refreshCacheUsage()
+    }
+    func refreshCacheUsage() async {
+        if let usage = await offlineCache?.usage() { cachedBytes = usage.bytes; cachedItems = usage.count }
+    }
+    func setCacheCapacity(_ megabytes: Int) async {
+        guard [64, 128, 256].contains(megabytes) else { return }
+        cacheCapacityMB = megabytes
+        defaults.set(megabytes, forKey: "offlineCacheCapacityMB")
+        await configureOfflineCache()
+    }
+    func clearOfflineCache() async {
+        guard !isClearingCache else { return }
+        isClearingCache = true
+        defer { isClearingCache = false }
+        // Keep the currently displayed article, but prevent older reads from repopulating the cache.
+        for source in sources where source.remote != nil {
+            invalidateDirectoryLoads(source.id)
+            refreshRequests[source.id] = nil
+            refreshingSources.remove(source.id)
+        }
+        if selectedKey.map({ key in sources.contains { $0.remote != nil && key.hasPrefix($0.id.uuidString + "|") } }) == true {
+            readingTask?.cancel(); isLoading = false; selectedKey = document?.key
+        }
+        do { try await github.clearOfflineCache() }
+        catch { self.error = "缓存未能完全清理，请重试。" }
+        await refreshCacheUsage()
+    }
+
+    @discardableResult
+    func setGitHubCredential(_ text: String?) async -> Bool {
+        guard !isUpdatingGitHubCredential else { return false }
+        let token = text?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let token {
+            guard token.hasPrefix("github_pat_"), token.count > 20, token.count <= 512,
+                  token.utf8.allSatisfy({ (48...57).contains($0) || (65...90).contains($0) || (97...122).contains($0) || $0 == 95 }) else {
+                error = CredentialError.invalidToken.localizedDescription
+                return false
+            }
+        }
+        do { try credentials.write(token) }
+        catch { self.error = CredentialError.unavailable.localizedDescription; return false }
+        isUpdatingGitHubCredential = true
+        defer { isUpdatingGitHubCredential = false }
+        authenticationGeneration = UUID()
+        isAddingGitHub = false
+        let previous = github
+        // Replace access objects so every old source/refresh completion fails its identity check.
+        let remoteIDs = Set(sources.filter { $0.remote != nil }.map(\.id))
+        for id in remoteIDs {
+            invalidateDirectoryLoads(id)
+            refreshRequests[id] = nil
+            refreshingSources.remove(id)
+        }
+        let isRemoteKey: (String) -> Bool = { key in remoteIDs.contains { key.hasPrefix($0.uuidString + "|") } }
+        nodes = nodes.filter { !isRemoteKey($0.key) }
+        directoryErrors = directoryErrors.filter { !isRemoteKey($0.key) }
+        remoteLocations.removeAll()
+        positions = positions.filter { !isRemoteKey($0.key) }
+        expanded = expanded.filter { !isRemoteKey($0) }
+        persistExpanded()
+        defaults.set(positions, forKey: "positions")
+        if let last = defaults.string(forKey: "lastDocument"), isRemoteKey(last) { defaults.removeObject(forKey: "lastDocument") }
+        if selectedKey.map(isRemoteKey) == true || document.map({ remoteIDs.contains($0.sourceID) }) == true {
+            readingTask?.cancel(); document = nil; selectedKey = nil; isLoading = false
+        }
+        sources = sources.map { source in
+            guard let saved = source.remote, let link = try? GitHubLink(saved.url) else { return source }
+            return Self.remoteSource(saved, link: link)
+        }
+        let cleaned = await previous.invalidate()
+        github = githubFactory(token)
+        hasGitHubCredential = token != nil
+        for id in remoteIDs { sourceVersions[id, default: 0] += 1 }
+        await refreshCacheUsage()
+        error = cleaned ? nil : "缓存未能完全清理，请重试。"
+        return cleaned
+    }
+
+    private func clearRejectedGitHubCredential(_ failure: Error) async -> Bool {
+        guard hasGitHubCredential, failure as? GitHubReadError == .credentialRejected else { return false }
+        let cleared = await setGitHubCredential(nil)
+        if cleared { error = GitHubReadError.credentialRejected.localizedDescription }
+        else {
+            // Even when Keychain deletion fails, stop serving the rejected session.
+            authenticationGeneration = UUID()
+            isAddingGitHub = false
+            await github.invalidate()
+            let ids = Set(sources.filter { $0.remote != nil }.map(\.id))
+            for id in ids { invalidateDirectoryLoads(id); refreshRequests[id] = nil; refreshingSources.remove(id) }
+            nodes = nodes.filter { key, _ in !ids.contains { key.hasPrefix($0.uuidString + "|") } }
+            remoteLocations.removeAll()
+            if selectedKey.map({ key in ids.contains { key.hasPrefix($0.uuidString + "|") } }) == true || document.map({ ids.contains($0.sourceID) }) == true {
+                readingTask?.cancel(); document = nil; selectedKey = nil; isLoading = false
+            }
+        }
+        return true
+    }
+
     var orderedSources: [FolderSource] {
-        ranked(sources, order: sourceOrder, unknownFirst: true) { $0.id.uuidString }
+        let ordered = ranked(sources, order: sourceOrder, unknownFirst: true) { $0.id.uuidString }
+        let pinned = ranked(ordered.filter { isPinned($0) }, order: pinnedSources) { $0.id.uuidString }
+        return pinned + ordered.filter { !isPinned($0) }
+    }
+
+    func isPinned(_ source: FolderSource) -> Bool { pinnedSources.contains(source.id.uuidString) }
+
+    func togglePin(_ source: FolderSource) {
+        guard sources.contains(where: { $0.id == source.id }) else { return }
+        if isPinned(source) { pinnedSources.removeAll { $0 == source.id.uuidString } }
+        else { pinnedSources.append(source.id.uuidString) }
+        defaults.set(pinnedSources, forKey: "pinnedSources")
+    }
+
+    func canDragSource(_ item: String) -> Bool {
+        sources.contains { rootOrderKey($0) == item && !isPinned($0) }
     }
 
     private func ranked<T>(_ items: [T], order: [String], unknownFirst: Bool = false, id: (T) -> String) -> [T] {
@@ -225,7 +429,7 @@ struct OpenDocument {
 
     func canReorderSource(_ item: String, over target: String) -> Bool {
         let roots = Set(sources.map(rootOrderKey))
-        return item != target && roots.contains(item) && roots.contains(target)
+        return item != target && roots.contains(item) && roots.contains(target) && canDragSource(item) && canDragSource(target)
     }
 
     @discardableResult
@@ -281,6 +485,7 @@ struct OpenDocument {
     }
     func loadChildren(source: FolderSource, directory: URL, reload: Bool = false) async {
         let id = key(source: source, url: directory)
+        guard source.remote == nil || !isUpdatingGitHubCredential else { return }
         guard let access = source.access, directoryRequests[id] == nil, reload || nodes[id] == nil else { return }
         let request = UUID()
         directoryRequests[id] = request
@@ -300,6 +505,7 @@ struct OpenDocument {
             nodes[id] = children
         } catch {
             guard directoryRequests[id] == request else { return }
+            if source.remote != nil, await clearRejectedGitHubCredential(error) { return }
             if source.remote == nil, await removeIfPermissionDenied(source, failure: error, rootOperation: directory.standardizedFileURL == source.url?.standardizedFileURL) { return }
             guard directoryRequests[id] == request else { return }
             directoryErrors[id] = error.localizedDescription
@@ -435,12 +641,23 @@ struct OpenDocument {
         invalidateDirectoryLoads(source.id)
         sources.removeAll { $0.id == source.id }
         remoteLocations[source.id] = nil
+        if source.remote != nil {
+            let reader = github
+            Task {
+                if let saved = source.remote, let link = try? GitHubLink(saved.url) {
+                    if !(await reader.removeOfflineRepository(link)) { self.error = "缓存未能完全清理，请重试。" }
+                }
+                else { await reader.clearMemoryCache() }
+            }
+        }
         persistRemoteSources()
         bookmarks.removeAll { $0.id == source.id }
         let prefix = source.id.uuidString + "|"
         nodes = nodes.filter { !$0.key.hasPrefix(prefix) }
         directoryErrors = directoryErrors.filter { !$0.key.hasPrefix(prefix) }
         sourceVersions[source.id] = nil
+        pinnedSources.removeAll { $0 == source.id.uuidString }
+        defaults.set(pinnedSources, forKey: "pinnedSources")
         sourceOrder.removeAll { $0 == source.id.uuidString }
         defaults.set(sourceOrder, forKey: "sourceOrder")
         expanded = expanded.filter { !$0.hasPrefix(prefix) }
@@ -456,6 +673,7 @@ struct OpenDocument {
     func open(_ url: URL, source: FolderSource, isRefresh: Bool = false) {
         guard let access = source.access else { Task { await retryLocalSource(source) }; return }
         readingTask?.cancel()
+        if source.remote == nil { isReadingOffline = false }
         let id = key(source: source, url: url)
         selectedKey = id; isLoading = true; error = nil
         readingTask = Task {
@@ -494,9 +712,11 @@ struct OpenDocument {
                 reveal(url, source: source)
                 document = OpenDocument(key: id, url: url, sourceID: source.id, access: access, rendered: rendered, initialProgress: positions[id] ?? 0, imageLoader: imageLoader)
                 progress = positions[id] ?? 0
+                isReadingOffline = source.remote != nil ? await github.isUsingOfflineCache : false
                 defaults.set(id, forKey: "lastDocument")
             } catch {
                 guard !Task.isCancelled else { return }
+                if source.remote != nil, await clearRejectedGitHubCredential(error) { return }
                 if source.remote == nil, await removeIfPermissionDenied(source, failure: error, rootOperation: false) { return }
                 guard !Task.isCancelled, sources.contains(where: { $0.id == source.id && $0.access === access }) else { return }
                 if isRefresh, let githubError = error as? GitHubReadError, githubError.isRateLimited {
@@ -649,14 +869,18 @@ struct OpenDocument {
 
     @discardableResult func addGitHub(_ text: String, reference: String? = nil) async -> Bool {
         guard !isAddingGitHub else { return false }
+        guard !isUpdatingGitHubCredential else { return false }
+        let generation = authenticationGeneration
+        let reader = github
         isAddingGitHub = true
         error = nil
-        defer { isAddingGitHub = false }
+        defer { if generation == authenticationGeneration { isAddingGitHub = false } }
         do {
             let link = try GitHubLink(text)
             let reference = reference?.trimmingCharacters(in: .whitespacesAndNewlines)
             let explicit = reference?.isEmpty == false ? reference : nil
-            let location = try await github.resolve(link, explicitReference: explicit)
+            let location = try await reader.resolve(link, explicitReference: explicit)
+            guard generation == authenticationGeneration else { throw CancellationError() }
             // Validate accessibility before persisting a new source.
             let duplicate = sources.first { source in
                 guard let saved = source.remote, let existing = try? GitHubLink(saved.url) else { return false }
@@ -671,6 +895,7 @@ struct OpenDocument {
             let root = source.url!
             let children = try await remoteChildren(source, directory: root, location: location)
             try Task.checkCancellation()
+            guard generation == authenticationGeneration else { throw CancellationError() }
             sources.insert(source, at: 0)
             remoteLocations[source.id] = location
             nodes[key(source: source, url: root)] = children
@@ -680,15 +905,20 @@ struct OpenDocument {
             return true
         } catch is CancellationError { return false }
         catch {
-            if !Task.isCancelled { self.error = error.localizedDescription }
+            guard generation == authenticationGeneration else { return false }
+            if await clearRejectedGitHubCredential(error) { return false }
+            if !Task.isCancelled && generation == authenticationGeneration { self.error = error.localizedDescription }
             return false
         }
     }
 
     private func remoteLocation(_ source: FolderSource) async throws -> GitHubLocation {
+        guard !isUpdatingGitHubCredential else { throw CancellationError() }
         if let location = remoteLocations[source.id] { return location }
         guard let saved = source.remote, let access = source.access else { throw GitHubReadError.invalidURL }
+        let generation = authenticationGeneration
         let location = try await github.resolve(GitHubLink(saved.url), explicitReference: saved.reference)
+        guard generation == authenticationGeneration else { throw CancellationError() }
         guard sources.contains(where: { $0.id == source.id && $0.access === access }) else { throw CancellationError() }
         // A completed source refresh takes precedence over a slower initial lookup.
         if let newer = remoteLocations[source.id] { return newer }
@@ -720,6 +950,7 @@ struct OpenDocument {
     }
 
     private func refreshRemote(_ source: FolderSource) async {
+        guard !isUpdatingGitHubCredential else { return }
         guard let saved = source.remote, let access = source.access, !refreshingSources.contains(source.id) else { return }
         let request = UUID()
         refreshRequests[source.id] = request
@@ -736,6 +967,7 @@ struct OpenDocument {
             if remoteLocations[source.id]?.commit == location.commit, nodes[rootKey] != nil,
                !directoryErrors.keys.contains(where: { $0.hasPrefix(prefix) }) {
                 remoteLocations[source.id] = location
+                if document?.sourceID == source.id { isReadingOffline = await github.isUsingOfflineCache }
                 return
             }
             var listings = [rootKey: try await remoteChildren(source, directory: access.url, location: location)]
@@ -759,6 +991,7 @@ struct OpenDocument {
             }
         } catch {
             guard refreshRequests[source.id] == request else { return }
+            if await clearRejectedGitHubCredential(error) { return }
             if let githubError = error as? GitHubReadError, githubError.isRateLimited {
                 self.error = githubError.localizedDescription + "\n当前文章和目录已保留。"
             } else {

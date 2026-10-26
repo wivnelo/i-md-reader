@@ -20,9 +20,12 @@ struct ReaderScreen: View {
     @State private var importing = false
     @State private var selectingMarkdown = false
     @State private var addingGitHub = false
+    @State private var managingGitHubAccess = false
+    @State private var managingOfflineCache = false
     @State private var showAppearance = false
     @State private var draggingFolder: String?
     @State private var sourceInsertion: SourceInsertion?
+    @AppStorage("pinnedSourcesExpanded") private var pinnedSourcesExpanded = true
     @State private var findRequest = 0
     @State private var anchor: String?
     @State private var prefersSingleColumn = false
@@ -49,12 +52,8 @@ struct ReaderScreen: View {
         return document.url.deletingLastPathComponent().lastPathComponent
     }
 
-    var body: some View {
-        NavigationSplitView(columnVisibility: $visibility, preferredCompactColumn: $compactColumn) {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 8, pinnedViews: [.sectionHeaders]) {
-                    Text("资料来源").font(.caption).foregroundStyle(.secondary).padding(.horizontal, 14).padding(.top, 16)
-                    ForEach(store.orderedSources) { source in
+    private func sourceSections(_ sources: [FolderSource]) -> some View {
+                    ForEach(sources) { source in
                         Section {
                             if let root = source.url {
                                 TreeDirectory(store: store, source: source, url: root, level: 0, selection: colors.selection, draggingFolder: $draggingFolder, onOpenDocument: showReadingColumn)
@@ -67,6 +66,28 @@ struct ReaderScreen: View {
                                 .background(colors.sidebar)
                         }
                     }
+    }
+
+    var body: some View {
+        NavigationSplitView(columnVisibility: $visibility, preferredCompactColumn: $compactColumn) {
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 8, pinnedViews: [.sectionHeaders]) {
+                    if store.orderedSources.contains(where: { store.isPinned($0) }) {
+                        Button { pinnedSourcesExpanded.toggle() } label: {
+                            HStack {
+                                Text("置顶").font(.headline)
+                                Spacer()
+                                Image(systemName: pinnedSourcesExpanded ? "chevron.down" : "chevron.right")
+                                    .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                            }.padding(.horizontal, 14).frame(minHeight: 44).contentShape(Rectangle())
+                        }.buttonStyle(.plain)
+                            .accessibilityValue(pinnedSourcesExpanded ? Text("已展开") : Text("已收起"))
+                        if pinnedSourcesExpanded {
+                            sourceSections(store.orderedSources.filter { store.isPinned($0) })
+                        }
+                    }
+                    Text("资料库").font(.caption).foregroundStyle(.secondary).padding(.horizontal, 14).padding(.top, 16)
+                    sourceSections(store.orderedSources.filter { !store.isPinned($0) })
                     if !store.recentFiles.isEmpty {
                         Section {
                             ForEach(store.recentFiles) { file in
@@ -123,8 +144,9 @@ struct ReaderScreen: View {
                     Menu {
                         Button("打开 Markdown 文件", systemImage: "doc.text") { selectingMarkdown = true; importing = true }
                         Button("本地文件夹", systemImage: "folder") { selectingMarkdown = false; importing = true }
-                        Button("公开 GitHub 链接", systemImage: "link") { addingGitHub = true }
-                    } label: { Label("添加来源", systemImage: "plus") }
+                        Button("GitHub 链接", systemImage: "link") { addingGitHub = true }
+                    } label: { Image(systemName: "plus") }
+                        .accessibilityLabel("添加来源")
                 }
             }
             .navigationSplitViewColumnWidth(min: 280, ideal: 300, max: 360)
@@ -150,6 +172,9 @@ struct ReaderScreen: View {
                             .id(document.id)
                         HStack {
                             Text(documentFolderName).lineLimit(1)
+                            if store.isReadingOffline && !document.isStandalone {
+                                Label("缓存阅读", systemImage: "internaldrive").foregroundStyle(Color.accentColor)
+                            }
                             Spacer()
                             Text(store.progress, format: .percent.precision(.fractionLength(0))).monospacedDigit()
                         }.font(.caption).foregroundStyle(.secondary).padding(.horizontal, 28).padding(.vertical, 10)
@@ -158,12 +183,12 @@ struct ReaderScreen: View {
                     ContentUnavailableView {
                         Label("留一点空间，开始阅读", systemImage: "book.closed")
                     } description: {
-                        Text("从左侧选择文章，或添加文件夹与公开 GitHub 链接。")
+                        Text("从左侧选择文章，或添加文件夹与 GitHub 链接。")
                     } actions: {
                         Menu {
                             Button("打开 Markdown 文件", systemImage: "doc.text") { selectingMarkdown = true; importing = true }
-                        Button("本地文件夹", systemImage: "folder") { selectingMarkdown = false; importing = true }
-                            Button("公开 GitHub 链接", systemImage: "link") { addingGitHub = true }
+                            Button("本地文件夹", systemImage: "folder") { selectingMarkdown = false; importing = true }
+                            Button("GitHub 链接", systemImage: "link") { addingGitHub = true }
                         } label: { Label("添加来源", systemImage: "plus") }.buttonStyle(.bordered)
                     }
                 }
@@ -192,6 +217,11 @@ struct ReaderScreen: View {
                     if visibility != .detailOnly {
                         Button("沉浸阅读", systemImage: "arrow.up.left.and.arrow.down.right") { visibility = .detailOnly }
                     }
+                    Menu {
+                        Button("GitHub 授权", systemImage: "key") { managingGitHubAccess = true }
+                        Button("离线缓存", systemImage: "internaldrive") { managingOfflineCache = true }
+                    } label: { Image(systemName: "ellipsis") }
+                        .accessibilityLabel("应用设置")
                 }
             }
         }
@@ -218,6 +248,8 @@ struct ReaderScreen: View {
             if id != nil { showReadingColumn() }
         }
         .sheet(isPresented: $addingGitHub) { GitHubAddSheet(store: store) }
+        .sheet(isPresented: $managingGitHubAccess) { GitHubAccessSheet(store: store) }
+        .sheet(isPresented: $managingOfflineCache) { OfflineCacheSheet(store: store) }
         .onOpenURL { store.openFileURL($0); showReadingColumn() }
         .fileImporter(isPresented: $importing, allowedContentTypes: selectingMarkdown ? Self.markdownPickerTypes : [.folder], allowsMultipleSelection: false) { result in
             switch result {
@@ -232,7 +264,7 @@ struct ReaderScreen: View {
         .alert(ReaderLanguage.message("无法完成操作", locale: language.locale), isPresented: Binding(get: { store.error != nil }, set: { if !$0 { store.error = nil } })) {
             Button("好", role: .cancel) { store.error = nil }
         } message: { Text(ReaderLanguage.message(store.error ?? "", locale: language.locale)) }
-        .task { store.restoreLastDocument() }
+        .task { await store.configureOfflineCache(); store.restoreLastDocument() }
         .environment(\.locale, language.locale)
 
     }
@@ -300,7 +332,7 @@ private struct SourceReorder: ViewModifier {
     @Binding var dragging: String?
     var enabled = true
     func body(content: Content) -> some View {
-        if enabled {
+        if enabled && store.canDragSource(item) {
             content
                 .onDrag {
                     dragging = item
@@ -441,6 +473,11 @@ private struct SourceHeader: View {
         .clipped()
         .overlay(alignment: .bottom) { Divider().opacity(insertion == nil ? 1 : 0) }
         .modifier(SourceDrop(store: store, item: source.id.uuidString + "|", dragging: $draggingFolder, insertion: $insertion))
+        .contextMenu {
+            Button { store.togglePin(source) } label: {
+                Label(store.isPinned(source) ? "取消置顶" : "置顶来源", systemImage: store.isPinned(source) ? "pin.slash" : "pin")
+            }
+        }
         .accessibilityAction(named: "移除来源") { if !source.isSample { store.remove(source) } }
     }
 }
@@ -494,7 +531,7 @@ private struct TreeDirectory: View {
               }.buttonStyle(.plain)
                 .accessibilityLabel(level == 0 ? (source.remote == nil ? Text("\(accessibleName)，文件夹来源") : Text("\(accessibleName)，GitHub 来源")) : Text(url.lastPathComponent))
                 .accessibilityValue(isExpanded ? Text("已展开") : Text("已收起"))
-                .accessibilityHint(level == 0 ? Text("长按并上下拖动可调整来源顺序") : Text(url.lastPathComponent))
+                .accessibilityHint(level == 0 ? (store.isPinned(source) ? Text("已置顶，取消置顶后可拖动") : Text("长按并上下拖动可调整来源顺序")) : Text(url.lastPathComponent))
                 .modifier(SourceReorder(store: store, item: key, dragging: $draggingFolder, enabled: level == 0))
               if level == 0 && isExpanded {
                   Button {
@@ -578,6 +615,103 @@ private struct TreeDirectory: View {
     }
 }
 
+private struct OfflineCacheSheet: View {
+    @State private var failure: String?
+    @ObservedObject var store: ReaderStore
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    if let failure { Text(ReaderLanguage.message(failure, locale: locale)).foregroundStyle(.red) }
+                    LabeledContent("已用空间", value: ByteCountFormatter.string(fromByteCount: Int64(store.cachedBytes), countStyle: .file))
+                    Picker("容量上限", selection: Binding(get: { store.cacheCapacityMB }, set: { value in
+                        Task { await store.setCacheCapacity(value) }
+                    })) {
+                        ForEach([64, 128, 256], id: \.self) { value in Text("\(value) MB").tag(value) }
+                    }
+                    Button("清空离线缓存", role: .destructive) {
+                        Task {
+                            failure = nil
+                            await store.clearOfflineCache()
+                            failure = store.error; store.error = nil
+                        }
+                    }
+                        .disabled(store.isClearingCache || store.isLoading)
+                } footer: {
+                    Text("自动缓存读过的 GitHub 文章、已列举目录和加载过的图片。断网或限流时使用已有缓存，不下载整个仓库。清空后保留当前页面、来源和授权，未缓存内容仍需联网。")
+                }
+                Section {
+                    Text("私有缓存按令牌隔离并加密；清除授权会删除对应缓存。本地原文件不复制到缓存。缓存仅保留在本机，不是跨设备同步。")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle(ReaderLanguage.message("离线缓存", locale: locale))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("完成") { dismiss() } } }
+        }.task { await store.refreshCacheUsage() }
+    }
+}
+
+private struct GitHubAccessSheet: View {
+    @ObservedObject var store: ReaderStore
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
+    @State private var token = ""
+    @State private var failure: String?
+    @State private var working = false
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Label(store.hasGitHubCredential ? "已保存授权" : "尚未保存授权", systemImage: "key")
+                    SecureField("细粒度访问令牌", text: $token)
+                        .textInputAutocapitalization(.never).autocorrectionDisabled()
+                        .privacySensitive()
+                    Button("保存授权") { update(token) }
+                        .disabled(token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                } footer: {
+                    Text("令牌仅存入此设备的 Keychain，不显示已保存的令牌。保存不代表已验证仓库权限，添加来源时会检查。")
+                }
+                Section {
+                    Link("前往 GitHub 创建令牌", destination: URL(string: "https://github.com/settings/personal-access-tokens/new")!)
+                } footer: {
+                    Text("在 GitHub 创建 fine-grained token，选择需要阅读的仓库，将 Contents 设为 Read-only，并设置有效期。不要授予写入权限。")
+                }
+                if store.hasGitHubCredential {
+                    Section {
+                        Button("清除授权", role: .destructive) { update(nil) }
+                    } footer: {
+                        Text("清除本机令牌和 GitHub 阅读内容、目录及内存缓存，保留来源链接。本地文件不受影响；撤销令牌本身需到 GitHub 操作。")
+                    }
+                }
+                if let failure { Text(ReaderLanguage.message(failure, locale: locale)).foregroundStyle(.red) }
+                if working { ProgressView() }
+            }
+            .disabled(working)
+            .navigationTitle(ReaderLanguage.message("GitHub 授权", locale: locale))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("完成") { token = ""; dismiss() }.disabled(working) } }
+        }
+        .interactiveDismissDisabled(working)
+        .onDisappear { token = "" }
+    }
+
+    private func update(_ value: String?) {
+        working = true; failure = nil
+        let candidate = value
+        token = ""
+        Task {
+            if !(await store.setGitHubCredential(candidate)) {
+                failure = store.error; store.error = nil
+            }
+            working = false
+        }
+    }
+}
+
 private struct GitHubAddSheet: View {
     @ObservedObject var store: ReaderStore
     @Environment(\.dismiss) private var dismiss
@@ -595,7 +729,7 @@ private struct GitHubAddSheet: View {
                         .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
                         .accessibilityLabel("GitHub 链接")
                 } footer: {
-                    Text("支持公开仓库、目录或 Markdown 文件。私有仓库暂未开放。")
+                    Text("支持仓库、目录或 Markdown 文件。私有仓库需先在“GitHub 授权”中保存只读令牌。")
                 }
                 DisclosureGroup("指定分支或标签（可选）") {
                     TextField("例如 main 或 feature/notes", text: $reference)

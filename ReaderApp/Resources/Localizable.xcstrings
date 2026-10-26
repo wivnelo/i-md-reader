@@ -53,18 +53,11 @@
       }
     },
     "资料库": {
-      "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Library"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "资料库"
           }
         }
       }
@@ -699,18 +692,11 @@
       }
     },
     "GitHub 链接": {
-      "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "GitHub Link"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "GitHub 链接"
+            "value": "GitHub link"
           }
         }
       }
@@ -1684,6 +1670,336 @@
           "stringUnit": {
             "state": "translated",
             "value": "文内查找"
+          }
+        }
+      }
+    },
+    "置顶来源": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pin source"
+          }
+        }
+      }
+    },
+    "取消置顶": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unpin"
+          }
+        }
+      }
+    },
+    "已置顶": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinned"
+          }
+        }
+      }
+    },
+    "已置顶，取消置顶后可拖动": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinned. Unpin to reorder."
+          }
+        }
+      }
+    },
+    "置顶": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinned"
+          }
+        }
+      }
+    },
+    "GitHub 授权": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub access"
+          }
+        }
+      }
+    },
+    "已保存授权": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Credential saved"
+          }
+        }
+      }
+    },
+    "尚未保存授权": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No credential saved"
+          }
+        }
+      }
+    },
+    "细粒度访问令牌": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fine-grained access token"
+          }
+        }
+      }
+    },
+    "保存授权": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save credential"
+          }
+        }
+      }
+    },
+    "创建只读令牌": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create a read-only token"
+          }
+        }
+      }
+    },
+    "前往 GitHub 创建令牌": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create a token on GitHub"
+          }
+        }
+      }
+    },
+    "清除授权": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear credential"
+          }
+        }
+      }
+    },
+    "完成": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
+    "无法访问安全凭据，请解锁设备后重试。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secure credentials are unavailable. Unlock your device and try again."
+          }
+        }
+      }
+    },
+    "请输入细粒度 GitHub 访问令牌。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a fine-grained GitHub personal access token."
+          }
+        }
+      }
+    },
+    "无法读取此仓库，请检查 GitHub 授权是否有效及所选仓库的读取权限。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot read this repository. Check your GitHub credential and repository read permissions."
+          }
+        }
+      }
+    },
+    "支持仓库、目录或 Markdown 文件。私有仓库需先在“GitHub 授权”中保存只读令牌。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supports repositories, folders, and Markdown files. Save a read-only token in GitHub access before opening private repositories."
+          }
+        }
+      }
+    },
+    "从左侧选择文章，或添加文件夹与 GitHub 链接。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a document in the sidebar, or add a folder or GitHub link."
+          }
+        }
+      }
+    },
+    "令牌仅存入此设备的 Keychain，不显示已保存的令牌。保存不代表已验证仓库权限，添加来源时会检查。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The token is stored only in this device’s Keychain and is never shown again. Saving does not verify repository access; adding a source checks access."
+          }
+        }
+      }
+    },
+    "在 GitHub 创建 fine-grained token，选择需要阅读的仓库，将 Contents 设为 Read-only，并设置有效期。不要授予写入权限。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create a fine-grained token on GitHub, select repositories to read, set Contents to Read-only, and choose an expiry. Do not grant write permissions."
+          }
+        }
+      }
+    },
+    "清除本机令牌和 GitHub 阅读内容、目录及内存缓存，保留来源链接。本地文件不受影响；撤销令牌本身需到 GitHub 操作。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Removes the local token, GitHub reading content, directory listings, and memory cache. Source links and local files are kept. Revoke the token itself on GitHub."
+          }
+        }
+      }
+    },
+    "GitHub 授权已失效，请重新保存令牌。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your GitHub credential is no longer valid. Save a new token."
+          }
+        }
+      }
+    },
+    "离线缓存": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline cache"
+          }
+        }
+      }
+    },
+    "缓存阅读": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cached copy"
+          }
+        }
+      }
+    },
+    "已用空间": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Storage used"
+          }
+        }
+      }
+    },
+    "容量上限": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Storage limit"
+          }
+        }
+      }
+    },
+    "清空离线缓存": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear offline cache"
+          }
+        }
+      }
+    },
+    "缓存未能完全清理，请重试。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The cache could not be fully cleared. Try again."
+          }
+        }
+      }
+    },
+    "网络不可用，且此内容尚未缓存。请联网打开一次后再离线阅读。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The network is unavailable and this content is not cached. Open it online before reading offline."
+          }
+        }
+      }
+    },
+    "自动缓存读过的 GitHub 文章、已列举目录和加载过的图片。断网或限流时使用已有缓存，不下载整个仓库。清空后保留当前页面、来源和授权，未缓存内容仍需联网。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatically saves GitHub articles you read, directory listings you open, and images you load. Uses saved copies when offline or rate limited; does not download entire repositories. Clearing keeps the current page, sources, and credential. Uncached content needs a connection."
+          }
+        }
+      }
+    },
+    "私有缓存按令牌隔离并加密；清除授权会删除对应缓存。本地原文件不复制到缓存。缓存仅保留在本机，不是跨设备同步。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Private cached content is encrypted and isolated by token; clearing authorization deletes it. Local original files are not copied. The cache stays on this device and does not sync across devices."
+          }
+        }
+      }
+    },
+    "应用设置": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App settings"
           }
         }
       }

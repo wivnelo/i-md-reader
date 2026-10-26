@@ -70,3 +70,68 @@ private func requestLocation(_ sha: String = String(repeating: "a", count: 40)) 
     _ = try await reader.markdown(location, path: "0.md")
     #expect(await counter.count == 5)
 }
+
+@Test func authenticatedReadsStayOnGitHubAndSessionsDoNotShareContent() async throws {
+    actor Recorder {
+        var requests: [URLRequest] = []
+        func fetch(_ request: URLRequest) -> GitHubReader.Response {
+            requests.append(request)
+            return .init(data: Data((request.value(forHTTPHeaderField: "Authorization") ?? "anonymous").utf8), status: 200)
+        }
+    }
+    let log = Recorder()
+    let first = GitHubReader(token: "github_pat_synthetic_first") { request, _ in await log.fetch(request) }
+    let second = GitHubReader(token: "github_pat_synthetic_second") { request, _ in await log.fetch(request) }
+    let anonymous = GitHubReader { request, _ in await log.fetch(request) }
+    let location = try requestLocation()
+    #expect(try await first.markdown(location, path: "note.md") == "Bearer github_pat_synthetic_first")
+    #expect(try await second.markdown(location, path: "note.md") == "Bearer github_pat_synthetic_second")
+    #expect(try await anonymous.markdown(location, path: "note.md") == "anonymous")
+    let requests = await log.requests
+    #expect(requests.count == 3)
+    #expect(requests.allSatisfy { $0.httpMethod == "GET" && $0.url?.host == "api.github.com" && $0.url?.scheme == "https" })
+    #expect(requests.allSatisfy { $0.url?.absoluteString.contains("synthetic") == false })
+    await first.invalidate()
+    await #expect(throws: CancellationError.self) { try await first.markdown(location, path: "note.md") }
+    #expect(await log.requests.count == 3)
+}
+
+@Test func invalidationRejectsUncooperativeInFlightResponsesAndImages() async throws {
+    actor Gate {
+        var started = false
+        var continuation: CheckedContinuation<Void, Never>?
+        func fetch() async -> GitHubReader.Response {
+            started = true
+            await withCheckedContinuation { continuation = $0 }
+            return .init(data: Data("private response".utf8), status: 200)
+        }
+        func release() { continuation?.resume(); continuation = nil }
+    }
+    let gate = Gate()
+    let reader = GitHubReader(token: "github_pat_synthetic_pending") { _, _ in await gate.fetch() }
+    let location = try requestLocation()
+    let request = Task { try await reader.markdown(location, path: "note.md") }
+    while !(await gate.started) { await Task.yield() }
+    await reader.invalidate()
+    await gate.release()
+    await #expect(throws: CancellationError.self) { try await request.value }
+    await #expect(throws: CancellationError.self) { try await reader.image(location, path: "image.png") }
+}
+
+@Test func malformedCredentialNeverReachesTransport() async throws {
+    let reader = GitHubReader(token: "bad\r\nheader") { _, _ in
+        Issue.record("Malformed credentials must not be sent")
+        return .init(data: Data(), status: 200)
+    }
+    await #expect(throws: GitHubReadError.unauthorized) { try await reader.markdown(requestLocation(), path: "note.md") }
+}
+
+@Test func clearingMemoryRemovesPrivateResponsesWithoutDroppingCredential() async throws {
+    let counter = RequestCounter()
+    let reader = counter.reader
+    let location = try requestLocation()
+    _ = try await reader.markdown(location, path: "note.md")
+    await reader.clearMemoryCache()
+    _ = try await reader.markdown(location, path: "note.md")
+    #expect(await counter.count == 2)
+}

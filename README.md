@@ -2,7 +2,7 @@
 
 轻量、原生、只读的 iPad Markdown 阅读器：IDE 式文件树，舒适的长文阅读排版。
 
-**当前为开发原型，部分核心功能已实现，尚未完成 MVP 验收。** 已完成、未完成和待验证内容集中记录在 [开发状态](docs/STATUS.md)。
+**阶段一：iPad核心阅读与交互版已完成，本期用户验收通过。** 已完成、未完成和待验证内容集中记录在 [开发状态](docs/STATUS.md)。
 
 ![iMDReader 原生界面](design/previews/imdreader-name.png)
 
@@ -12,23 +12,26 @@
 
 - **单个文件**：App 内选择 Markdown，或从系统“文件 → 打开方式 → iMDReader”进入；独立书签、最近文件和严格文件权限边界。
 - **本地文件夹**：系统目录选择、多来源、原层级懒加载树、安全范围书签及状态恢复；只读原文件。
-- **公开 GitHub**：仓库、子目录、单篇 Markdown 链接；分支解析、固定提交读取、相对 Markdown 导航及每来源刷新。
-- **阅读**：GFM、表格、任务列表、代码高亮/复制、本地图片、文章目录、阅读位置、隐藏侧栏。
+- **GitHub**：公开仓库及持有细粒度只读令牌的选定私有仓库、子目录、单篇 Markdown 链接；分支解析、固定提交读取、相对 Markdown 导航及每来源刷新。
+- **阅读**：GFM、表格、任务列表、代码高亮/复制、本地和GitHub相对位图、MATLAB等代码块高亮、文章目录、阅读位置、隐藏侧栏。
 - **外观**：浅色/深色、四套低饱和配色；默认 17pt，字号滑杆以 17pt 为中点（范围 12–26pt）。
-- **来源管理**：根标题吸顶、左滑移除、顶层长按排序并保存顺序、收起全部子目录、无障碍上移/下移；移除来源不删除源文件。
+- **来源管理**：根标题吸顶、左滑移除、未置顶的顶层长按排序并保存顺序、可折叠置顶分组、收起全部子目录、无障碍上移/下移；移除来源不删除源文件。
 - **界面语言**：跟随系统、简体中文、English；保存选择，不翻译文档正文或文件名。
 - **刷新保护**：并发请求合并、固定提交响应的受限内存缓存、限流冷却和恢复时间提示。
 
-代码已实现不代表所有实机、异常与无障碍场景已验收。
+本期已交付功能用户确认通过；完整平台、异常、性能与无障碍检查按后续计划单独记录。
 
-## 尚未实现
+## 下一阶段与专项检查
 
-- 私有 GitHub 认证、Keychain 与授权撤销后的内容清理。
-- 远程图片、图片放大和持久离线正文缓存。
-- 单文件冷启动、真实 iCloud、文件移动与系统默认类型选择等完整实机验收。入口已接入，见[实现与验证](docs/FILE_OPENING.md)。
-- 完整 iCloud、最低系统、实机长文性能、动态字号和 VoiceOver 验收。
+- iPhone小屏适配，随后增加同工程的Mac原生目标，复用现有核心。
+- 图片放大、外部HTTPS图片和SVG安全加载。
+- 最低系统、VoiceOver/动态字号、其他文件提供方/组织授权异常、长文与多图性能和分发检查。
+
+本期已交付功能按用户整体确认收口；专项检查不被整体使用反馈自动代替。见[阶段总结](docs/STAGE_2026-10-26.md)。
 
 不开发编辑器、Git 提交/推送、AI、协作或自建服务。
+
+入口：“＋”直接添加MD文件、本地文件夹、GitHub链接；阅读区右上“•••”管理授权和离线缓存；Aa管理阅读外观及语言。
 
 ## 构建与测试
 
@@ -52,12 +55,13 @@ xcodebuild -project iMDReader.xcodeproj -scheme iMDReader \
 
 Swift 6 / SwiftUI `NavigationSplitView` + `WKWebView`。swift-markdown（cmark-gfm）解析为安全白名单 HTML，highlight.js 随应用离线内置。原始 HTML 不直接执行，资源路径检查授权边界，WebKit 禁止文档脚本和网络直连。
 
-GitHub 当前只读取公开内容，不复用开发机登录；请求限定 GitHub API，拒绝重定向。内存缓存上限 32 MB / 128 项，**不等于重启后离线可读**。远程正文暂限 UTF-8 / 10 MB，本地图片文件暂限 20 MB；这些是保护上限，不是性能保证。
+GitHub不复用开发机登录；可在App内保存细粒度访问令牌到Keychain，请求限定GitHub API、只发GET并拒绝重定向。内存缓存上限32 MB / 128项，另有默认128 MB / 512项磁盘缓存，支持已读GitHub内容重启离线阅读，见[离线缓存与高亮](docs/OFFLINE_CACHE.md)。远程正文暂限 UTF-8 / 10 MB，本地图片文件暂限 20 MB；这些是保护上限，不是性能保证。
 
 第三方声明见 [ThirdPartyNotices](ReaderApp/Resources/ThirdPartyNotices.txt)、[highlight.js 来源与许可](ReaderApp/Resources/Vendor/README.md) 及 [GitHub 来源标识说明](ReaderApp/Resources/GitHubMark-Attribution.md)。GitHub 标识仅用于辨识来源，不是本应用图标。
 
 ## 项目入口
 
+- [阶段一总结与固定决策](docs/STAGE_2026-10-26.md)
 - [开发状态与后续计划](docs/STATUS.md)
 - [单文件打开与默认应用设计](docs/FILE_OPENING.md)
 - [原生运行截图](design/previews/README.md)

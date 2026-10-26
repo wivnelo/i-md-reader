@@ -323,12 +323,14 @@ private actor RemoteFixture {
     var version = 1
     var fail = false
     var pause = false
-    func change(version: Int? = nil, fail: Bool = false, pause: Bool = false) {
+    var offline = false
+    func change(version: Int? = nil, fail: Bool = false, pause: Bool = false, offline: Bool = false) {
         if let version { self.version = version }
-        self.fail = fail; self.pause = pause
+        self.fail = fail; self.pause = pause; self.offline = offline
     }
     func response(_ request: URLRequest) async throws -> GitHubReader.Response {
         if pause { try await Task.sleep(for: .milliseconds(100)) }
+        if offline { throw URLError(.notConnectedToInternet) }
         if fail { return .init(data: Data(), status: 503) }
         let path = request.url!.path(percentEncoded: false)
         let sha = String(repeating: String(version), count: 40)
@@ -602,4 +604,142 @@ private actor RemoteFixture {
     try await Task.sleep(for: .milliseconds(100))
     #expect(store.recentFiles.isEmpty)
     #expect(store.document?.id == documentID)
+}
+
+@Test @MainActor func pinnedSourcesStayAboveNewSourcesAndRejectMovement() async throws {
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let a = try fixture.add("Pinned A")
+    let b = try fixture.add("Pinned B")
+    fixture.store.togglePin(a)
+    fixture.store.togglePin(b)
+    let c = try fixture.add("Ordinary")
+    let key = { (source: FolderSource) in source.id.uuidString + "|" }
+    #expect(fixture.store.orderedSources.prefix(2).map(\.id) == [a.id, b.id])
+    #expect(!fixture.store.canDragSource(key(a)))
+    #expect(!fixture.store.reorderSource(key(a), over: key(c)))
+    #expect(!fixture.store.reorderSource(key(c), over: key(a)))
+    fixture.store.moveSource(key(b), direction: -1)
+    let restored = ReaderStore(defaults: fixture.defaults)
+    #expect(restored.orderedSources.prefix(2).map(\.id) == [a.id, b.id])
+    #expect(restored.isPinned(a))
+    restored.togglePin(a)
+    #expect(restored.canDragSource(key(a)))
+    #expect(restored.orderedSources.first?.id == b.id)
+    restored.remove(b)
+    #expect(!ReaderStore(defaults: fixture.defaults).isPinned(b))
+}
+
+@Test @MainActor func changingGitHubCredentialsClearsRemoteContentButPreservesLocalSources() async throws {
+    let remote = RemoteFixture()
+    let fixture = try Fixture(github: remote.reader)
+    defer { fixture.clean() }
+    let local = try fixture.add("Local")
+    let vault = EphemeralGitHubCredentials()
+    let store = ReaderStore(defaults: fixture.defaults, github: remote.reader, credentials: vault,
+                            githubFactory: { _ in remote.reader })
+    #expect(await store.addGitHub("https://github.com/test/repo/tree/main/docs", reference: "main"))
+    let source = try #require(store.sources.first { $0.remote != nil })
+    let root = try #require(source.url)
+    store.open(root.appendingPathComponent("readme.md"), source: source)
+    while store.isLoading { try await Task.sleep(for: .milliseconds(5)) }
+    #expect(store.document != nil)
+    let token = "github_pat_synthetic_state_test"
+    #expect(await store.setGitHubCredential(token))
+    #expect(store.hasGitHubCredential)
+    #expect(try vault.read() == token)
+    #expect(store.document == nil)
+    #expect(!store.expanded.contains { $0.hasPrefix(source.id.uuidString + "|") })
+    #expect(store.nodes[store.key(source: source, url: root)] == nil)
+    #expect(store.sources.contains { $0.id == local.id })
+    #expect(store.sources.contains { $0.id == source.id })
+    let config = try PropertyListSerialization.data(fromPropertyList: fixture.defaults.dictionaryRepresentation(), format: .xml, options: 0)
+    #expect(!String(decoding: config, as: UTF8.self).contains(token))
+    #expect(ReaderStore(defaults: fixture.defaults, credentials: vault, githubFactory: { _ in remote.reader }).hasGitHubCredential)
+    #expect(await store.setGitHubCredential(nil))
+    #expect(!store.hasGitHubCredential)
+    #expect(try vault.read() == nil)
+    #expect(!ReaderStore(defaults: fixture.defaults, credentials: vault, githubFactory: { _ in remote.reader }).hasGitHubCredential)
+    #expect(!(await store.setGitHubCredential("not a fine-grained token")))
+}
+
+@Test @MainActor func clearingAuthorizationPreventsPendingAddFromRestoringPrivateSource() async throws {
+    let remote = RemoteFixture()
+    await remote.change(pause: true)
+    let fixture = try Fixture(github: remote.reader)
+    defer { fixture.clean() }
+    let task = Task { await fixture.store.addGitHub("https://github.com/test/repo/tree/main/docs", reference: "main") }
+    while !fixture.store.isAddingGitHub { await Task.yield() }
+    #expect(await fixture.store.setGitHubCredential(nil))
+    #expect(!(await task.value))
+    #expect(!fixture.store.sources.contains { $0.remote != nil })
+    #expect(fixture.store.error == nil)
+}
+
+@Test @MainActor func rejectedCredentialIsRemovedAndDoesNotPersistNewSource() async throws {
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let vault = EphemeralGitHubCredentials()
+    let store = ReaderStore(defaults: fixture.defaults, credentials: vault, githubFactory: { token in
+        GitHubReader(token: token) { _, _ in .init(data: Data(), status: 401) }
+    })
+    #expect(await store.setGitHubCredential("github_pat_synthetic_rejected"))
+    #expect(!(await store.addGitHub("https://github.com/test/repo")))
+    #expect(!store.hasGitHubCredential)
+    #expect(try vault.read() == nil)
+    #expect(!store.sources.contains { $0.remote != nil })
+    #expect(store.error == GitHubReadError.credentialRejected.localizedDescription)
+}
+
+@Test @MainActor func credentialStorageFailuresDoNotClaimSuccessfulAuthorization() async throws {
+    final class Unavailable: GitHubCredentialStorage {
+        func read() throws -> String? { throw CocoaError(.fileReadNoPermission) }
+        func write(_ token: String?) throws { throw CocoaError(.fileWriteNoPermission) }
+    }
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let store = ReaderStore(defaults: fixture.defaults, credentials: Unavailable(), githubFactory: { _ in GitHubReader() })
+    #expect(!store.hasGitHubCredential)
+    #expect(store.error != nil)
+    #expect(!(await store.setGitHubCredential("github_pat_synthetic_unavailable")))
+    #expect(!store.hasGitHubCredential)
+    #expect(store.error != nil)
+}
+
+@Test @MainActor func storeRestoresGitHubOfflineAfterRestartAndClearsCacheWithoutDeletingSources() async throws {
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let server = RemoteFixture()
+    let cache = GitHubOfflineCache(directory: fixture.root.appendingPathComponent("offline-cache"))
+    let factory: @Sendable (String?) -> GitHubReader = { token in
+        GitHubReader(token: token, offlineCache: cache) { request, _ in try await server.response(request) }
+    }
+    let store = ReaderStore(defaults: fixture.defaults, credentials: EphemeralGitHubCredentials(), githubFactory: factory, offlineCache: cache)
+    await store.configureOfflineCache()
+    #expect(await store.addGitHub("https://github.com/test/repo/tree/main/docs", reference: "main"))
+    let source = try #require(store.sources.first { $0.remote != nil })
+    store.open(try #require(source.url).appendingPathComponent("readme.md"), source: source)
+    while store.isLoading { try await Task.sleep(for: .milliseconds(5)) }
+    #expect(store.document != nil)
+    await server.change(offline: true)
+    let restored = ReaderStore(defaults: fixture.defaults, credentials: EphemeralGitHubCredentials(), githubFactory: factory, offlineCache: cache)
+    restored.restoreLastDocument()
+    for _ in 0..<100 where restored.document == nil { try await Task.sleep(for: .milliseconds(5)) }
+    #expect(restored.document?.rendered.body.contains("Version") == true)
+    #expect(restored.isReadingOffline)
+    await restored.refreshCacheUsage()
+    #expect(restored.cachedBytes > 0)
+    let documentID = restored.document?.id
+    await restored.setCacheCapacity(64)
+    #expect(restored.cacheCapacityMB == 64)
+    #expect(fixture.defaults.integer(forKey: "offlineCacheCapacityMB") == 64)
+    await restored.clearOfflineCache()
+    #expect(restored.cachedBytes == 0)
+    #expect(restored.document?.id == documentID)
+    #expect(restored.sources.contains { $0.id == source.id })
+    let empty = ReaderStore(defaults: fixture.defaults, credentials: EphemeralGitHubCredentials(), githubFactory: factory, offlineCache: cache)
+    empty.restoreLastDocument()
+    for _ in 0..<100 where empty.error == nil { try await Task.sleep(for: .milliseconds(5)) }
+    #expect(empty.document == nil)
+    #expect(empty.error?.contains("尚未缓存") == true)
 }
