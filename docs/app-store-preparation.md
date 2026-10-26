@@ -2,7 +2,7 @@
 
 用户确认iPhone/iPad使用App Store。当前仅准备，任何上传、协议接受、密钥或权限扩展、审核提交和上架需要单独明确步骤。
 
-本次GitHub正式发行仅为Mac 0.2.0（46）；移动源码版本已同步，设备仍为0.2.0（44），不等于App Store已发布。
+GitHub正式发行仅为Mac 0.2.0（46）；本地开发源码为0.2.1（48），iPhone开发设备版为0.2.1（47）、iPad为0.2.1（48），不等于App Store已发布。实际状态及接手步骤见[STATUS](STATUS.md)。
 
 ## 隐私元数据补充（最新）
 
@@ -21,10 +21,10 @@ NSPrivacyTracking为false、TrackingDomains为空：源码无广告标识、跨A
 
 ## 本地核对
 
-- iOS target为iMDReader，支持iPhone/iPad，最低iOS17，公开工程默认bundle ID为`com.example.ipadmarkdownreader`；此前两台真机安装使用本机构建覆盖的开发标识，与此默认值不同。当前设备build44沿用原开发标识，具体本机签名参数不入库。拟用商店标识及既有记录仍须对照核实，不擅自改名或清空设备资料。
+- iOS target为iMDReader，支持iPhone/iPad，最低iOS17，公开工程默认bundle ID为`com.example.ipadmarkdownreader`；两台真机安装使用本机构建覆盖的开发标识，与此默认值不同。当前47/48沿用原开发标识，具体本机签名参数不入库。拟用商店标识及既有记录仍须对照核实，不擅自改名或清空设备资料。
 - 工程使用Automatic signing；公开工程不保存团队或个人设备信息。已有本机Apple Development身份，尚未确认App Store distribution provisioning可用，不自动创建证书或profile。
 - Info.plist声明Markdown Viewer、原地打开文档、单scene；没有新增相册/定位等权限。当前源码已包含PrivacyInfo.xcprivacy；已核对的required-reason API见上表，数据收集评估仍未完成，不据此声明“完全不收集”。
-- iOS 0.2.0（34）unsigned Release Archive已成功并包含隐私清单；build39 iOS Simulator构建通过。build44已用原开发签名覆盖安装iPhone/iPad并读回版本，详见STATUS；开发签名与unsigned Archive均不等于App Store分发签名或真机功能验收。
+- iOS 0.2.0（34）unsigned Release Archive已成功并包含隐私清单；build39 iOS Simulator构建通过。当前iPhone47/iPad48已用原开发签名覆盖安装并读回版本，详见STATUS；开发签名与unsigned Archive均不等于App Store分发签名或真机功能验收。已配对设备可经同局域网无线安装，仍属本机开发分发。
 - 无已验证App Store ID/公开URL，移动启动更新入口暂不启用。后续读取App Store Connect现有记录，核对bundle ID后接入真实商店地址。
 
 ## 可审阅商店文案
