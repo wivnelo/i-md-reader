@@ -2,9 +2,9 @@
 
 轻量、原生、只读的 Markdown 阅读器，支持 Mac、iPad 和 iPhone。
 
-**首个 Mac 发行候选：0.1.0（build26），已公证，Release仍为草稿。** Universal 二进制支持 Apple Silicon 与 Intel，最低 macOS 14。已通过 Developer ID 签名、Apple 公证、staple 和 Gatekeeper 验证。Apple Silicon 已完成主要真实流程检查；Intel 与 macOS 14 本机运行尚未实测。移动端保留现有源码与功能，本次不发布 App Store 版本。
+**首个 Mac 正式发行包：0.1.0（build27）。** Universal 二进制支持 Apple Silicon 与 Intel，最低 macOS 14。已通过 Developer ID 签名、Apple 公证、staple 和 Gatekeeper 验证。Apple Silicon 已完成主要真实流程检查；Intel 与 macOS 14 本机运行尚未实测。移动端保留现有源码与功能，本次不发布 App Store 版本。
 
-审计发现应用英文模式下原生自定义菜单仍中文，等待本版修复/下版处理决定；正式公开尚未完成。
+独立审查发现的原生自定义菜单语言问题已按最小范围修复并复测；本版功能冻结，新增需求进入下一版本。
 
 [发布页面](https://github.com/wivnelo/i-md-reader/releases/tag/v0.1.0) · [验证结果与限制](docs/STATUS.md)
 
@@ -85,7 +85,7 @@ GitHub不复用开发机登录；可在App内保存细粒度访问令牌到Keych
 xcodebuild -project iMDReader.xcodeproj -scheme iMDReaderMac \
   -configuration Release -destination 'generic/platform=macOS' \
   ONLY_ACTIVE_ARCH=NO 'ARCHS=arm64 x86_64' \
-  CURRENT_PROJECT_VERSION=26 MARKETING_VERSION=0.1.0 \
+  CURRENT_PROJECT_VERSION=27 MARKETING_VERSION=0.1.0 \
   CODE_SIGNING_ALLOWED=NO build
 ```
 

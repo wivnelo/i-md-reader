@@ -1,22 +1,15 @@
 # iMDReader 开发与发行状态
 
-## 独立审查与发布门槛
+## 首版最终候选：0.1.0（27） · 2026-10-26
 
-独立只读代码审查和安全审计已完成，未发现确认的阻断级安全缺陷。覆盖近期差异、主题/语言/布局、只读书签、WebView/CSP/路径、GitHub请求/令牌缓存、权限、依赖锁定及净化快照。最终App无get-task-allow，沙箱外独立严格签名通过；公开快照97文件，无个人路径、团队标识或真实凭据泄漏。未执行完整依赖漏洞数据库审计；不等于所有漏洞均被排除。
+本节优先于下方build26草稿与历史HOLD记录。用户批准本版最小修复原生菜单语言P2；已完成并由独立只读reviewer复审，无新增功能、布局或文件行为变更。
 
-确认P2语言一致性问题：App明确English时，阅读区已英文，但File菜单三个自定义条目仍中文；ReaderApp.swift的Commands未读取应用语言，内容视图locale没有覆盖菜单。阅读和数据不受影响。已恢复测试前System语言。用户要求保护已确认行为，尚未修改代码；等待决定本版最小修复并重新签名公证，或列入下一版已知问题后发布。正式Release保持草稿，不将公证通过等同于公开发布。
-
-## 当前发行结果：Mac 0.1.0（26）
-
-本文件记录当前公开发行范围与验证边界；早期阶段决策见STAGE_2026-10-26.md。
-
-- Apple公证最终 **Accepted**：`52ec3e2d-986f-4dc4-bd5c-663c6236ad1f`。首次提交因Xcode额外注入get-task-allow被Invalid，已移除调试权限、使用原沙箱权限重新签名同一build26；应用代码与已测行为未改。工程Mac Release同时设置CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO防止再注入。
-- staple与stapler validate通过；严格签名校验通过；Gatekeeper为 **accepted / Notarized Developer ID**。使用既有Developer ID、可信时间戳、hardened runtime；不公开签名团队或凭据。
-- 最终ZIP：`iMDReader-0.1.0-macOS-universal.zip`，SHA256 `7def33918f7bb1716c6f3999afa5abd3c2b96d5c4fa7fc852bf751e7deb045b4`。Universal arm64+x86_64，最低macOS14；Apple Silicon实际测试，Intel与最低系统运行未覆盖。
-- 本轮实际测试：状态/核心共64项有通过证据（默认跳过的2项真实网络已分别补跑通过）；最终build26 Mac Release/iOS Simulator构建通过；128组受控视图与9组标题检查通过。真实Mac公开GitHub表单和README、文件夹授权/重启书签/相对导航、Finder指定候选冷热打开、⌘O/⌘⇧O、⌘F聚焦输入及回车命中通过；四份隔离源文件哈希不变。
-- 不扩大验收：中等宽度长标题最终画面、面板内部滚动分支、最低系统/Intel运行、完整无障碍/性能、移动真机动效等仍未覆盖；极小窗口隐藏文件名是用户接受行为。iPad跨单双栏和SE标题方案仍待决定，不随发行修改。
-- GitHub源码将从公开main生成净化快照，只有公开父历史与noreply作者；本地master及未提交开发成果不重置、不整体推送。正式发布链接：[v0.1.0](https://github.com/wivnelo/i-md-reader/releases/tag/v0.1.0)；当前正在完成净化提交与Release上传，以远端核验结果为准。
-- 后续：保留现有App数据，移动端不扩展商店发布；继续已列专项与图片放大/安全资源加载计划。README、FILE_OPENING同步本阶段结果，知识库由调度任务单独更新。
+- Commands订阅应用语言，四个自定义命令显式使用该locale，补齐“添加本地文件夹”英文资源；动作/快捷键不变。真实Mac中文→English、English→中文及跟随系统菜单正确，英文外观面板标签完整；浅色/深色/系统选择切换正常，最终恢复系统语言与主题。CUA菜单关闭偶有失效，通过正常退出重开恢复；未绕过安全控制。
+- build27 Mac Universal Release与iOS Simulator编译通过；新增真实语言目录测试先失败后通过，与两项语言回归共3项通过；最终包128组视图矩阵、9组受控标题检查通过。前一基线64项核心/状态含2项网络补跑通过；菜单补丁后未无故重跑全部。此前真实文件/GitHub/搜索流程证据继续保留，不冒称本轮全部重做。
+- 新公证 **Accepted**：`31b93933-d5f9-49bf-80c5-5304c4ae404e`；Developer ID、时间戳、hardened runtime、无get-task-allow，staple/严格签名/Gatekeeper通过。最终ZIP解压后同样验证通过，Gatekeeper为Notarized Developer ID。未沿用build26公证。
+- 最终ZIP `iMDReader-0.1.0-macOS-universal.zip`；SHA256 `f459eb829684932a0e1f91c1ff553d5cc21ded9369413a8971cf3f9323dfdcca`。arm64+x86_64，macOS14起；Intel/最低系统运行、中等宽度长标题最终像素、外观内部滚动、完整无障碍/性能、移动真机动效仍未覆盖。极小窗口隐藏标题是接受行为。
+- 独立代码与安全审查无确认阻断级问题，菜单P2已解决并增量复审通过；未进行完整依赖漏洞数据库审计。仅净化公开历史快照/noreply作者，不推本地master、不强推。本地历史和开发成果保留。
+- GitHub Release仍待本轮最终资产替换和公开核验；旧build26资产已在本地build/archive/build26保存，可恢复，不丢弃旧包。发布页：https://github.com/wivnelo/i-md-reader/releases/tag/v0.1.0 。
 
 ## 下一版本（本版功能冻结）
 

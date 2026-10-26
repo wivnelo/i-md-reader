@@ -30,14 +30,16 @@ extension FocusedValues {
 }
 private struct ReaderCommands: Commands {
     @FocusedValue(\.readerActions) private var actions
+    @AppStorage("readerLanguage") private var languageValue = ReaderLanguage.system.rawValue
+    private var locale: Locale { (ReaderLanguage(rawValue: languageValue) ?? .system).locale }
     var body: some Commands {
         CommandGroup(replacing: .newItem) {
-            Button("打开 Markdown 文件") { actions?.openFile() }.keyboardShortcut("o")
-            Button("添加本地文件夹") { actions?.openFolder() }.keyboardShortcut("o", modifiers: [.command, .shift])
-            Button("添加 GitHub 来源") { actions?.addGitHub() }
+            Button { actions?.openFile() } label: { Text(verbatim: ReaderLanguage.message("打开 Markdown 文件", locale: locale)) }.keyboardShortcut("o")
+            Button { actions?.openFolder() } label: { Text(verbatim: ReaderLanguage.message("添加本地文件夹", locale: locale)) }.keyboardShortcut("o", modifiers: [.command, .shift])
+            Button { actions?.addGitHub() } label: { Text(verbatim: ReaderLanguage.message("添加 GitHub 来源", locale: locale)) }
         }
         CommandGroup(after: .textEditing) {
-            Button("文内查找") { actions?.find() }.keyboardShortcut("f")
+            Button { actions?.find() } label: { Text(verbatim: ReaderLanguage.message("文内查找", locale: locale)) }.keyboardShortcut("f")
         }
     }
 }

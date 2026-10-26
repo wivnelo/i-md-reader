@@ -775,3 +775,19 @@ private actor RemoteFixture {
     #expect(empty.document == nil)
     #expect(empty.error?.contains("尚未缓存") == true)
 }
+
+@Test func nativeMenuTranslationsExistInShippedCatalog() throws {
+    let repository = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    let data = try Data(contentsOf: repository.appendingPathComponent("ReaderApp/Resources/Localizable.xcstrings"))
+    let catalog = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+    let strings = try #require(catalog["strings"] as? [String: Any])
+    let expected = ["打开 Markdown 文件": "Open Markdown File", "添加本地文件夹": "Add Local Folder",
+                    "添加 GitHub 来源": "Add GitHub Source", "文内查找": "Find in Document"]
+    for (key, translation) in expected {
+        let entry = try #require(strings[key] as? [String: Any])
+        let localizations = try #require(entry["localizations"] as? [String: Any])
+        let english = try #require(localizations["en"] as? [String: Any])
+        let unit = try #require(english["stringUnit"] as? [String: Any])
+        #expect(unit["value"] as? String == translation)
+    }
+}
