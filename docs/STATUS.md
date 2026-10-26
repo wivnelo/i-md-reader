@@ -1,6 +1,6 @@
 # iMDReader 开发与发行状态
 
-## 首版最终候选：0.1.0（27） · 2026-10-26
+## 首版正式发布：0.1.0（27） · 2026-10-26
 
 本节优先于下方build26草稿与历史HOLD记录。用户批准本版最小修复原生菜单语言P2；已完成并由独立只读reviewer复审，无新增功能、布局或文件行为变更。
 
@@ -9,7 +9,7 @@
 - 新公证 **Accepted**：`31b93933-d5f9-49bf-80c5-5304c4ae404e`；Developer ID、时间戳、hardened runtime、无get-task-allow，staple/严格签名/Gatekeeper通过。最终ZIP解压后同样验证通过，Gatekeeper为Notarized Developer ID。未沿用build26公证。
 - 最终ZIP `iMDReader-0.1.0-macOS-universal.zip`；SHA256 `f459eb829684932a0e1f91c1ff553d5cc21ded9369413a8971cf3f9323dfdcca`。arm64+x86_64，macOS14起；Intel/最低系统运行、中等宽度长标题最终像素、外观内部滚动、完整无障碍/性能、移动真机动效仍未覆盖。极小窗口隐藏标题是接受行为。
 - 独立代码与安全审查无确认阻断级问题，菜单P2已解决并增量复审通过；未进行完整依赖漏洞数据库审计。仅净化公开历史快照/noreply作者，不推本地master、不强推。本地历史和开发成果保留。
-- GitHub Release仍待本轮最终资产替换和公开核验；旧build26资产已在本地build/archive/build26保存，可恢复，不丢弃旧包。发布页：https://github.com/wivnelo/i-md-reader/releases/tag/v0.1.0 。
+- GitHub正式Release于2026-10-26 11:00:11 UTC公开，非草稿、非预发布；v0.1.0标签与源码提交均为`50dbddf1e6a121ba19ed21bf76b55de802bef367`。远端仅最终build27 ZIP及SHA256SUMS.txt，服务器摘要与本地一致，公开下载后SHA256校验通过。旧build26资产已在本地build/archive/build26保存，可恢复。发布页：https://github.com/wivnelo/i-md-reader/releases/tag/v0.1.0 。
 
 ## 下一版本（本版功能冻结）
 
