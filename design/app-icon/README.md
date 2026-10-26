@@ -26,7 +26,7 @@ Tinted：Create a monochrome TINTED appearance iOS app icon resource matching th
 
 ## App 内品牌区
 
-侧栏导航栏采用 32pt 圆角图标 + iMDReader，移除原“资料库”大标题，保留添加来源按钮。ReaderBrand 图片集复用已确认的浅深色图标，跟随 App 当前外观。构建通过；模拟器已检查深色横屏。
+品牌采用 32pt 圆角图标 + iMDReader（Mac阅读区工具栏、iPhone导航栏；iPad从build44起为侧栏顶部固定一行），移除原“资料库”大标题，保留添加来源按钮。ReaderBrand 图片集复用已确认的浅深色图标，跟随 App 当前外观。构建通过；模拟器已检查深色横屏。
 
 ## Mac固定深色图标 · 0.2.0正式资源
 

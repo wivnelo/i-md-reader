@@ -4,9 +4,9 @@
 
 ## 当前版本
 
-- Mac正式候选 **0.2.0（46）**，Universal（arm64+x86_64）、Release、macOS 14起。用户已明确授权GitHub正式发布，App和DMG均已通过签名、公证、staple与Gatekeeper；GitHub发布核验待完成。
+- Mac正式发行 **0.2.0（46）**，Universal（arm64+x86_64）、Release、macOS 14起。用户已明确授权GitHub正式发布，App和DMG均已通过签名、公证、staple与Gatekeeper；[GitHub v0.2.0](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.0)已于2026-10-26 21:58（Asia/Manila）公开为Latest，非草稿、非预发布。
 - 本机Applications已更新为上述正式包并重开，原资料库、来源、文章与进度恢复。iPhone/iPad仍为原开发签名 **0.2.0（44）**，未发布App Store；build45/46仅Mac改动及发行构建，没有重复安装移动端。
-- 原正式版v0.1.0（27）的标签与资产保持不变。其ZIP SHA256：`f459eb829684932a0e1f91c1ff553d5cc21ded9369413a8971cf3f9323dfdcca`。
+- 原正式版v0.1.0（27）的标签与资产保持不变，远端资产ID/大小/摘要已前后核对。其ZIP SHA256：`f459eb829684932a0e1f91c1ff553d5cc21ded9369413a8971cf3f9323dfdcca`。
 - 开发工作树`/tmp/imdreader-next-release`、分支`next-release`；私有master历史与原仓库未提交成果保留。公开代码从当前树生成仅以origin/main为父提交的净化快照，不推私有历史、不force push。
 
 ## 0.2.0 交付范围
@@ -29,6 +29,7 @@
 - 正式包资源的128组hosted-view外观检查、9组受控标题分配通过；这些不代替所有真实窗口视觉验收。
 - Universal Release编译通过，arm64和x86_64核实；Developer ID、可信时间戳、hardened runtime、严格签名校验通过。原bundle ID及资料库保持。
 - App Apple公证Accepted：`cba539d3-c4a4-49f5-89d1-9f355b632ef4`；DMG Accepted：`625f5fc9-c457-4ecc-9215-db5ac28ab05f`。两者staple/validate和Gatekeeper均通过，DMG只读挂载中的App同样通过，版本46及Applications链接核对通过，已卸载。
+- 公开下载DMG、ZIP、SHA256SUMS均重新下载校验通过；GitHub资产摘要与本地一致。生产更新解析器对真实Release元数据选择0.2.0官方DMG，当前版本不误提示。发布标签源码提交为`ea385ff17e9dd421fcb2321fa6493cad57cc5d48`；文档后续更新只推进main，不改标签。
 - 正式产物在本地`build/releases/v0.2.0/`（不入Git）；包与校验和随GitHub Release发布。Mac仅Apple Silicon实机运行；Intel与macOS14运行未测。
 
 | 文件 | SHA256 |
@@ -45,7 +46,7 @@
 
 ## 测试清理与历史
 
-本轮发布后清理冗余预览DMG、中间构建、QA应用及日志；保留正式发行资产、关键验证证据、当前源码/私有历史、用户资料及必要回退备份。清理实际结果待记录。
+本轮已清理369项冗余预览DMG、中间构建、QA应用、旧测试App及日志，约8.8 GiB。保留正式发行资产、关键验证证据、当前源码/私有历史及用户资料；Applications保留build45上一测试版与before-build33（正式0.1.0 build27）两个回退备份。没有清空真实资料库、书签、凭据或离线缓存。正式资产及审计记录另在原仓库忽略目录`build/releases/v0.2.0/`保存。无在途构建、安装或公证任务。
 
 build38去查找蓝框、build39去置顶折叠、build41固定深色图标/配色去重影、build43表单裁切修复、build44缓存设置及iPad顶部修复、build45菜单锚点修复，最终由Mac Release build46整合。中间包不再作为当前分发版本。iOS build34 unsigned Archive已确认隐私清单，但不是商店分发包。旧阶段验收仅覆盖当时明确测试项目，见[阶段记录](STAGE_2026-10-26.md)。
 

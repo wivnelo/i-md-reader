@@ -2,7 +2,7 @@
 
 轻量、原生、只读的 Markdown 阅读器，支持 Mac、iPad 和 iPhone。
 
-**Mac 0.2.0（46）正式包**：Universal 支持 Apple Silicon 与 Intel，最低 macOS 14；Developer ID 签名、Apple 公证及 Gatekeeper 验证通过。iPhone/iPad 当前为开发设备测试版，尚未上架 App Store。
+**最新正式版：Mac 0.2.0（46）**：Universal 支持 Apple Silicon 与 Intel，最低 macOS 14；Developer ID 签名、Apple 公证及 Gatekeeper 验证通过。iPhone/iPad 当前为开发设备测试版，尚未上架 App Store。
 
 [0.2.0 发布页面](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.0) · [版本状态与验证限制](docs/STATUS.md)
 
