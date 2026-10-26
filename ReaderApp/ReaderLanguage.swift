@@ -13,8 +13,8 @@ enum ReaderLanguage: String, CaseIterable, Identifiable {
     }
     var locale: Locale { Locale(identifier: resolved()) }
     private static func englishTable(in bundle: Bundle) -> [String: String] {
-        let url = bundle.bundleURL.appendingPathComponent("en.lproj/Localizable.strings")
-        guard let data = try? Data(contentsOf: url),
+        guard let url = bundle.resourceURL?.appendingPathComponent("en.lproj/Localizable.strings"),
+              let data = try? Data(contentsOf: url),
               let table = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: String] else { return [:] }
         return table
     }

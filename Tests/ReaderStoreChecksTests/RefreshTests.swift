@@ -56,6 +56,36 @@ import ReaderCore
     #expect(ReaderLanguage.message("无法保留文件夹授权：Provider detail", locale: en, bundle: bundle) == "Unable to save folder access: Provider detail")
 }
 
+@Test(arguments: [false, true])
+func appearanceLabelsFollowLanguageAcrossBundleLayouts(macLayout: Bool) throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".bundle")
+    defer { try? FileManager.default.removeItem(at: root) }
+    let resources = macLayout ? root.appendingPathComponent("Contents/Resources") : root
+    let english = resources.appendingPathComponent("en.lproj")
+    try FileManager.default.createDirectory(at: english, withIntermediateDirectories: true)
+    if macLayout {
+        let info: [String: Any] = ["CFBundleIdentifier": "test.imdreader.localization", "CFBundlePackageType": "BNDL", "CFBundleDevelopmentRegion": "zh-Hans"]
+        try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0)
+            .write(to: root.appendingPathComponent("Contents/Info.plist"))
+    }
+    let labels = ["跟随系统", "浅色", "深色", "雾蓝", "远山", "青苔", "暖砂", "语言", "配色", "English"]
+    let translated = ["System", "Light", "Dark", "Mist Blue", "Distant Hills", "Moss", "Warm Sand", "Language", "Palette", "English"]
+    let table = Dictionary(uniqueKeysWithValues: zip(labels, translated))
+    try PropertyListSerialization.data(fromPropertyList: table, format: .binary, options: 0)
+        .write(to: english.appendingPathComponent("Localizable.strings"))
+    let bundle = try #require(Bundle(url: root))
+    let choices: [(ReaderLanguage, [String], Bool)] = [
+        (.chinese, ["en-US"], false), (.english, ["zh-CN"], true),
+        (.chinese, ["en-US"], false), (.system, ["en-GB"], true),
+        (.system, ["zh-Hans"], false), (.english, ["zh-CN"], true)
+    ]
+    for (choice, preferred, expectsEnglish) in choices {
+        let locale = Locale(identifier: choice.resolved(preferred: preferred))
+        let actual = labels.map { ReaderLanguage.message($0, locale: locale, bundle: bundle) }
+        #expect(actual == (expectsEnglish ? translated : labels))
+    }
+}
+
 @Test func interfaceLanguageResolvesExplicitSystemAndUnsupportedChoices() {
     #expect(ReaderLanguage.chinese.resolved(preferred: ["en-US"]) == "zh-Hans")
     #expect(ReaderLanguage.english.resolved(preferred: ["zh-CN"]) == "en")
@@ -724,7 +754,9 @@ private actor RemoteFixture {
     await server.change(offline: true)
     let restored = ReaderStore(defaults: fixture.defaults, credentials: EphemeralGitHubCredentials(), githubFactory: factory, offlineCache: cache)
     restored.restoreLastDocument()
-    for _ in 0..<100 where restored.document == nil { try await Task.sleep(for: .milliseconds(5)) }
+    // The document is published before the awaited offline-cache status arrives.
+    for _ in 0..<100 where restored.isLoading { try await Task.sleep(for: .milliseconds(5)) }
+    #expect(!restored.isLoading)
     #expect(restored.document?.rendered.body.contains("Version") == true)
     #expect(restored.isReadingOffline)
     await restored.refreshCacheUsage()

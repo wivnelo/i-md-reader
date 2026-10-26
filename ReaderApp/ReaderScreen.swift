@@ -1,4 +1,7 @@
 import SwiftUI
+#if os(macOS)
+import AppKit
+#endif
 import UniformTypeIdentifiers
 import ReaderCore
 
@@ -22,6 +25,15 @@ struct ReaderScreen: View {
     @State private var addingGitHub = false
     @State private var managingGitHubAccess = false
     @State private var managingOfflineCache = false
+    #if os(iOS)
+    @State private var appearanceAvailableSize = CGSize(width: 375, height: 667)
+    private var mobileAppearanceWidth: CGFloat { min(456, max(0, appearanceAvailableSize.width - 32)) }
+    private var usesCompactPalette: Bool { mobileAppearanceWidth < 456 }
+    #endif
+    #if os(macOS)
+    @State private var readingFrame = CGRect.zero
+    @StateObject private var macSystemAppearance = MacSystemAppearance()
+    #endif
     @State private var showAppearance = false
     @State private var draggingFolder: String?
     @State private var sourceInsertion: SourceInsertion?
@@ -29,16 +41,55 @@ struct ReaderScreen: View {
     @State private var findRequest = 0
     @State private var anchor: String?
     @State private var prefersSingleColumn = false
+    @State private var hasAdaptedLayout = false
     @State private var renderingID: UUID?
     @AppStorage("fontSize") private var fontSize = 17.0
     @AppStorage("readerLanguage") private var languageValue = ReaderLanguage.system.rawValue
     @AppStorage("readerPalette") private var paletteValue = ReaderPalette.mist.rawValue
     @AppStorage("readerTheme") private var theme = "system"
+    #if os(iOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #else
+    @State private var findText = ""
+    @State private var findFocusRequest = 0
+    #endif
     @Environment(\.colorScheme) private var systemScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    private var dark: Bool { theme == "dark" || (theme == "system" && systemScheme == .dark) }
-    private var scaledSize: Double { UIFontMetrics(forTextStyle: .body).scaledValue(for: fontSize) }
+    private var dark: Bool {
+        #if os(macOS)
+        theme == "dark" || (theme == "system" && macSystemAppearance.isDark)
+        #else
+        theme == "dark" || (theme == "system" && systemScheme == .dark)
+        #endif
+    }
+    private var scaledSize: Double {
+        #if os(iOS)
+        UIFontMetrics(forTextStyle: .body).scaledValue(for: fontSize)
+        #else
+        fontSize
+        #endif
+    }
+    private var leadingToolbar: ToolbarItemPlacement {
+        #if os(macOS)
+        .navigation
+        #else
+        .topBarLeading
+        #endif
+    }
+    private var trailingToolbar: ToolbarItemPlacement {
+        #if os(macOS)
+        .primaryAction
+        #else
+        .topBarTrailing
+        #endif
+    }
+    private var searchText: String {
+        #if os(macOS)
+        findText
+        #else
+        ""
+        #endif
+    }
     private var language: ReaderLanguage { ReaderLanguage(rawValue: languageValue) ?? .system }
     private var palette: ReaderPalette { .resolve(paletteValue) }
     private var colors: ReaderColors { palette.colors(dark: dark) }
@@ -62,10 +113,42 @@ struct ReaderScreen: View {
                                     .font(.caption).foregroundStyle(.secondary).padding(14)
                             }
                         } header: {
-                            SourceHeader(store: store, source: source, background: colors.sidebar, selection: colors.selection, draggingFolder: $draggingFolder, insertion: $sourceInsertion)
-                                .background(colors.sidebar)
+                            SourceHeader(store: store, source: source, selection: colors.selection, draggingFolder: $draggingFolder, insertion: $sourceInsertion)
+                                .background { SourceHeaderBackground() }
                         }
                     }
+    }
+
+    private var brandSpacing: CGFloat {
+        #if os(macOS)
+        8
+        #else
+        14
+        #endif
+    }
+
+    private var readerBrand: some View {
+                    HStack(spacing: brandSpacing) {
+                        Image("ReaderBrand")
+                            .resizable()
+                            .frame(width: 32, height: 32)
+                            .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                            .accessibilityHidden(true)
+                        Text(verbatim: "iMDReader")
+                            .font(SidebarTypography.brand)
+                            .lineLimit(1)
+                            #if os(iOS)
+                            .minimumScaleFactor(0.8)
+                            #endif
+                    }
+                    .fixedSize(horizontal: true, vertical: false)
+                    #if os(iOS)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    #endif
+                    .foregroundStyle(colors.ink)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityAddTraits(.isHeader)
     }
 
     var body: some View {
@@ -86,7 +169,7 @@ struct ReaderScreen: View {
                             sourceSections(store.orderedSources.filter { store.isPinned($0) })
                         }
                     }
-                    Text("资料库").font(.caption).foregroundStyle(.secondary).padding(.horizontal, 14).padding(.top, 16)
+                    Text("资料库").font(SidebarTypography.caption).foregroundStyle(.secondary).padding(.horizontal, 14).padding(.top, 16)
                     sourceSections(store.orderedSources.filter { !store.isPinned($0) })
                     if !store.recentFiles.isEmpty {
                         Section {
@@ -100,12 +183,12 @@ struct ReaderScreen: View {
                                         Button("重新打开", systemImage: "arrow.clockwise") { store.openRecent(file) }
                                         Button("移除记录", systemImage: "minus.circle", role: .destructive) { store.removeRecent(file) }
                                     } label: { Image(systemName: "ellipsis").frame(width: 44, height: 44) }
-                                }.font(.subheadline).padding(.leading, 10)
+                                }.font(SidebarTypography.row).padding(.leading, 10)
                                     .background(store.selectedKey == file.key ? colors.selection : .clear, in: RoundedRectangle(cornerRadius: 9))
                             }
                         } header: {
                             HStack {
-                                Text("最近文件").font(.caption).foregroundStyle(.secondary)
+                                Text("最近文件").font(SidebarTypography.caption).foregroundStyle(.secondary)
                                 Spacer()
                                 Button("清空") { store.clearRecentFiles() }
                                     .font(.caption).accessibilityLabel("清空最近文件")
@@ -113,34 +196,31 @@ struct ReaderScreen: View {
                             }.padding(.horizontal, 12).background(colors.sidebar)
                         }
                     }
-                    Text("仅阅读，不修改源文件").font(.footnote).foregroundStyle(.secondary).padding(16)
+                    Text("仅阅读，不修改源文件").font(SidebarTypography.footnote).foregroundStyle(.secondary).padding(16)
                 }.padding(.horizontal, 12)
             }
             .foregroundStyle(colors.ink)
             .background(colors.sidebar)
             .navigationTitle("")
+        #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+        #endif
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    HStack(spacing: 14) {
-                        Image("ReaderBrand")
-                            .resizable()
-                            .frame(width: 32, height: 32)
-                            .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
-                            .accessibilityHidden(true)
-                        Text(verbatim: "iMDReader")
-                            .font(.headline)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                    }
-                    .fixedSize(horizontal: true, vertical: false)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .foregroundStyle(colors.ink)
-                    .accessibilityElement(children: .combine)
-                    .accessibilityAddTraits(.isHeader)
+                #if os(iOS)
+                ToolbarItem(placement: leadingToolbar) {
+                    readerBrand
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                #endif
+                #if os(macOS)
+                if #available(macOS 26.0, *) {
+                    ToolbarItem(placement: .primaryAction) {
+                        macNativeAddButton.glassEffect(.regular, in: Circle())
+                    }.sharedBackgroundVisibility(.hidden)
+                } else {
+                    ToolbarItem(placement: .primaryAction) { macNativeAddButton }
+                }
+                #else
+                ToolbarItem(placement: trailingToolbar) {
                     Menu {
                         Button("打开 Markdown 文件", systemImage: "doc.text") { selectingMarkdown = true; importing = true }
                         Button("本地文件夹", systemImage: "folder") { selectingMarkdown = false; importing = true }
@@ -148,6 +228,7 @@ struct ReaderScreen: View {
                     } label: { Image(systemName: "plus") }
                         .accessibilityLabel("添加来源")
                 }
+                #endif
             }
             .navigationSplitViewColumnWidth(min: 280, ideal: 300, max: 360)
         } detail: {
@@ -162,7 +243,7 @@ struct ReaderScreen: View {
                                 Button("添加所在文件夹") { selectingMarkdown = false; importing = true }.font(.caption)
                             }.padding(.horizontal, 20).padding(.vertical, 8)
                         }
-                        ReaderWebView(document: document, fontSize: scaledSize, dark: dark, palette: palette, language: language.resolved(), reduceMotion: reduceMotion, findRequest: findRequest, anchor: $anchor,
+                        ReaderWebView(document: document, fontSize: scaledSize, dark: dark, palette: palette, language: language.resolved(), reduceMotion: reduceMotion, findRequest: findRequest, findText: searchText, anchor: $anchor,
                                       onProgress: { store.recordProgress($0, documentKey: document.key) },
                                       onInternalLink: { url in
                                           if let source = store.sources.first(where: { $0.id == document.sourceID }) { store.open(url, source: source) }
@@ -196,14 +277,51 @@ struct ReaderScreen: View {
                     ProgressView("正在打开文档…").padding(24).background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
                 }
             }
-            .navigationTitle(store.document.map { Text($0.url.lastPathComponent) } ?? Text("阅读"))
-            .navigationBarTitleDisplayMode(.inline)
+            #if os(macOS)
+            .background(ReadingFrameProbe { frame in
+                if readingFrame != frame {
+                    readingFrame = frame
+                }
+            })
+            .navigationTitle("")
             .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
+                if #available(macOS 26.0, *) {
+                    ToolbarItem(placement: .navigation) {
+                        readerBrand.padding(.horizontal, 8)
+                    }
+                        .sharedBackgroundVisibility(.visible)
+                } else {
+                    ToolbarItem(placement: .navigation) {
+                        readerBrand.padding(.horizontal, 8)
+                    }
+                }
+                if #available(macOS 26.0, *) {
+                    ToolbarItem(placement: .principal) { macReadingTitle }
+                        .sharedBackgroundVisibility(.hidden)
+                } else {
+                    ToolbarItem(placement: .principal) { macReadingTitle }
+                }
+            }
+            #else
+            .navigationTitle(store.document.map { Text($0.url.lastPathComponent) } ?? Text("阅读"))
+            #endif
+        #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+        #endif
+            .toolbar {
+                ToolbarItemGroup(placement: trailingToolbar) {
                     if let document = store.document {
+                        #if os(macOS)
+                        MacFindField(text: $findText, focusRequest: findFocusRequest,
+                                     placeholder: ReaderLanguage.message("文内查找", locale: language.locale),
+                                     submit: { findRequest += 1 })
+                            .frame(width: 140)
+                        Button { findFocusRequest += 1; findRequest += 1 } label: { Label("查找下一个", systemImage: "magnifyingglass") }
+                        #else
                         Button { findRequest += 1 } label: { Label("文内查找", systemImage: "magnifyingglass") }
                             .keyboardShortcut("f", modifiers: .command)
                             .disabled(store.isLoading || renderingID != nil)
+                        #endif
                         Menu {
                             if document.rendered.headings.isEmpty { Text("这篇文章没有标题") }
                             ForEach(document.rendered.headings) { heading in
@@ -211,9 +329,14 @@ struct ReaderScreen: View {
                             }
                         } label: { Label("文章目录", systemImage: "list.bullet") }
                     }
+                    #if os(macOS)
+                    Button { showAppearance.toggle() } label: { Text("Aa").font(.system(.title3, design: .serif)) }
+                        .accessibilityLabel("阅读外观")
+                    #else
                     Button { showAppearance = true } label: { Text("Aa").font(.system(.title3, design: .serif)) }
                         .accessibilityLabel("阅读外观")
                         .popover(isPresented: $showAppearance) { appearancePanel }
+                    #endif
                     if visibility != .detailOnly {
                         Button("沉浸阅读", systemImage: "arrow.up.left.and.arrow.down.right") { visibility = .detailOnly }
                     }
@@ -225,19 +348,25 @@ struct ReaderScreen: View {
                 }
             }
         }
+        #if os(macOS)
+        .overlay(alignment: .topTrailing) {
+            if showAppearance { macAppearanceOverlay }
+        }
+        #endif
         .tint(readerTint)
         .accentColor(readerTint)
+        #if os(macOS)
+        .preferredColorScheme(dark ? .dark : .light)
+        #else
         .preferredColorScheme(theme == "system" ? nil : (dark ? .dark : .light))
+        #endif
         .background {
             GeometryReader { geometry in
                 Color.clear.onAppear { adaptLayout(to: geometry.size) }
                     .onChange(of: geometry.size) { _, size in adaptLayout(to: size) }
-            }
-        }
-        .onChange(of: horizontalSizeClass) { _, sizeClass in
-            if sizeClass == .compact {
-                prefersSingleColumn = true
-                if store.selectedKey != nil { showReadingColumn() }
+        #if os(iOS)
+                    .onChange(of: horizontalSizeClass) { _, _ in adaptLayout(to: geometry.size) }
+        #endif
             }
         }
         .onChange(of: store.selectedKey) { _, key in
@@ -266,6 +395,13 @@ struct ReaderScreen: View {
         } message: { Text(ReaderLanguage.message(store.error ?? "", locale: language.locale)) }
         .task { await store.configureOfflineCache(); store.restoreLastDocument() }
         .environment(\.locale, language.locale)
+        #if os(macOS)
+        .focusedSceneValue(\.readerActions, ReaderActions(
+            openFile: { selectingMarkdown = true; importing = true },
+            openFolder: { selectingMarkdown = false; importing = true },
+            addGitHub: { addingGitHub = true },
+            find: { findFocusRequest += 1 }))
+        #endif
 
     }
 
@@ -276,7 +412,19 @@ struct ReaderScreen: View {
     }
 
     private func adaptLayout(to size: CGSize) {
-        prefersSingleColumn = size.width < 900 || size.width < size.height || horizontalSizeClass == .compact
+        #if os(iOS)
+        appearanceAvailableSize = size
+        #endif
+        #if os(macOS)
+        let singleColumn = false
+        #else
+        let singleColumn = size.width < 900 || size.width < size.height || horizontalSizeClass == .compact
+        #endif
+        // Rotation, keyboard and safe-area changes must not undo a user's return
+        // to the library when the navigation layout itself has not changed.
+        guard !hasAdaptedLayout || singleColumn != prefersSingleColumn else { return }
+        hasAdaptedLayout = true
+        prefersSingleColumn = singleColumn
         if prefersSingleColumn {
             if store.document != nil || store.selectedKey != nil { showReadingColumn() }
             else { compactColumn = .sidebar; visibility = .all }
@@ -288,40 +436,138 @@ struct ReaderScreen: View {
                 set: { fontSize = ReaderFontScale.size(at: $0) })
     }
 
+    #if os(macOS)
+    private var macNativeAddButton: some View {
+                    NativeAddMenu(locale: language.locale,
+                                  openFile: { selectingMarkdown = true; importing = true },
+                                  openFolder: { selectingMarkdown = false; importing = true },
+                                  openGitHub: { addingGitHub = true })
+                        .frame(width: 36, height: 36)
+    }
+
+    private var macReadingTitle: some View {
+        ReadingAreaTitle(title: store.document?.url.lastPathComponent ?? "", targetCenterX: readingFrame.midX)
+            .frame(width: min(600, max(80, readingFrame.width - 320)), height: 24)
+    }
+
+    private var macAppearanceOverlay: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .topTrailing) {
+                Button("关闭阅读外观") { showAppearance = false }
+                    .keyboardShortcut(.cancelAction)
+                    .frame(width: 0, height: 0).clipped()
+                    .accessibilityHidden(true)
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture { showAppearance = false }
+                ViewThatFits(in: .vertical) {
+                    appearancePanel
+                    ScrollView { appearancePanel }
+                }
+                .frame(width: min(456, max(0, geometry.size.width - 24)))
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(color: .black.opacity(0.15), radius: 12, y: 4)
+                .padding(12)
+            }
+        }
+    }
+    #endif
+
     private var appearancePanel: some View {
+        #if os(iOS)
+        ViewThatFits(in: .vertical) {
+            appearanceContents.fixedSize(horizontal: false, vertical: true)
+            ScrollView { appearanceContents }
+        }
+        .frame(width: mobileAppearanceWidth)
+        .frame(maxHeight: max(160, appearanceAvailableSize.height - 80))
+        .presentationCompactAdaptation(.popover)
+        #else
+        appearanceContents
+        #endif
+    }
+
+    private var appearanceContents: some View {
         VStack(alignment: .leading, spacing: 24) {
             Text("阅读外观").font(.headline)
             VStack(alignment: .leading, spacing: 12) {
-                HStack { Text("正文字号"); Spacer(); Text("\(Int(fontSize))").monospacedDigit().foregroundStyle(.secondary) }
+                HStack {
+                    Text("正文字号")
+                    Text("\(Int(fontSize))").monospacedDigit().foregroundStyle(.secondary)
+                }
                 Slider(value: fontSliderPosition, in: 0...1) {
                     Text("正文字号")
                 } minimumValueLabel: { Text("A").font(.caption) }
                   maximumValueLabel: { Text("A").font(.title3) }
                     .accessibilityValue("\(Int(fontSize)) 点")
             }
+            #if os(macOS)
+            MacAppearanceSegments(title: "明暗", options: [("跟随系统", "system"), ("浅色", "light"), ("深色", "dark")], selection: $theme, locale: language.locale, tint: readerTint)
+                .frame(height: 24)
+            #else
             Picker("明暗", selection: $theme) {
                 Text("跟随系统").tag("system"); Text("浅色").tag("light"); Text("深色").tag("dark")
             }.pickerStyle(.segmented)
+            #endif
             VStack(alignment: .leading, spacing: 12) {
                 Text("配色").font(.subheadline)
-                Picker("配色", selection: $paletteValue) {
-                    ForEach(ReaderPalette.allCases) { option in
-                        Text(LocalizedStringKey(option.name)).tag(option.rawValue)
+                #if os(macOS)
+                MacAppearanceSegments(title: "配色", options: ReaderPalette.allCases.map { ($0.name, $0.rawValue) }, selection: $paletteValue, locale: language.locale, tint: readerTint)
+                    .frame(height: 24)
+                #else
+                if usesCompactPalette {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                        ForEach(ReaderPalette.allCases) { option in
+                            Button { paletteValue = option.rawValue } label: {
+                                Text(LocalizedStringKey(option.name))
+                                    .frame(maxWidth: .infinity, minHeight: 32)
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(paletteValue == option.rawValue ? readerTint : .secondary)
+                            .background(paletteValue == option.rawValue ? readerTint.opacity(0.18) : .clear,
+                                        in: RoundedRectangle(cornerRadius: 8))
+                            .accessibilityAddTraits(paletteValue == option.rawValue ? .isSelected : [])
+                        }
                     }
-                }.pickerStyle(.segmented)
+                } else {
+                    Picker("配色", selection: $paletteValue) {
+                        ForEach(ReaderPalette.allCases) { option in
+                            Text(LocalizedStringKey(option.name)).tag(option.rawValue)
+                        }
+                    }.pickerStyle(.segmented)
+                        .frame(maxWidth: .infinity)
+                }
+                #endif
             }
             VStack(alignment: .leading, spacing: 12) {
                 Text("语言").font(.subheadline)
+                #if os(macOS)
+                MacAppearanceSegments(title: "语言", options: [("跟随系统", "system"), ("简体中文", "zh-Hans"), ("English", "en")], selection: $languageValue, locale: language.locale, tint: readerTint)
+                    .frame(height: 24)
+                #else
                 Picker("语言", selection: $languageValue) {
                     Text("跟随系统").tag("system")
                     Text("简体中文").tag("zh-Hans")
                     Text("English").tag("en")
                 }.pickerStyle(.segmented)
+                #endif
             }
         }
+        #if os(macOS)
+        .labelsHidden()
+        #endif
         .environment(\.locale, language.locale)
-        .padding(28).frame(minWidth: 360).presentationCompactAdaptation(.popover)
+        .padding(28)
+        #if os(macOS)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
+        #else
+        .frame(maxWidth: .infinity, alignment: .leading)
+        #endif
+        #if os(iOS)
         .preferredColorScheme(dark ? .dark : .light)
+        #endif
         .tint(readerTint)
     }
 }
@@ -424,10 +670,22 @@ private struct SourceInsertionDrop: DropDelegate {
     }
 }
 
+// Section headers can remain hosted while sources move between pinned groups.
+// Observe appearance here so their backgrounds do not depend on a captured Color.
+private struct SourceHeaderBackground: View {
+    @AppStorage("readerPalette") private var paletteValue = ReaderPalette.mist.rawValue
+    @AppStorage("readerTheme") private var theme = "system"
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        let dark = theme == "dark" || (theme == "system" && colorScheme == .dark)
+        ReaderPalette.resolve(paletteValue).colors(dark: dark).sidebar
+    }
+}
+
 private struct SourceHeader: View {
     @ObservedObject var store: ReaderStore
     let source: FolderSource
-    let background: Color
     let selection: Color
     @Binding var draggingFolder: String?
     @Binding var insertion: SourceInsertion?
@@ -449,7 +707,7 @@ private struct SourceHeader: View {
                     TreeDirectory(store: store, source: source, url: root, level: 0, selection: selection, draggingFolder: $draggingFolder).directoryHeader
                 } else {
                     HStack {
-                        Label(source.name, systemImage: "folder").font(.subheadline).fontWeight(.semibold)
+                        Label(source.name, systemImage: "folder").font(SidebarTypography.row).fontWeight(.semibold)
                         Spacer()
                         Button("重试") { Task { await store.retryLocalSource(source) } }
                     }.padding(14).frame(minHeight: 56)
@@ -457,7 +715,7 @@ private struct SourceHeader: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .background(background)
+            .background { SourceHeaderBackground() }
             .offset(x: source.isSample ? 0 : min(0, max(-actionWidth, (showingRemove ? -actionWidth : 0) + drag)))
             .simultaneousGesture(DragGesture(minimumDistance: 24)
                 .updating($drag) { value, state, _ in
@@ -527,7 +785,7 @@ private struct TreeDirectory: View {
                         .lineLimit(level == 0 ? 2 : 1).truncationMode(.middle)
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 0)
-                }.font(.subheadline).padding(.leading, CGFloat(min(level, 5) * 14 + 10)).padding(.trailing, 10).frame(minHeight: level == 0 ? 56 : 44).contentShape(Rectangle())
+                }.font(SidebarTypography.row).padding(.leading, CGFloat(min(level, 5) * 14 + 10)).padding(.trailing, 10).frame(minHeight: level == 0 ? 56 : 44).contentShape(Rectangle())
               }.buttonStyle(.plain)
                 .accessibilityLabel(level == 0 ? (source.remote == nil ? Text("\(accessibleName)，文件夹来源") : Text("\(accessibleName)，GitHub 来源")) : Text(url.lastPathComponent))
                 .accessibilityValue(isExpanded ? Text("已展开") : Text("已收起"))
@@ -590,7 +848,7 @@ private struct TreeDirectory: View {
                                     Image(systemName: node.isMarkdown ? "doc.text" : "doc").foregroundStyle(.secondary)
                                     Text(node.name).lineLimit(1).truncationMode(.middle)
                                     Spacer(minLength: 0)
-                                }.font(.subheadline).padding(.leading, CGFloat(min(level + 1, 5) * 14 + 32)).padding(.trailing, 12)
+                                }.font(SidebarTypography.row).padding(.leading, CGFloat(min(level + 1, 5) * 14 + 32)).padding(.trailing, 12)
                                     .frame(minHeight: 44).contentShape(Rectangle())
                             }.buttonStyle(.plain)
                                 .disabled(!node.isMarkdown)
@@ -648,7 +906,9 @@ private struct OfflineCacheSheet: View {
                 }
             }
             .navigationTitle(ReaderLanguage.message("离线缓存", locale: locale))
+        #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+        #endif
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("完成") { dismiss() } } }
         }.task { await store.refreshCacheUsage() }
     }
@@ -668,7 +928,9 @@ private struct GitHubAccessSheet: View {
                 Section {
                     Label(store.hasGitHubCredential ? "已保存授权" : "尚未保存授权", systemImage: "key")
                     SecureField("细粒度访问令牌", text: $token)
+        #if os(iOS)
                         .textInputAutocapitalization(.never).autocorrectionDisabled()
+        #endif
                         .privacySensitive()
                     Button("保存授权") { update(token) }
                         .disabled(token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -692,7 +954,9 @@ private struct GitHubAccessSheet: View {
             }
             .disabled(working)
             .navigationTitle(ReaderLanguage.message("GitHub 授权", locale: locale))
+        #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+        #endif
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("完成") { token = ""; dismiss() }.disabled(working) } }
         }
         .interactiveDismissDisabled(working)
@@ -726,14 +990,18 @@ private struct GitHubAddSheet: View {
             Form {
                 Section {
                     TextField("https://github.com/owner/repository", text: $url)
+        #if os(iOS)
                         .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
+        #endif
                         .accessibilityLabel("GitHub 链接")
                 } footer: {
                     Text("支持仓库、目录或 Markdown 文件。私有仓库需先在“GitHub 授权”中保存只读令牌。")
                 }
                 DisclosureGroup("指定分支或标签（可选）") {
                     TextField("例如 main 或 feature/notes", text: $reference)
+        #if os(iOS)
                         .textInputAutocapitalization(.never).autocorrectionDisabled()
+        #endif
                     Text("链接存在歧义时填写；留空则自动解析。")
                         .font(.footnote).foregroundStyle(.secondary)
                 }
@@ -742,7 +1010,9 @@ private struct GitHubAddSheet: View {
             }
             .disabled(store.isAddingGitHub)
             .navigationTitle(ReaderLanguage.message("添加 GitHub 来源", locale: locale))
+        #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+        #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("取消") { task?.cancel(); dismiss() }
@@ -762,3 +1032,225 @@ private struct GitHubAddSheet: View {
         .onDisappear { task?.cancel() }
     }
 }
+
+private enum SidebarTypography {
+    #if os(macOS)
+    static let row = Font.system(size: 15)
+    static let caption = Font.system(size: 12)
+    static let footnote = Font.system(size: 12)
+    static let brand = Font.system(size: 17, weight: .semibold)
+    #else
+    static let row = Font.subheadline
+    static let caption = Font.caption
+    static let footnote = Font.footnote
+    static let brand = Font.headline
+    #endif
+}
+
+#if os(macOS)
+/// A full-width native segmented control; localized titles never determine its width.
+private struct MacAppearanceSegments: NSViewRepresentable {
+    let title: String
+    let options: [(label: String, value: String)]
+    @Binding var selection: String
+    let locale: Locale
+    let tint: Color
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+    func makeNSView(context: Context) -> NSSegmentedControl {
+        let control = NSSegmentedControl()
+        control.trackingMode = .selectOne
+        control.segmentDistribution = .fillEqually
+        control.target = context.coordinator
+        control.action = #selector(Coordinator.selectSegment(_:))
+        control.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        return control
+    }
+    func updateNSView(_ control: NSSegmentedControl, context: Context) {
+        context.coordinator.parent = self
+        control.segmentCount = options.count
+        for (index, option) in options.enumerated() {
+            control.setLabel(ReaderLanguage.message(option.label, locale: locale), forSegment: index)
+        }
+        control.selectedSegmentBezelColor = NSColor(tint)
+        control.selectedSegment = options.firstIndex { $0.value == selection } ?? -1
+        control.setAccessibilityLabel(ReaderLanguage.message(title, locale: locale))
+    }
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSSegmentedControl, context: Context) -> CGSize? {
+        CGSize(width: proposal.width ?? 400, height: 24)
+    }
+    @MainActor final class Coordinator: NSObject {
+        var parent: MacAppearanceSegments
+        init(_ parent: MacAppearanceSegments) { self.parent = parent }
+        @objc func selectSegment(_ sender: NSSegmentedControl) {
+            guard parent.options.indices.contains(sender.selectedSegment) else { return }
+            parent.selection = parent.options[sender.selectedSegment].value
+        }
+    }
+}
+#endif
+
+#if os(macOS)
+private struct MacFindField: NSViewRepresentable {
+    @Binding var text: String
+    let focusRequest: Int
+    let placeholder: String
+    let submit: () -> Void
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+    func makeNSView(context: Context) -> NSTextField {
+        let field = NSTextField(string: text)
+        field.isBordered = false
+        field.drawsBackground = false
+        field.font = .systemFont(ofSize: NSFont.systemFontSize)
+        field.delegate = context.coordinator
+        field.target = context.coordinator
+        field.action = #selector(Coordinator.submitSearch)
+        field.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        return field
+    }
+    func updateNSView(_ field: NSTextField, context: Context) {
+        context.coordinator.parent = self
+        if field.stringValue != text { field.stringValue = text }
+        field.placeholderString = placeholder
+        field.setAccessibilityLabel(placeholder)
+        if context.coordinator.lastFocusRequest != focusRequest {
+            context.coordinator.lastFocusRequest = focusRequest
+            field.window?.makeFirstResponder(field)
+        }
+    }
+    final class Coordinator: NSObject, NSTextFieldDelegate {
+        var parent: MacFindField
+        var lastFocusRequest: Int
+        init(_ parent: MacFindField) {
+            self.parent = parent
+            lastFocusRequest = parent.focusRequest
+        }
+        func controlTextDidChange(_ notification: Notification) {
+            guard let field = notification.object as? NSTextField else { return }
+            parent.text = field.stringValue
+        }
+        @objc func submitSearch() { parent.submit() }
+    }
+}
+
+private struct ReadingFrameProbe: NSViewRepresentable {
+    let changed: (CGRect) -> Void
+    func makeNSView(context: Context) -> Probe { Probe(changed: changed) }
+    func updateNSView(_ view: Probe, context: Context) { view.changed = changed; view.report() }
+    final class Probe: NSView {
+        var changed: (CGRect) -> Void
+        init(changed: @escaping (CGRect) -> Void) { self.changed = changed; super.init(frame: .zero) }
+        required init?(coder: NSCoder) { nil }
+        override func layout() { super.layout(); report() }
+        override func viewDidMoveToWindow() { super.viewDidMoveToWindow(); report() }
+        func report() {
+            guard window != nil else { return }
+            let rect = convert(bounds, to: nil)
+            DispatchQueue.main.async { [weak self] in self?.changed(rect) }
+        }
+    }
+}
+
+private struct ReadingAreaTitle: NSViewRepresentable {
+    let title: String
+    let targetCenterX: CGFloat
+    func makeNSView(context: Context) -> Title { Title() }
+    func updateNSView(_ view: Title, context: Context) {
+        view.label.stringValue = title
+        view.label.toolTip = title
+        view.targetCenterX = targetCenterX
+        view.needsLayout = true
+    }
+    final class Title: NSView {
+        let label = NSTextField(labelWithString: "")
+        var targetCenterX: CGFloat = 0
+        init() {
+            super.init(frame: .zero)
+            label.drawsBackground = false
+            label.isBordered = false
+            label.isBezeled = false
+            label.alignment = .center
+            label.font = .systemFont(ofSize: 17, weight: .semibold)
+            label.lineBreakMode = .byTruncatingMiddle
+            label.maximumNumberOfLines = 1
+            addSubview(label)
+        }
+        required init?(coder: NSCoder) { nil }
+        override func layout() {
+            super.layout()
+            guard window != nil else { return }
+            let center = convert(NSPoint(x: targetCenterX, y: 0), from: nil).x
+            let width = max(0, 2 * min(center - bounds.minX, bounds.maxX - center))
+            label.frame = CGRect(x: center - width / 2, y: (bounds.height - 20) / 2, width: width, height: 20)
+        }
+    }
+}
+#endif
+
+#if os(macOS)
+private struct NativeAddMenu: NSViewRepresentable {
+    let locale: Locale
+    let openFile: () -> Void
+    let openFolder: () -> Void
+    let openGitHub: () -> Void
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+    func makeNSView(context: Context) -> NSButton {
+        let button = NSButton(title: "", target: context.coordinator, action: #selector(Coordinator.showMenu(_:)))
+        button.image = NSImage(systemSymbolName: "plus", accessibilityDescription: nil)
+        button.bezelStyle = .circular
+        button.isBordered = true
+        button.imagePosition = .imageOnly
+        button.controlSize = .large
+        return button
+    }
+    func updateNSView(_ button: NSButton, context: Context) {
+        context.coordinator.parent = self
+        let title = ReaderLanguage.message("添加来源", locale: locale)
+        button.setAccessibilityLabel(title)
+        button.toolTip = title
+    }
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSButton, context: Context) -> CGSize? {
+        CGSize(width: 36, height: 36)
+    }
+    @MainActor final class Coordinator: NSObject {
+        var parent: NativeAddMenu
+        init(_ parent: NativeAddMenu) { self.parent = parent }
+        @objc func showMenu(_ sender: NSButton) {
+            let menu = NSMenu()
+            let options: [(String, Selector)] = [
+                ("打开 Markdown 文件", #selector(openFile)),
+                ("本地文件夹", #selector(openFolder)),
+                ("GitHub 链接", #selector(openGitHub))
+            ]
+            for (title, action) in options {
+                let item = NSMenuItem(title: ReaderLanguage.message(title, locale: parent.locale), action: action, keyEquivalent: "")
+                item.target = self
+                menu.addItem(item)
+            }
+            menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.minY), in: sender)
+        }
+        @objc func openFile() { parent.openFile() }
+        @objc func openFolder() { parent.openFolder() }
+        @objc func openGitHub() { parent.openGitHub() }
+    }
+}
+#endif
+
+#if os(macOS)
+/// System appearance must not be inferred from a window with a reader override.
+@MainActor private final class MacSystemAppearance: ObservableObject {
+    @Published private(set) var isDark: Bool
+    private var observation: NSKeyValueObservation?
+    init() {
+        isDark = NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        observation = NSApp.observe(\.effectiveAppearance, options: [.new]) { [weak self] _, _ in
+            Task { @MainActor [weak self] in
+                self?.isDark = NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            }
+        }
+    }
+}
+
+
+#endif

@@ -79,6 +79,23 @@ struct SavedSource: Codable, Identifiable {
     var bookmark: Data
 }
 
+enum ReaderBookmarkOptions {
+    static var creation: URL.BookmarkCreationOptions {
+        #if os(macOS)
+        [.withSecurityScope, .securityScopeAllowOnlyReadAccess]
+        #else
+        .minimalBookmark
+        #endif
+    }
+    static var resolution: URL.BookmarkResolutionOptions {
+        #if os(macOS)
+        .withSecurityScope
+        #else
+        []
+        #endif
+    }
+}
+
 final class ScopedAccess: @unchecked Sendable {
     let url: URL
     private let scoped: Bool
@@ -196,9 +213,9 @@ struct OpenDocument {
             let saved = savedFiles[index]
             var stale = false
             do {
-                let url = try URL(resolvingBookmarkData: saved.bookmark, options: [], relativeTo: nil, bookmarkDataIsStale: &stale)
+                let url = try URL(resolvingBookmarkData: saved.bookmark, options: ReaderBookmarkOptions.resolution, relativeTo: nil, bookmarkDataIsStale: &stale)
                 let access = ScopedAccess(url)
-                if stale { savedFiles[index].bookmark = try url.bookmarkData(options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil) }
+                if stale { savedFiles[index].bookmark = try url.bookmarkData(options: ReaderBookmarkOptions.creation, includingResourceValuesForKeys: nil, relativeTo: nil) }
                 recentFiles.append(RecentFile(id: saved.id, name: url.lastPathComponent, access: access))
             } catch {
                 // Keep recent records for temporary provider/network failures.
@@ -212,10 +229,10 @@ struct OpenDocument {
             let saved = bookmarks[index]
             var stale = false
             do {
-                let url = try URL(resolvingBookmarkData: saved.bookmark, options: [], relativeTo: nil, bookmarkDataIsStale: &stale)
+                let url = try URL(resolvingBookmarkData: saved.bookmark, options: ReaderBookmarkOptions.resolution, relativeTo: nil, bookmarkDataIsStale: &stale)
                 let access = ScopedAccess(url)
                 if stale {
-                    bookmarks[index].bookmark = try url.bookmarkData(options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil)
+                    bookmarks[index].bookmark = try url.bookmarkData(options: ReaderBookmarkOptions.creation, includingResourceValuesForKeys: nil, relativeTo: nil)
                     refreshedBookmarks = true
                 }
                 sources.append(FolderSource(id: saved.id, name: saved.name, access: access, isSample: false))
@@ -283,7 +300,7 @@ struct OpenDocument {
               let saved = bookmarks.first(where: { $0.id == source.id }) else { return }
         do {
             var stale = false
-            let url = try URL(resolvingBookmarkData: saved.bookmark, options: [], relativeTo: nil, bookmarkDataIsStale: &stale)
+            let url = try URL(resolvingBookmarkData: saved.bookmark, options: ReaderBookmarkOptions.resolution, relativeTo: nil, bookmarkDataIsStale: &stale)
             let restored = FolderSource(id: saved.id, name: saved.name, access: ScopedAccess(url), isSample: false)
             guard let index = sources.firstIndex(where: { $0.id == source.id }) else { return }
             sources[index] = restored
@@ -595,7 +612,7 @@ struct OpenDocument {
     func addFolder(_ url: URL) {
         let access = ScopedAccess(url)
         do {
-            let bookmark = try url.bookmarkData(options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil)
+            let bookmark = try url.bookmarkData(options: ReaderBookmarkOptions.creation, includingResourceValuesForKeys: nil, relativeTo: nil)
             // Re-selecting the same location should not create duplicate roots.
             let existing = sources.first(where: { !$0.isSample && $0.url?.standardizedFileURL == url.standardizedFileURL })?.id
             let id = existing ?? UUID()
@@ -753,7 +770,7 @@ struct OpenDocument {
         guard let saved = savedFiles.first(where: { $0.id == recent.id }) else { return }
         do {
             var stale = false
-            let url = try URL(resolvingBookmarkData: saved.bookmark, options: [], relativeTo: nil, bookmarkDataIsStale: &stale)
+            let url = try URL(resolvingBookmarkData: saved.bookmark, options: ReaderBookmarkOptions.resolution, relativeTo: nil, bookmarkDataIsStale: &stale)
             openFileURL(url, existingID: saved.id)
         } catch { self.error = "文件暂时无法访问，记录已保留，请稍后重试。" }
     }
@@ -823,7 +840,7 @@ struct OpenDocument {
                         NSFileCoordinator().coordinate(readingItemAt: url, options: [], error: &coordinationError) { coordinated in
                             output = Result {
                                 let text = try LocalDocuments.read(coordinated, root: coordinated)
-                                let bookmark = try url.bookmarkData(options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil)
+                                let bookmark = try url.bookmarkData(options: ReaderBookmarkOptions.creation, includingResourceValuesForKeys: nil, relativeTo: nil)
                                 return (MarkdownRenderer().render(text, allowRelativeImages: false), bookmark)
                             }
                         }

@@ -1,8 +1,14 @@
 # iMDReader
 
-轻量、原生、只读的 iPad Markdown 阅读器：IDE 式文件树，舒适的长文阅读排版。
+轻量、原生、只读的 Markdown 阅读器，支持 Mac、iPad 和 iPhone。
 
-**阶段一：iPad核心阅读与交互版已完成，本期用户验收通过。** 已完成、未完成和待验证内容集中记录在 [开发状态](docs/STATUS.md)。
+**首个 Mac 发行候选：0.1.0（build26），已公证，Release仍为草稿。** Universal 二进制支持 Apple Silicon 与 Intel，最低 macOS 14。已通过 Developer ID 签名、Apple 公证、staple 和 Gatekeeper 验证。Apple Silicon 已完成主要真实流程检查；Intel 与 macOS 14 本机运行尚未实测。移动端保留现有源码与功能，本次不发布 App Store 版本。
+
+审计发现应用英文模式下原生自定义菜单仍中文，等待本版修复/下版处理决定；正式公开尚未完成。
+
+[发布页面](https://github.com/wivnelo/i-md-reader/releases/tag/v0.1.0) · [验证结果与限制](docs/STATUS.md)
+
+解压后将 iMDReader.app 放入“应用程序”即可使用。已有用户应保留原App标识及数据，不卸载清空沙箱；可用 `shasum -a 256` 与Release附带的SHA256SUMS.txt核对ZIP。无需关闭Gatekeeper。
 
 ![iMDReader 原生界面](design/previews/imdreader-name.png)
 
@@ -23,7 +29,7 @@
 
 ## 下一阶段与专项检查
 
-- iPhone小屏适配，随后增加同工程的Mac原生目标，复用现有核心。
+- Mac主要GitHub、书签恢复、系统文件冷热打开和搜索已完成检查；剩余窗口专项及移动端待决定事项见STATUS。
 - 图片放大、外部HTTPS图片和SVG安全加载。
 - 最低系统、VoiceOver/动态字号、其他文件提供方/组织授权异常、长文与多图性能和分发检查。
 
@@ -35,7 +41,7 @@
 
 ## 构建与测试
 
-使用 Xcode 打开 `iMDReader.xcodeproj`，选择共享方案 `iMDReader`。首轮构建需下载 Swift 官方 Markdown/cmark 依赖，版本记录在 `Package.resolved`。暂定 iPadOS 17 下限，尚未完成该版本的运行验收；已使用 Xcode 27.1 构建。
+使用 Xcode 打开 `iMDReader.xcodeproj`，选择共享方案 `iMDReader`。首轮构建需下载 Swift 官方 Markdown/cmark 依赖，版本记录在 `Package.resolved`。Mac 使用同工程共享方案 `iMDReaderMac`，原生 AppKit/WebKit，不使用 Catalyst。Mac 最低目标为 macOS 14（尚未在该系统实测），Debug 默认本机架构。暂定 iOS/iPadOS 17 下限，尚未完成该版本的运行验收；已使用 Xcode 27.1 构建。
 
 ```sh
 # 核心解析、路径、GitHub 请求测试
@@ -47,7 +53,7 @@ xcodebuild -project iMDReader.xcodeproj -scheme iMDReader \
   -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
 ```
 
-实机安装需要在 Xcode 配置自己的开发团队和唯一 Bundle ID；仓库不包含签名证书或个人团队参数。首次选择本地目录需要系统授权。
+首次实机安装需要在 Xcode 配置自己的开发团队和唯一 Bundle ID；已有安装必须沿用原团队与标识，不卸载清空数据。仓库不包含签名证书或个人团队参数。首次选择本地目录需要系统授权。
 
 真实网络测试默认跳过，可在确有需要时显式设置 `READER_GITHUB_LIVE=1`，注意 GitHub 请求额度。
 
@@ -72,3 +78,23 @@ GitHub不复用开发机登录；可在App内保存细粒度访问令牌到Keych
 - `design/`：早期视觉原型、配色比较与历史截图；不作为当前实现状态的依据。
 
 当前文档支持工具栏关键词查找与 ⌘F；最近文件支持一键清空记录，源文件保留。具体验证范围见 [开发状态](docs/STATUS.md)。
+
+### Mac 构建
+
+```sh
+xcodebuild -project iMDReader.xcodeproj -scheme iMDReaderMac \
+  -configuration Release -destination 'generic/platform=macOS' \
+  ONLY_ACTIVE_ARCH=NO 'ARCHS=arm64 x86_64' \
+  CURRENT_PROJECT_VERSION=26 MARKETING_VERSION=0.1.0 \
+  CODE_SIGNING_ALLOWED=NO build
+```
+
+上例仅构建源码，不生成可分发签名。正式分发需使用自己的Developer ID身份、可信时间戳和hardened runtime，并完成公证/staple/Gatekeeper检查；Mac Release禁用自动注入调试权限，不允许get-task-allow。签名团队和凭据不写入仓库。
+
+原生视图检查使用指定Mac包的真实英文资源，隐藏测试窗口，不修改系统外观：
+
+```sh
+bash scripts/check-mac-appearance.sh /path/to/iMDReader.app
+```
+
+版本、功能验证、未测范围及后续计划统一维护在 [STATUS](docs/STATUS.md)。

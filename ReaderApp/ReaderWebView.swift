@@ -2,7 +2,14 @@ import SwiftUI
 import WebKit
 import ReaderCore
 
-struct ReaderWebView: UIViewRepresentable {
+#if os(macOS)
+import AppKit
+private typealias ReaderWebRepresentable = NSViewRepresentable
+#else
+private typealias ReaderWebRepresentable = UIViewRepresentable
+#endif
+
+struct ReaderWebView: ReaderWebRepresentable {
     let document: OpenDocument
     let fontSize: Double
     let dark: Bool
@@ -10,6 +17,7 @@ struct ReaderWebView: UIViewRepresentable {
     let language: String
     let reduceMotion: Bool
     let findRequest: Int
+    var findText: String = ""
     @Binding var anchor: String?
     let onProgress: (Double) -> Void
     let onInternalLink: (URL) -> Void
@@ -18,7 +26,17 @@ struct ReaderWebView: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
-    func makeUIView(context: Context) -> WKWebView {
+    #if os(macOS)
+    func makeNSView(context: Context) -> WKWebView { makeWebView(context: context) }
+    func updateNSView(_ web: WKWebView, context: Context) { updateWebView(web, context: context) }
+    static func dismantleNSView(_ web: WKWebView, coordinator: Coordinator) { dismantleWebView(web, coordinator: coordinator) }
+    #else
+    func makeUIView(context: Context) -> WKWebView { makeWebView(context: context) }
+    func updateUIView(_ web: WKWebView, context: Context) { updateWebView(web, context: context) }
+    static func dismantleUIView(_ web: WKWebView, coordinator: Coordinator) { dismantleWebView(web, coordinator: coordinator) }
+    #endif
+
+    private func makeWebView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .nonPersistent()
         configuration.setURLSchemeHandler(LocalResourceHandler(root: document.access.url, imageLoader: document.imageLoader), forURLScheme: "reader-resource")
@@ -34,13 +52,17 @@ struct ReaderWebView: UIViewRepresentable {
             configuration.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true, in: .defaultClient))
         }
         let web = WKWebView(frame: .zero, configuration: configuration)
+        #if os(iOS)
         web.isFindInteractionEnabled = true
         web.isOpaque = false
         web.backgroundColor = .clear
         web.scrollView.backgroundColor = .clear
+        #endif
         web.navigationDelegate = context.coordinator
         web.allowsLinkPreview = false
+        #if os(iOS)
         web.scrollView.contentInsetAdjustmentBehavior = .automatic
+        #endif
         let css = Bundle.main.url(forResource: "reader", withExtension: "css").flatMap { try? String(contentsOf: $0, encoding: .utf8) } ?? ""
         let theme = dark ? "dark" : "light"
         let html = """
@@ -56,12 +78,16 @@ struct ReaderWebView: UIViewRepresentable {
         web.loadHTMLString(html, baseURL: base.url)
         return web
     }
-    func updateUIView(_ web: WKWebView, context: Context) {
+    private func updateWebView(_ web: WKWebView, context: Context) {
         context.coordinator.parent = self
         if context.coordinator.lastFindRequest != findRequest {
             context.coordinator.lastFindRequest = findRequest
             // ShowingReplace is always false: the reader never offers editing.
+            #if os(macOS)
+            if !findText.isEmpty { web.find(findText, configuration: WKFindConfiguration()) { _ in } }
+            #else
             web.findInteraction?.presentFindNavigator(showingReplace: false)
+            #endif
         }
         let appearance = "\(fontSize)-\(dark)-\(palette.rawValue)-\(language)"
         if appearance != context.coordinator.appearance {
@@ -79,8 +105,10 @@ struct ReaderWebView: UIViewRepresentable {
         let theme = dark ? "dark" : "light"
         return "document.documentElement.dataset.uiLanguage='\(language)';document.documentElement.dataset.theme='\(theme)';document.documentElement.style.cssText='\(palette.colors(dark: dark).cssVariables)';document.body.style.fontSize='\(fontSize)px';"
     }
-    static func dismantleUIView(_ web: WKWebView, coordinator: Coordinator) {
+    private static func dismantleWebView(_ web: WKWebView, coordinator: Coordinator) {
+        #if os(iOS)
         web.findInteraction?.dismissFindNavigator()
+        #endif
         web.stopLoading()
         web.configuration.userContentController.removeScriptMessageHandler(forName: "reader", contentWorld: .defaultClient)
         web.navigationDelegate = nil
@@ -95,7 +123,14 @@ struct ReaderWebView: UIViewRepresentable {
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             guard message.frameInfo.isMainFrame, let body = message.body as? [String: Any], let type = body["type"] as? String else { return }
             if type == "progress", let value = body["value"] as? Double { parent.onProgress(value) }
-            if type == "copy", let text = body["text"] as? String, text.utf8.count <= 1_048_576 { UIPasteboard.general.string = text }
+            if type == "copy", let text = body["text"] as? String, text.utf8.count <= 1_048_576 {
+                #if os(macOS)
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(text, forType: .string)
+                #else
+                UIPasteboard.general.string = text
+                #endif
+            }
         }
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             // A palette can change while HTML is loading; apply the latest value.
@@ -135,7 +170,11 @@ struct ReaderWebView: UIViewRepresentable {
                     else { parent.onError("此链接不是 Markdown 文档。") }
                 } catch { parent.onError(error.localizedDescription) }
             } else if ["http", "https", "mailto"].contains(url.scheme?.lowercased() ?? "") {
+                #if os(macOS)
+                NSWorkspace.shared.open(url)
+                #else
                 _ = await UIApplication.shared.open(url)
+                #endif
             }
             return .cancel
         }
