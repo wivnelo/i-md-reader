@@ -1,4 +1,10 @@
-# 原生运行截图 · 2026-10-24
+# 原生运行截图
+
+## 当前截图 · 0.2.1（51）
+
+`51-zh-ipad-reading.jpg`、`51-en-ipad-reading.jpg`为iPad模拟器实际阅读截图；`51-zh-iphone-reading.png`、`51-en-iphone-reading.png`为用户提供的iPhone真机阅读截图。均来自已选商店素材，画面未修图或拉伸；英文iPad图系统状态栏仍为中文。
+
+## 历史截图 · 2026-10-24
 
 `imdreader-name.png`：统一iMDReader显示名后的模拟器原始截图。插入线触摸跨行效果仍待实机复查，不以这张静态图声称已验收。
 
