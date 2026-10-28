@@ -1,5 +1,26 @@
 # App Store 分发准备（未上传、未提交）
 
+## 问卷建议与截图清单（2026-10-28，未填报）
+
+| 项目 | 源码支持的建议 | 尚缺确认 |
+| --- | --- | --- |
+| 跟踪/广告 | 建议否；无IDFA、广告或统计SDK，Tracking=false | 不把第三方整个网站行为等同本App行为 |
+| 本地正文/书签/阅读记录 | 设备本地处理，不因本地存储申报收集；无正文上传接口 | 用户主动支持附件另行评估 |
+| GitHub请求 | HTTPS GET到api.github.com，路径/固定提交和可选令牌；禁cookie和重定向 | 官方政策包含IP及服务使用信息，需核定用户指定服务在商店标签中的适用范围；不能直接填全局“未收集数据” |
+| 支持邮件/Issues | 自愿外部支持，无App自动上传 | 责任人确认用途、留存/删除及是否营销/转交；自愿不自动满足可选披露全部条件 |
+| 加密 | 使用加密：系统TLS/Keychain、CryptoKit AES-GCM私有缓存和SHA256派生；未发现自研算法 | 根据ASC实际问题核定豁免及出口/法国等要求；不擅填非豁免加密为false |
+| 年龄与内容 | 无聊天、社区发布、广告、购买或开发者提供成人/赌博内容 | 自有/GitHub内容及外链按问卷定义判断，不自动给年龄等级 |
+| 经营/地区 | 已定免费、手动发布及目标地区 | DSA交易者身份、地区资质/备案、内容权利须责任人据实确认，免费不代表非交易者 |
+
+新归档许可声明与隐私清单逐字节匹配源码，无额外嵌入Frameworks；不等于全量供应链审计。新增日期查询只向GitHub发送当前仓库文件路径/提交，无正文上传；新增授权文件时间戳用途为3B52.1。
+
+截图：旧临时截图已缺失，历史design预览及网站图片不算最终套图。待首发界面定稿后拍简中/英文各5张×iPhone/iPad共20张：阅读与目录、来源层级、代码表格、明暗配色、公开文档离线阅读。iPhone采用1206×2622竖屏，iPad13英寸采用2752×2064横屏；无透明PNG/JPEG，每档1–10张。记录build/系统/机型/语言，使用合成资料，核查裁切和私人信息；隐私入口另拍交互证据。50日期排版截图只作开发验证，不当商店实拍。
+
+官方截图页当前要求iPhone灵动岛中等屏幕和13英寸iPad；iPhone Duo要求注明2027年4月起适用于iOS27.1+构建，当前不阻塞既有机型准备，亦不代表已经适配验收。
+
+依据：[Apple隐私定义与可选披露](https://developer.apple.com/app-store/app-privacy-details/)、[GitHub隐私政策](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)、[出口合规](https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance)、[截图规格](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications)。建议不是已提交答案。
+
+
 更新：2026-10-28。Mac正式版仍为0.2.0（46）；移动首发准备版本为0.2.1。源码、恢复及验证边界见[STATUS](STATUS.md)。
 
 ## 已完成准备

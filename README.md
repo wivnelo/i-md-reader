@@ -1,5 +1,7 @@
 # iMDReader
 
+本地开发已推进至0.2.1（50）：新增正文标题上方真实文件日期/当前版本GitHub提交日期，测试与无签名构建通过，尚未安装验收、公开源码或发布。正式Mac仍为46；详见[STATUS](docs/STATUS.md)。
+
 轻量、原生、只读的 Markdown 阅读器，支持 Mac、iPad 和 iPhone。
 
 **最新正式版：Mac 0.2.0（46）**：Universal 支持 Apple Silicon 与 Intel，最低 macOS 14；Developer ID 签名、Apple 公证及 Gatekeeper 验证通过。iPhone/iPad 当前为开发设备测试版，尚未上架 App Store。
