@@ -1,8 +1,31 @@
-# App Store 分发准备（草稿，未上传）
+# App Store 分发准备（未上传、未提交）
 
-用户确认iPhone/iPad使用App Store。当前仅准备，任何上传、协议接受、密钥或权限扩展、审核提交和上架需要单独明确步骤。
+更新：2026-10-28。Mac正式版仍为0.2.0（46）；移动首发准备版本为0.2.1。源码、恢复及验证边界见[STATUS](STATUS.md)。
 
-GitHub正式发行仅为Mac 0.2.0（46）；本地开发源码为0.2.1（48），iPhone开发设备版为0.2.1（47）、iPad为0.2.1（48），不等于App Store已发布。实际状态及接手步骤见[STATUS](STATUS.md)。
+## 已完成准备
+
+- 10月27日已核对开发团队与生产移动标识，并按授权建立Explicit App ID和App Store Connect记录；真实Apple ID已确认。记录存在不等于公开商店页面已上线。
+- 已按用户决定保存0.2.1、免费、手动发布及175个地区的目标范围；首发仅iPhone/iPad，关闭Apple芯片Mac和Vision Pro兼容分发。地区选择不等于满足各地区资质要求。
+- 中英文商店描述、关键词及支持/营销/隐私链接已准备并保存过读回；审核联系资料仅保存在Apple后台，不放入公开仓库。
+- [产品网站](https://wivnelo.github.io/i-md-reader/)、[隐私政策](https://wivnelo.github.io/i-md-reader/privacy.html)、[支持](https://wivnelo.github.io/i-md-reader/support.html)已发布。移动App隐私入口源码已恢复，但未安装给用户验收。
+- 用户创建Apple Distribution身份后，已核对匹配团队的App Store描述文件；历史0.2.1（49）签名归档、严格验签和本地IPA导出成功。原临时产物现已缺失，恢复后尚未重新构建，不能称为当前可上传包。
+
+本轮未重新登录后台；以上后台状态来自10月27日操作与读回记录。未上传二进制、提交审核或发布。
+
+## 构建与验证清单
+
+- iOS目标支持iPhone/iPad，最低iOS17；历史49使用iOS27.1 SDK。SDK能编译不等于所有新形态或最低系统布局已验收。
+- 公开工程保留通用标识及空团队参数；生产标识、签名参数和设备信息不入公开文档。重新构建须核对实际签名团队、Bundle ID、版本、设备族、隐私清单及描述文件权限。
+- Info.plist声明Markdown Viewer、原地打开文档、单scene，无新增相册/定位权限。不得把unsigned Archive或开发签名包当商店分发包。
+- 新包另存持久目录并计算新摘要，不覆盖旧正式资产或设备资料。分发私钥不导出、不写入Git；不再次自动操作Keychain Access权限弹窗。
+
+## 尚缺资料与决策
+
+- 最终iPhone/iPad截图与对应版本交互证据；使用合成阅读资料，中英文截图和说明必须反映真实功能。
+- 商店隐私标签、年龄分级、分类/副标题、加密出口、DSA及中国等地区适用资质仍需完成；不得代填未经确认的经营或法律声明。
+- 依赖许可已有声明，仍需最终归档隐私报告与数据流复核。GitHub请求、令牌存储、邮件反馈处理必须纳入评估；没有广告SDK不直接等于“完全不收集”。
+- 审核说明需覆盖本地文件、文件夹、公开GitHub样例及离线阅读，说明私有仓库为可选，不提供私人令牌或用户文档。
+- 上传、审核及正式发布另行授权。分发证书和记录已创建，不重复创建；缺失原IPA须先重新构建验证。
 
 ## 隐私元数据补充（最新）
 
@@ -19,33 +42,9 @@ NSPrivacyTracking为false、TrackingDomains为空：源码无广告标识、跨A
 
 验证：build34 unsigned iOS Release Archive成功；App包内清单与源码解析结果完全一致，plist及工程语法检查通过。未上传Apple验证；后续Mac build37/38/39已构建并包含同一资源阶段，不能将此归档检查等同于Apple审核通过。
 
-## 本地核对
 
-- iOS target为iMDReader，支持iPhone/iPad，最低iOS17，公开工程默认bundle ID为`com.example.ipadmarkdownreader`；两台真机安装使用本机构建覆盖的开发标识，与此默认值不同。当前47/48沿用原开发标识，具体本机签名参数不入库。拟用商店标识及既有记录仍须对照核实，不擅自改名或清空设备资料。
-- 工程使用Automatic signing；公开工程不保存团队或个人设备信息。已有本机Apple Development身份，尚未确认App Store distribution provisioning可用，不自动创建证书或profile。
-- Info.plist声明Markdown Viewer、原地打开文档、单scene；没有新增相册/定位等权限。当前源码已包含PrivacyInfo.xcprivacy；已核对的required-reason API见上表，数据收集评估仍未完成，不据此声明“完全不收集”。
-- iOS 0.2.0（34）unsigned Release Archive已成功并包含隐私清单；build39 iOS Simulator构建通过。当前iPhone47/iPad48已用原开发签名覆盖安装并读回版本，详见STATUS；开发签名与unsigned Archive均不等于App Store分发签名或真机功能验收。已配对设备可经同局域网无线安装，仍属本机开发分发。
-- 无已验证App Store ID/公开URL，移动启动更新入口暂不启用。后续读取App Store Connect现有记录，核对bundle ID后接入真实商店地址。
+## 数据流与政策证据
 
-## 可审阅商店文案
+本地保存来源引用、书签、阅读位置、偏好和缓存；访问GitHub时向GitHub请求目录、正文及相对资源，用户令牌保存在设备钥匙串。外部链接由用户点击打开，目标网站适用自身政策。WebView采用非持久存储，Markdown外部图片过滤；依赖为固定版本swift-markdown/swift-cmark及内置高亮资源。政策网页存在不代表商店标签或所有供应链审计完成。
 
-名称：iMDReader
-副标题草稿：只读 Markdown 阅读器
-说明草稿：在iPhone与iPad阅读本地Markdown文件、文件夹及GitHub文档。保留目录层级，支持代码高亮、目录导航、主题、字号与中英文界面。应用不修改源文档。GitHub私有仓库可使用用户授权的只读访问。
-
-待准备：实际版本截图、支持与隐私政策URL、隐私表逐项核实、年龄分级与内容声明、加密出口合规核对、审核演示步骤、分发签名与设备Archive验证。不得把示例占位URL提交到商店。
-
-
-## 后台只读补核（2026-10-26）
-
-App Store Connect后台浏览器访问apps实际返回登录页与authResult=FAILED；没有可用连接器。不代表账户没有App记录，只代表本会话未认证。最小下一步：用户在本机登录App Store Connect，进入“我的App”并打开iMDReader现有记录；然后核对App信息中的bundle ID和Apple ID。如没有记录，先报告，不自动创建或猜URL。密码/验证码不发聊天。
-
-历史build33 unsigned归档缺隐私清单的发现已由build34修复；本轮复核build34包内清单与源码完全一致，但没有embedded.mobileprovision，仍不是可上传的分发归档。数据收集评估、商店隐私标签及最终签名归档报告仍待完成。
-
-隐私政策可审阅草稿：
-
-> iMDReader在设备上保存阅读偏好、来源引用、阅读位置及离线缓存，不修改原Markdown文件。访问GitHub来源时，应用向GitHub请求仓库目录、文章与相对资源；私有仓库的访问令牌保存在本机钥匙串，并随授权请求发送给GitHub。令牌不用于开发者自有分析服务。清除离线缓存会移除本机缓存；移除来源不删除原文件。点击外部链接会交由系统打开，对方网站适用其自身隐私政策。
-
-以上为源码支持的草稿，发布前需补实际运营主体、联系渠道、政策生效日期及托管URL。未发现广告/统计SDK，不等于已经完成所有依赖和服务端数据保留审计，不直接提交“完全不收集”标签。现有依赖为固定版本swift-markdown/swift-cmark，仍需归档隐私报告核对。WebView使用nonPersistent存储（ReaderWebView.swift:41），外链需用户点击（:172），Markdown外部图片被过滤（MarkdownRenderer.swift:107）。
-
-Apple依据：[App Privacy Details](https://developer.apple.com/app-store/app-privacy-details/)、[required-reason API](https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api)。商店标签与隐私清单是两项不同交付，不能相互替代。
+Apple依据：[App Privacy Details](https://developer.apple.com/app-store/app-privacy-details/)、[required-reason API](https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api)。隐私清单与商店标签是两项不同交付。
