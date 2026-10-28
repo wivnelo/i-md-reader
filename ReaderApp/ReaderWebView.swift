@@ -69,7 +69,7 @@ struct ReaderWebView: ReaderWebRepresentable {
         <!doctype html><html lang="zh-CN" data-theme="\(theme)" data-ui-language="\(language)" style="\(palette.colors(dark: dark).cssVariables)"><head>
         <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
         <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src reader-resource:; style-src 'unsafe-inline'; script-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'">
-        <style>\(css)</style></head><body style="font-size:\(fontSize)px"><article>\(document.rendered.body)</article></body></html>
+        <style>\(css)</style></head><body style="font-size:\(fontSize)px"><article><div id="reader-file-dates" class="file-dates" hidden></div>\(document.rendered.body)</article></body></html>
         """
         var base = URLComponents()
         base.scheme = "reader-resource"; base.host = "local"
@@ -89,6 +89,11 @@ struct ReaderWebView: ReaderWebRepresentable {
             web.findInteraction?.presentFindNavigator(showingReplace: false)
             #endif
         }
+        let dateLabels = document.dates.labels(language: language)
+        if context.coordinator.dateLabels != dateLabels {
+            context.coordinator.dateLabels = dateLabels
+            web.evaluateJavaScript(datesScript, completionHandler: nil)
+        }
         let appearance = "\(fontSize)-\(dark)-\(palette.rawValue)-\(language)"
         if appearance != context.coordinator.appearance {
             context.coordinator.appearance = appearance
@@ -100,6 +105,16 @@ struct ReaderWebView: ReaderWebRepresentable {
             web.evaluateJavaScript("document.getElementById(\(escaped))?.scrollIntoView({behavior:'\(reduceMotion ? "auto" : "smooth")'});", completionHandler: nil)
             DispatchQueue.main.async { self.anchor = nil; context.coordinator.lastAnchor = nil }
         }
+    }
+    private var datesScript: String {
+        let labels = String(data: try! JSONEncoder().encode(document.dates.labels(language: language)), encoding: .utf8)!
+        return """
+        (()=>{const box=document.getElementById('reader-file-dates');if(!box)return;
+        const anchor=box.nextElementSibling, old=anchor.getBoundingClientRect().top, y=window.scrollY;
+        box.replaceChildren();const labels=\(labels);box.hidden=labels.length===0;
+        labels.forEach(text=>{const item=document.createElement('span');item.textContent=text;box.append(item);});
+        if(y>0)window.scrollTo(0,y+anchor.getBoundingClientRect().top-old);})();
+        """
     }
     private var appearanceScript: String {
         let theme = dark ? "dark" : "light"
@@ -117,6 +132,7 @@ struct ReaderWebView: ReaderWebRepresentable {
     @MainActor final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         var parent: ReaderWebView
         var appearance: String?
+        var dateLabels: [String]?
         var lastFindRequest: Int
         var lastAnchor: String?
         init(_ parent: ReaderWebView) { self.parent = parent; lastFindRequest = parent.findRequest }
@@ -135,6 +151,7 @@ struct ReaderWebView: ReaderWebRepresentable {
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             // A palette can change while HTML is loading; apply the latest value.
             webView.evaluateJavaScript(parent.appearanceScript, completionHandler: nil)
+            webView.evaluateJavaScript(parent.datesScript, completionHandler: nil)
             parent.onReady()
             if let fragment = parent.document.url.fragment(percentEncoded: false), parent.document.rendered.headings.contains(where: { $0.id == fragment }),
                let data = try? JSONEncoder().encode(fragment), let escaped = String(data: data, encoding: .utf8) {

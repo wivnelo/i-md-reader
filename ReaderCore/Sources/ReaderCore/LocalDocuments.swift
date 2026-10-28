@@ -12,6 +12,32 @@ public enum ReaderError: LocalizedError {
     }
 }
 
+/// Dates reported by the granted file provider, never import/cache timestamps.
+public struct DocumentDates: Sendable, Equatable {
+    public var modified: Date?
+    public var committed: Date?
+    public init(modified: Date? = nil, committed: Date? = nil) {
+        self.modified = modified; self.committed = committed
+    }
+    public static func local(_ url: URL) -> Self {
+        let values = try? url.resourceValues(forKeys: [.contentModificationDateKey])
+        return Self(modified: values?.contentModificationDate)
+    }
+    public func labels(language: String, timeZone: TimeZone = .current) -> [String] {
+        let chinese = language.lowercased().hasPrefix("zh")
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: chinese ? "zh_Hans_CN" : "en_US")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.timeZone = timeZone
+        formatter.dateFormat = chinese ? "yyyy年M月d日 HH:mm zzz" : "MMM d, yyyy HH:mm zzz"
+        guard let date = committed ?? modified else { return [] }
+        let label = committed != nil
+            ? (chinese ? "变更时间（提交 · 当前版本）" : "Changed (commit · current revision)")
+            : (chinese ? "变更时间" : "Changed")
+        return [label + " · " + formatter.string(from: date)]
+    }
+}
+
 public struct FileNode: Identifiable, Sendable {
     public let url: URL
     public let isDirectory: Bool

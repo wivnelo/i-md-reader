@@ -225,28 +225,9 @@ struct ReaderScreen: View {
                     ToolbarItem(placement: .primaryAction) { macNativeAddButton }
                 }
                 #else
-                if UIDevice.current.userInterfaceIdiom != .pad {
-                    ToolbarItem(placement: trailingToolbar) { mobileAddMenu }
-                }
+                ToolbarItem(placement: trailingToolbar) { mobileAddMenu }
                 #endif
             }
-            #if os(iOS)
-            .safeAreaInset(edge: .top, spacing: 0) {
-                if UIDevice.current.userInterfaceIdiom == .pad {
-                    HStack(spacing: 8) {
-                        readerBrand
-                        Spacer(minLength: 0)
-                        mobileAddMenu
-                            .buttonStyle(.plain)
-                            .frame(width: 44, height: 44)
-                            .background(.regularMaterial, in: Circle())
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(colors.sidebar)
-                }
-            }
-            #endif
             .navigationSplitViewColumnWidth(min: 280, ideal: 300, max: 360)
         } detail: {
             ZStack {
@@ -326,6 +307,11 @@ struct ReaderScreen: View {
             .navigationBarTitleDisplayMode(.inline)
         #endif
             .toolbar {
+                #if os(iOS)
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    ToolbarItem(placement: .topBarLeading) { readerBrand }
+                }
+                #endif
                 ToolbarItemGroup(placement: trailingToolbar) {
                     if let document = store.document {
                         #if os(macOS)
@@ -362,6 +348,9 @@ struct ReaderScreen: View {
                         Button("GitHub 授权", systemImage: "key") { managingGitHubAccess = true }
                         #if os(iOS)
                         Button("离线缓存", systemImage: "internaldrive") { managingOfflineCache = true }
+                        Link(destination: URL(string: "https://wivnelo.github.io/i-md-reader/privacy.html")!) {
+                            Label("隐私政策", systemImage: "hand.raised")
+                        }
                         #endif
                     } label: { Image(systemName: "ellipsis") }
                         .accessibilityLabel("应用设置")
@@ -717,14 +706,12 @@ private struct SourceHeader: View {
     var body: some View {
         ZStack(alignment: .trailing) {
             #if !os(macOS)
-            if !source.isSample {
-                Button(role: .destructive) { store.remove(source) } label: {
-                    Text("移除来源").font(.subheadline).foregroundStyle(.white)
-                        .frame(width: actionWidth).frame(maxHeight: .infinity)
-                        .background(Color.red)
-                }.buttonStyle(.plain)
-                    .accessibilityHidden(!showingRemove)
-            }
+            Button(role: .destructive) { store.remove(source) } label: {
+                Text("移除来源").font(.subheadline).foregroundStyle(.white)
+                    .frame(width: actionWidth).frame(maxHeight: .infinity)
+                    .background(Color.red)
+            }.buttonStyle(.plain)
+                .accessibilityHidden(!showingRemove)
             #endif
             Group {
                 if let root = source.url {
@@ -741,14 +728,14 @@ private struct SourceHeader: View {
             .frame(maxWidth: .infinity)
             .background { SourceHeaderBackground() }
             #if !os(macOS)
-            .offset(x: source.isSample ? 0 : min(0, max(-actionWidth, (showingRemove ? -actionWidth : 0) + drag)))
+            .offset(x: min(0, max(-actionWidth, (showingRemove ? -actionWidth : 0) + drag)))
             .simultaneousGesture(DragGesture(minimumDistance: 24)
                 .updating($drag) { value, state, _ in
                     if abs(value.translation.width) > abs(value.translation.height) * 1.5 {
                         state = value.translation.width
                     }
                 }.onEnded { value in
-                    guard !source.isSample, abs(value.translation.width) > abs(value.translation.height) * 1.5 else { return }
+                    guard abs(value.translation.width) > abs(value.translation.height) * 1.5 else { return }
                     showingRemove = value.translation.width < -35 || (showingRemove && value.translation.width < 35)
                 })
             #endif
@@ -762,12 +749,10 @@ private struct SourceHeader: View {
                 Label(store.isPinned(source) ? "取消置顶" : "置顶来源", systemImage: store.isPinned(source) ? "pin.slash" : "pin")
             }
             #if os(macOS)
-            if !source.isSample {
-                Button("移除来源", systemImage: "minus.circle", role: .destructive) { store.remove(source) }
-            }
+            Button("移除来源", systemImage: "minus.circle", role: .destructive) { store.remove(source) }
             #endif
         }
-        .accessibilityAction(named: "移除来源") { if !source.isSample { store.remove(source) } }
+        .accessibilityAction(named: "移除来源") { store.remove(source) }
     }
 }
 

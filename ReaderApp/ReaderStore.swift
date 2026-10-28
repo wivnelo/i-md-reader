@@ -140,6 +140,7 @@ struct OpenDocument {
     let access: ScopedAccess
     let rendered: RenderedDocument
     let initialProgress: Double
+    var dates = DocumentDates()
     var isStandalone = false
     var imageLoader: (@Sendable (String) async throws -> Data)? = nil
 }
@@ -164,6 +165,7 @@ struct OpenDocument {
     @Published private var sourceOrder: [String]
     private var bookmarks: [SavedSource]
     private var readingTask: Task<Void, Never>?
+    private var dateTask: Task<Void, Never>?
     private let defaults: UserDefaults
     private var github: GitHubReader
     private let credentials: any GitHubCredentialStorage
@@ -187,7 +189,8 @@ struct OpenDocument {
     init(defaults: UserDefaults = .standard, github: GitHubReader? = nil,
          credentials: (any GitHubCredentialStorage)? = nil,
          githubFactory: (@Sendable (String?) -> GitHubReader)? = nil,
-         offlineCache: GitHubOfflineCache? = nil) {
+         offlineCache: GitHubOfflineCache? = nil,
+         sampleURL: URL? = Bundle.main.url(forResource: "Samples", withExtension: nil)) {
         self.defaults = defaults
         let vault = credentials ?? (github == nil ? GitHubKeychain() : EphemeralGitHubCredentials())
         self.credentials = vault
@@ -246,7 +249,7 @@ struct OpenDocument {
             guard let link = try? GitHubLink(saved.url) else { continue }
             sources.append(Self.remoteSource(saved, link: link))
         }
-        if let sample = Bundle.main.url(forResource: "Samples", withExtension: nil) {
+        if !defaults.bool(forKey: "readingSampleRemoved"), let sample = sampleURL {
             sources.append(FolderSource(id: Self.sampleID, name: "阅读示例", access: ScopedAccess(sample), isSample: true))
         }
         if !deniedBookmarks.isEmpty {
@@ -336,7 +339,7 @@ struct OpenDocument {
             refreshingSources.remove(source.id)
         }
         if selectedKey.map({ key in sources.contains { $0.remote != nil && key.hasPrefix($0.id.uuidString + "|") } }) == true {
-            readingTask?.cancel(); isLoading = false; selectedKey = document?.key
+            readingTask?.cancel(); dateTask?.cancel(); isLoading = false; selectedKey = document?.key
         }
         do { try await github.clearOfflineCache() }
         catch { self.error = "缓存未能完全清理，请重试。" }
@@ -378,7 +381,7 @@ struct OpenDocument {
         defaults.set(positions, forKey: "positions")
         if let last = defaults.string(forKey: "lastDocument"), isRemoteKey(last) { defaults.removeObject(forKey: "lastDocument") }
         if selectedKey.map(isRemoteKey) == true || document.map({ remoteIDs.contains($0.sourceID) }) == true {
-            readingTask?.cancel(); document = nil; selectedKey = nil; isLoading = false
+            readingTask?.cancel(); dateTask?.cancel(); document = nil; selectedKey = nil; isLoading = false
         }
         sources = sources.map { source in
             guard let saved = source.remote, let link = try? GitHubLink(saved.url) else { return source }
@@ -407,7 +410,7 @@ struct OpenDocument {
             nodes = nodes.filter { key, _ in !ids.contains { key.hasPrefix($0.uuidString + "|") } }
             remoteLocations.removeAll()
             if selectedKey.map({ key in ids.contains { key.hasPrefix($0.uuidString + "|") } }) == true || document.map({ ids.contains($0.sourceID) }) == true {
-                readingTask?.cancel(); document = nil; selectedKey = nil; isLoading = false
+                readingTask?.cancel(); dateTask?.cancel(); document = nil; selectedKey = nil; isLoading = false
             }
         }
         return true
@@ -625,7 +628,7 @@ struct OpenDocument {
                 if defaults.string(forKey: "lastDocument")?.hasPrefix(prefix) == true { defaults.removeObject(forKey: "lastDocument") }
             }
             if document?.sourceID == id || selectedKey?.hasPrefix(id.uuidString + "|") == true {
-                readingTask?.cancel(); document = nil; selectedKey = nil; isLoading = false
+                readingTask?.cancel(); dateTask?.cancel(); document = nil; selectedKey = nil; isLoading = false
             }
             refreshRequests[id] = nil; refreshingSources.remove(id)
             invalidateDirectoryLoads(id)
@@ -648,9 +651,9 @@ struct OpenDocument {
         } catch { self.error = "无法保留文件夹授权：\(error.localizedDescription)" }
     }
     func remove(_ source: FolderSource) {
-        guard !source.isSample else { return }
+        if source.isSample { defaults.set(true, forKey: "readingSampleRemoved") }
         if document?.sourceID == source.id || selectedKey?.hasPrefix(source.id.uuidString + "|") == true {
-            readingTask?.cancel(); isLoading = false
+            readingTask?.cancel(); dateTask?.cancel(); isLoading = false
             selectedKey = document?.sourceID == source.id ? nil : document?.key
             if document?.sourceID == source.id { document = nil }
         }
@@ -689,18 +692,21 @@ struct OpenDocument {
 
     func open(_ url: URL, source: FolderSource, isRefresh: Bool = false) {
         guard let access = source.access else { Task { await retryLocalSource(source) }; return }
-        readingTask?.cancel()
+        readingTask?.cancel(); dateTask?.cancel()
         if source.remote == nil { isReadingOffline = false }
         let id = key(source: source, url: url)
         selectedKey = id; isLoading = true; error = nil
         readingTask = Task {
             do {
                 let rendered: RenderedDocument
+                var dates = DocumentDates()
+                var history: (GitHubLocation, String)?
                 var imageLoader: (@Sendable (String) async throws -> Data)?
                 if source.remote != nil {
                     let location = try await remoteLocation(source)
                     let path = try remotePath(url, source: source, location: location)
                     let text = try await github.markdown(location, path: path)
+                    history = (location, path)
                     let base = remoteBase(location)
                     let reader = github
                     imageLoader = { relative in
@@ -711,23 +717,33 @@ struct OpenDocument {
                         MarkdownRenderer().render(text)
                     }.value
                 } else {
-                rendered = try await Task.detached(priority: .userInitiated) {
+                let local = try await Task.detached(priority: .userInitiated) {
                     try withExtendedLifetime(access) {
                         // File coordination allows iCloud/file providers to materialize the document.
                         var coordinationError: NSError?
-                        var result: Result<RenderedDocument, Error>?
+                        var result: Result<(RenderedDocument, DocumentDates), Error>?
                         NSFileCoordinator().coordinate(readingItemAt: url, options: [], error: &coordinationError) { coordinatedURL in
-                            result = Result { MarkdownRenderer().render(try LocalDocuments.read(coordinatedURL, root: access.url)) }
+                            result = Result { (MarkdownRenderer().render(try LocalDocuments.read(coordinatedURL, root: access.url)), DocumentDates.local(coordinatedURL)) }
                         }
                         if let coordinationError { throw coordinationError }
                         guard let result else { throw CocoaError(.fileReadUnknown) }
                         return try result.get()
                     }
                 }.value
+                rendered = local.0; dates = local.1
                 }
                 guard !Task.isCancelled, sources.contains(where: { $0.id == source.id && $0.access === access }) else { return }
                 reveal(url, source: source)
-                document = OpenDocument(key: id, url: url, sourceID: source.id, access: access, rendered: rendered, initialProgress: positions[id] ?? 0, imageLoader: imageLoader)
+                document = OpenDocument(key: id, url: url, sourceID: source.id, access: access, rendered: rendered, initialProgress: positions[id] ?? 0, dates: dates, imageLoader: imageLoader)
+                if let history, let documentID = document?.id {
+                    let reader = github
+                    dateTask = Task { [weak store = self] in
+                        guard let date = try? await reader.latestCommitDate(history.0, path: history.1),
+                              !Task.isCancelled, let store, store.document?.id == documentID,
+                              store.selectedKey == id else { return }
+                        store.document?.dates = DocumentDates(committed: date)
+                    }
+                }
                 progress = positions[id] ?? 0
                 isReadingOffline = source.remote != nil ? await github.isUsingOfflineCache : false
                 defaults.set(id, forKey: "lastDocument")
@@ -778,7 +794,7 @@ struct OpenDocument {
     func clearRecentFiles() {
         // Cancel a pending standalone open so it cannot recreate cleared history.
         if selectedKey?.hasPrefix("file:") == true && isLoading {
-            readingTask?.cancel(); isLoading = false
+            readingTask?.cancel(); dateTask?.cancel(); isLoading = false
             selectedKey = document?.key
         }
         for recent in recentFiles { positions[recent.key] = nil }
@@ -794,7 +810,7 @@ struct OpenDocument {
 
     func removeRecent(_ recent: RecentFile) {
         if selectedKey == recent.key {
-            readingTask?.cancel(); isLoading = false
+            readingTask?.cancel(); dateTask?.cancel(); isLoading = false
             selectedKey = document?.key == recent.key ? nil : document?.key
         }
         if document?.key == recent.key { document = nil }
@@ -829,19 +845,19 @@ struct OpenDocument {
         let previous = recentFiles.first { $0.access?.url.standardizedFileURL.resolvingSymlinksInPath() == canonical }
         let id = existingID ?? previous?.id ?? UUID()
         let key = "file:" + id.uuidString
-        readingTask?.cancel()
+        readingTask?.cancel(); dateTask?.cancel()
         selectedKey = key; isLoading = true; error = nil
         readingTask = Task {
             do {
                 let result = try await Task.detached(priority: .userInitiated) {
                     try withExtendedLifetime(access) {
                         var coordinationError: NSError?
-                        var output: Result<(RenderedDocument, Data), Error>?
+                        var output: Result<(RenderedDocument, Data, DocumentDates), Error>?
                         NSFileCoordinator().coordinate(readingItemAt: url, options: [], error: &coordinationError) { coordinated in
                             output = Result {
                                 let text = try LocalDocuments.read(coordinated, root: coordinated)
                                 let bookmark = try url.bookmarkData(options: ReaderBookmarkOptions.creation, includingResourceValuesForKeys: nil, relativeTo: nil)
-                                return (MarkdownRenderer().render(text, allowRelativeImages: false), bookmark)
+                                return (MarkdownRenderer().render(text, allowRelativeImages: false), bookmark, DocumentDates.local(coordinated))
                             }
                         }
                         if let coordinationError { throw coordinationError }
@@ -862,7 +878,7 @@ struct OpenDocument {
                 defaults.set(positions, forKey: "positions")
                 persistRecentFiles()
                 document = OpenDocument(key: key, url: input, sourceID: id, access: access,
-                                        rendered: result.0, initialProgress: positions[key] ?? 0, isStandalone: true)
+                                        rendered: result.0, initialProgress: positions[key] ?? 0, dates: result.2, isStandalone: true)
                 progress = positions[key] ?? 0
                 defaults.set(key, forKey: "lastDocument")
             } catch {

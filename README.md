@@ -1,20 +1,20 @@
 # iMDReader
 
-Mac/iPhone/iPad本机测试安装现已统一为0.2.1（51），版本已读回；尚未公开发行，正式下载仍46。
-
-Mac 0.2.1（51）冻结候选已通过App/DMG公证与Gatekeeper，尚未公开发行；正式下载仍为0.2.0（46）。
-
-**本轮功能已冻结为0.2.1（51）发布候选**：正文标题上方仅显示一个变更时间；本地修改时间或GitHub当前版本提交时间，缺值省略。测试与构建通过，仍待最终验收和分发门槛；尚未公开源码或发布，Mac正式版仍46，已安装测试版仍50。详见[STATUS](docs/STATUS.md)。
-
-本地开发已推进至0.2.1（50）：新增正文标题上方真实文件日期/当前版本GitHub提交日期，测试与无签名构建通过，尚未安装验收、公开源码或发布。正式Mac仍为46；详见[STATUS](docs/STATUS.md)。
-
 轻量、原生、只读的 Markdown 阅读器，支持 Mac、iPad 和 iPhone。
 
-**最新正式版：Mac 0.2.0（46）**：Universal 支持 Apple Silicon 与 Intel，最低 macOS 14；Developer ID 签名、Apple 公证及 Gatekeeper 验证通过。iPhone/iPad 当前为开发设备测试版，尚未上架 App Store。
+**Mac正式版：0.2.1（51）**。Universal支持Apple Silicon与Intel，最低macOS14；App和DMG均已通过Developer ID签名、Apple公证、staple及Gatekeeper检查。iPhone/iPad已完成本机开发安装验收，尚未在App Store发行。
 
-[0.2.0 发布页面](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.0) · [版本状态与验证限制](docs/STATUS.md)
+[下载0.2.1](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.1) · [版本状态与验证边界](docs/STATUS.md) · [历史0.2.0](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.0)
 
-推荐下载 DMG，打开后将 iMDReader.app 拖入 Applications。已有安装直接覆盖，保留资料库；不必卸载或关闭 Gatekeeper。另提供 ZIP 与 SHA256SUMS.txt 供校验。[0.1.0 历史版本](https://github.com/wivnelo/i-md-reader/releases/tag/v0.1.0)保持不变。
+推荐下载DMG，打开后将iMDReader.app拖入Applications覆盖旧版，保留资料库；另提供ZIP与SHA256SUMS.txt。
+
+## 0.2.1更新
+
+- 正文标题上方只显示一个“变更时间”：本地文件修改时间，或GitHub当前阅读版本的最近提交；缺值省略。
+- 阅读示例可移除，重启不再恢复，不删除源文件。
+- 移动源码包含iPad顶栏调整和隐私政策入口，商店分发仍在准备。
+
+三端51已获用户验收确认，功能冻结；非P0改进留待后续版本。Intel和最低系统实机运行未覆盖，完整边界见STATUS。
 
 ![iMDReader 原生界面](design/previews/imdreader-name.png)
 
@@ -41,11 +41,9 @@ Mac 0.2.1（51）冻结候选已通过App/DMG公证与Gatekeeper，尚未公开�
 - Mac 保留自动缓存并取消缓存设置；移动端缓存页精简说明。
 - 移动窄屏配色去除重复底色；iPad 品牌与独立加号固定在侧栏顶部。
 
-截至2026-10-28：0.2.1的47/48开发源码及移动隐私政策入口已在本地持久工作区恢复，公开main仍未包含这些代码。历史49分发签名归档与IPA曾成功导出，但原临时产物已缺失，恢复后已完成无签名移动归档和Mac签名构建，但移动签名等待系统交互后已停止，尚无新IPA。App Store记录与网站已建立，移动端仍未上传或上架。验证范围和下一步统一见[STATUS](docs/STATUS.md)及[App Store准备](docs/app-store-preparation.md)。
-
 ## 下一阶段与专项检查
 
-- 优先完成恢复后构建、签名复核和移动隐私入口/截图验收；用户现有设备反馈不替代未覆盖专项。完整状态以STATUS为准。
+- 移动端继续完成商店签名、截图与必需声明；本轮功能冻结，非P0改进延期。完整状态以STATUS为准。
 
 - Mac主要GitHub、书签恢复、系统文件冷热打开和搜索已完成检查；剩余窗口专项及移动端待决定事项见STATUS。
 - 图片放大、外部HTTPS图片和SVG安全加载。

@@ -205,6 +205,31 @@ public struct GitHubReader: Sendable {
         guard result.allSatisfy(GitHubLink.validSegment) else { throw GitHubReadError.invalidPath }
         return result
     }
+    /// History is scoped to the document's immutable revision, not the branch tip.
+    public func latestCommitDate(_ location: GitHubLocation, path: String) async throws -> Date? {
+        let safePath = try segments(path).joined(separator: "/")
+        guard !safePath.isEmpty else { throw GitHubReadError.invalidPath }
+        struct Entry: Decodable {
+            struct Commit: Decodable {
+                struct Person: Decodable { let date: String? }
+                let committer: Person?
+            }
+            let commit: Commit
+        }
+        let bytes = try await request(location.link, endpoint: ["commits"], limit: 1_048_576,
+            query: [URLQueryItem(name: "sha", value: location.commit),
+                    URLQueryItem(name: "path", value: safePath), URLQueryItem(name: "per_page", value: "1")], immutable: true)
+        let entries: [Entry]
+        do { entries = try JSONDecoder().decode([Entry].self, from: bytes) }
+        catch { throw GitHubReadError.invalidResponse }
+        guard let raw = entries.first?.commit.committer?.date else { return nil }
+        let parser = ISO8601DateFormatter()
+        if let date = parser.date(from: raw) { return date }
+        parser.formatOptions.insert(.withFractionalSeconds)
+        guard let date = parser.date(from: raw) else { throw GitHubReadError.invalidResponse }
+        return date
+    }
+
     private func commit(_ link: GitHubLink, reference: String) async throws -> String {
         struct Commit: Decodable { let sha: String }
         let result: Commit
@@ -220,19 +245,21 @@ public struct GitHubReader: Sendable {
         catch is DecodingError { throw GitHubReadError.invalidResponse }
     }
     private func request(_ link: GitHubLink, endpoint: [String], ref: String? = nil,
-                         accept: String = "application/vnd.github+json", limit: Int) async throws -> Data {
+                         accept: String = "application/vnd.github+json", limit: Int,
+                         query: [URLQueryItem] = [], immutable: Bool = false) async throws -> Data {
         var url = URLComponents()
         url.scheme = "https"; url.host = "api.github.com"
         let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-._~"))
         url.percentEncodedPath = "/" + (["repos", link.owner, link.repository] + endpoint).map { $0.addingPercentEncoding(withAllowedCharacters: allowed)! }.joined(separator: "/")
-        if let ref { url.queryItems = [URLQueryItem(name: "ref", value: ref)] }
+        let items = query + (ref.map { [URLQueryItem(name: "ref", value: $0)] } ?? [])
+        if !items.isEmpty { url.queryItems = items }
         guard let address = url.url else { throw GitHubReadError.invalidURL }
         var request = URLRequest(url: address, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
         request.httpMethod = "GET"
         request.setValue(accept, forHTTPHeaderField: "Accept")
         request.setValue("2026-03-10", forHTTPHeaderField: "X-GitHub-Api-Version")
         request.setValue("iMDReader-Prototype", forHTTPHeaderField: "User-Agent")
-        let response = try await requests.send(request, limit: limit, immutable: ref != nil)
+        let response = try await requests.send(request, limit: limit, immutable: ref != nil || immutable)
         guard response.data.count <= limit else { throw GitHubReadError.responseTooLarge }
         switch response.status {
         case 200: return response.data

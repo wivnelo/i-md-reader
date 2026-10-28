@@ -791,3 +791,58 @@ private actor RemoteFixture {
         #expect(unit["value"] as? String == translation)
     }
 }
+
+@Test @MainActor func removingReadingSamplePersistsWithoutDeletingBundledFiles() throws {
+    let suite = "ReadingSampleRemoval-" + UUID().uuidString
+    let defaults = try #require(UserDefaults(suiteName: suite))
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(suite)
+    try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+    let file = root.appendingPathComponent("sample.md")
+    try Data("# Sample".utf8).write(to: file)
+    defer {
+        defaults.removePersistentDomain(forName: suite)
+        try? FileManager.default.removeItem(at: root)
+    }
+    let reader = GitHubReader()
+    let store = ReaderStore(defaults: defaults, github: reader, sampleURL: root)
+    let sample = try #require(store.sources.first { $0.isSample })
+    store.togglePin(sample)
+    defaults.set(sample.id.uuidString + "|sample.md", forKey: "lastDocument")
+    store.remove(sample)
+    #expect(!store.sources.contains { $0.isSample })
+    #expect(!store.isPinned(sample))
+    #expect(defaults.string(forKey: "lastDocument") == nil)
+    #expect(try Data(contentsOf: file) == Data("# Sample".utf8))
+    let restored = ReaderStore(defaults: defaults, github: reader, sampleURL: root)
+    #expect(!restored.sources.contains { $0.isSample })
+    restored.restoreLastDocument()
+    #expect(restored.selectedKey == nil)
+}
+
+@Test @MainActor func delayedHistoryDoesNotBlockReadingOrLeakToAnotherFile() async throws {
+    let remote = RemoteFixture()
+    let reader = GitHubReader { request, _ in
+        if request.url!.path == "/repos/test/repo/commits" {
+            try? await Task.sleep(for: .milliseconds(300))
+            return .init(data: Data(#"[{"commit":{"committer":{"date":"2026-10-28T10:00:00Z"}}}]"#.utf8), status: 200)
+        }
+        return try await remote.response(request)
+    }
+    let fixture = try Fixture(github: reader)
+    defer { fixture.clean() }
+    #expect(await fixture.store.addGitHub("https://github.com/test/repo/tree/main/docs", reference: "main"))
+    let source = try #require(fixture.store.sources.first(where: { $0.remote != nil }))
+    fixture.store.open(try #require(source.url).appendingPathComponent("readme.md"), source: source)
+    try await fixture.waitForReading()
+    #expect(fixture.store.document != nil)
+    #expect(fixture.store.document?.dates.committed == nil)
+    let local = fixture.root.appendingPathComponent("local.md")
+    try "# Local".write(to: local, atomically: true, encoding: .utf8)
+    fixture.store.openFileURL(local)
+    try await fixture.waitForReading()
+    let id = fixture.store.document?.id
+    #expect(fixture.store.document?.dates.modified != nil)
+    try await Task.sleep(for: .milliseconds(400))
+    #expect(fixture.store.document?.id == id)
+    #expect(fixture.store.document?.dates.committed == nil)
+}
