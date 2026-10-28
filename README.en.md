@@ -1,21 +1,21 @@
-<p align="center"><img src="ReaderApp/Resources/SourceIcons.xcassets/AppIcon.appiconset/AppIcon-Light.png" width="120" alt="iMDReader app icon"></p>
+<p align="center"><img src="design/previews/51-app-icon-rounded.svg" width="120" alt="iMDReader app icon"></p>
 
 <h1 align="center">iMDReader</h1>
 
 <p align="center"><a href="README.md">简体中文</a> · English</p>
 
-A lightweight, native, read-only Markdown reader for Mac, iPhone, and iPad. Open local files, folders, and GitHub documents while keeping the originals unchanged.
+<p align="center">A lightweight, native, read-only Markdown reader<br>for Mac, iPhone, and iPad.</p>
 
 ## Download
 
 - **Mac:** [Download the 0.2.1 release](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.1). Supports Apple Silicon and Intel; requires macOS 14 or later.
 - **iPhone / iPad:** 0.2.1 (51) has been submitted for App Store review and is not yet available.
 
-For Mac, download the `.dmg`, open it, and drag iMDReader to Applications. A ZIP is also available. The release is Developer ID signed, notarized by Apple, and checked with Gatekeeper. You can replace an existing installation without uninstalling or clearing your library. Intel and macOS 14 have not been tested on physical hardware.
+For Mac, download the `.dmg`, open it, and drag iMDReader to Applications. A ZIP is also available. The release is Developer ID signed, notarized by Apple, and checked with Gatekeeper. You can replace an existing installation without uninstalling or clearing your library.
 
 ## Preview
 
-<table><tr><td align="center"><img src="design/previews/51-en-ipad-reading.jpg" alt="iPad reading view" width="520"><br>iPad reading view</td><td align="center"><img src="design/previews/51-en-iphone-reading.png" alt="iPhone reading view" width="220"><br>iPhone reading view</td></tr></table>
+<p align="center"><img src="design/previews/51-en-ipad-rounded.svg" alt="iPad reading view" height="460">&nbsp;&nbsp;&nbsp;<img src="design/previews/51-en-iphone-rounded.svg" alt="iPhone reading view" height="460"></p>
 
 These are actual 0.2.1 (51) reading views from an iPad simulator and an iPhone. The iPad system status bar remains in Chinese.
 

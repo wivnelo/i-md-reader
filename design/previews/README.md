@@ -2,7 +2,7 @@
 
 ## 当前截图 · 0.2.1（51）
 
-`51-zh-ipad-reading.jpg`、`51-en-ipad-reading.jpg`为iPad模拟器实际阅读截图；`51-zh-iphone-reading.png`、`51-en-iphone-reading.png`为用户提供的iPhone真机阅读截图。均来自已选商店素材，画面未修图或拉伸；英文iPad图系统状态栏仍为中文。
+`51-zh-ipad-reading.jpg`、`51-en-ipad-reading.jpg`为iPad模拟器实际阅读截图；`51-zh-iphone-reading.png`、`51-en-iphone-reading.png`为用户提供的iPhone真机阅读截图。均来自已选商店素材，画面未修图或拉伸；英文iPad图系统状态栏仍为中文。 首页所用SVG仅通过裁切路径显示圆角，内嵌原图，源截图与商店素材未改。
 
 ## 历史截图 · 2026-10-24
 

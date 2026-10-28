@@ -1,21 +1,21 @@
-<p align="center"><img src="ReaderApp/Resources/SourceIcons.xcassets/AppIcon.appiconset/AppIcon-Light.png" width="120" alt="iMDReader 应用图标"></p>
+<p align="center"><img src="design/previews/51-app-icon-rounded.svg" width="120" alt="iMDReader 应用图标"></p>
 
 <h1 align="center">iMDReader</h1>
 
 <p align="center">简体中文 · <a href="README.en.md">English</a></p>
 
-轻量、原生、只读的 Markdown 阅读器，适用于 Mac、iPhone 和 iPad。打开本地文件、文件夹或 GitHub 文档，专注阅读，保留原文件。
+<p align="center">轻量、原生、只读的 Markdown 阅读器<br>在 Mac、iPhone 和 iPad 上，专注于内容。</p>
 
 ## 下载
 
 - **Mac：** [下载 0.2.1 正式版](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.1)。支持 Apple Silicon 和 Intel，系统要求 macOS 14 或更高版本。
 - **iPhone / iPad：** 0.2.1（51）已提交 App Store 审核，尚未上架。
 
-Mac 推荐下载 `.dmg`，打开后将 iMDReader 拖入“应用程序”；也可下载 ZIP。发行包已通过 Developer ID 签名、Apple 公证和 Gatekeeper 检查。更新时无需卸载，保留已有资料库。Intel 和 macOS 14 尚未实机验证。
+Mac 推荐下载 `.dmg`，打开后将 iMDReader 拖入“应用程序”；也可下载 ZIP。发行包已通过 Developer ID 签名、Apple 公证和 Gatekeeper 检查。更新时无需卸载，保留已有资料库。
 
 ## 预览
 
-<table><tr><td align="center"><img src="design/previews/51-zh-ipad-reading.jpg" alt="iPad 阅读页面" width="520"><br>iPad 阅读页面</td><td align="center"><img src="design/previews/51-zh-iphone-reading.png" alt="iPhone 阅读页面" width="220"><br>iPhone 阅读页面</td></tr></table>
+<p align="center"><img src="design/previews/51-zh-ipad-rounded.svg" alt="iPad 阅读页面" height="460">&nbsp;&nbsp;&nbsp;<img src="design/previews/51-zh-iphone-rounded.svg" alt="iPhone 阅读页面" height="460"></p>
 
 以上为 0.2.1（51）实际阅读界面，分别来自 iPad 模拟器和 iPhone 真机。
 
