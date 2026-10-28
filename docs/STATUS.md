@@ -1,5 +1,7 @@
 # iMDReader 开发与发行状态
 
+公开发行已完成：2026-10-28 19:49（Asia/Manila），[v0.2.1](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.1)为Latest，发布源码`786514e65214b670278f7662cb8179d19b8a2f89`。DMG、ZIP和SHA256SUMS已从公开链接下载比对通过；旧v0.1.0/v0.2.0资产ID、大小及摘要前后不变。
+
 ## 当前发行：Mac0.2.1（51）
 
 三端51已获用户验收确认，功能冻结。Mac App/DMG签名、公证Accepted、staple与Gatekeeper通过；标准DMG、ZIP和SHA256SUMS随v0.2.1提供，旧v0.1.0/v0.2.0标签资产不变。公开源码为以公开main为父的净化快照，不包含私有开发历史。
