@@ -1,12 +1,8 @@
 # App Store 分发准备（未上传、未提交）
 
-Mac0.2.1（51）发行与移动商店流程分开；三端51已获用户验收通过，移动端仍未上传/提交审核。以下早期验收待办以此确认更新，签名和商店硬性材料仍须完成。
+2026-10-28：移动0.2.1（51）Apple Distribution归档及本地IPA导出成功；严格验签、生产标识、iPhone/iPad设备族、App Store描述文件（无设备限制、关闭调试权限）及隐私清单与源码一致性均通过。最低iOS17，构建SDK为iOS27.1。签名授权阻塞已解除，无需重复申请。IPA仅保存在本地，未上传、未提交审核。
 
-51移动开发签名包已通过严格验签并覆盖安装到既有iPhone/iPad，版本读回通过。此包使用Apple Development，仅用于已配对设备，不是App Store IPA；分发私钥步骤仍暂停。
-
-Mac51公证及Gatekeeper已通过，未公开发行。移动51已补正确生产标识的无签名归档，但仍无可上传IPA；移动私钥步骤保持暂停。
-
-当前冻结候选为0.2.1（51），只有变更时间展示；最终截图须以51为准。移动无签名归档通过，私钥授权阻塞未解决，不能上传。只继续签名、关键验收、截图和必需声明准备，非P0功能/美化延期；详见[冻结状态](STATUS.md)。
+IPA大小6,546,071字节，SHA256：`79446268ef68dc5475b540579c05e4aa39d85f0188b092376b12b4cba6e46a49`。新51摘要独立核验，不沿用已缺失的历史49产物。Mac0.2.1（51）已正式发布，三端51获用户验收；剩余商店硬性资料见下表。
 
 ## 问卷建议与截图清单（2026-10-28，未填报）
 
@@ -29,7 +25,9 @@ Mac51公证及Gatekeeper已通过，未公开发行。移动51已补正确生产
 依据：[Apple隐私定义与可选披露](https://developer.apple.com/app-store/app-privacy-details/)、[GitHub隐私政策](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)、[出口合规](https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance)、[截图规格](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications)。建议不是已提交答案。
 
 
-更新：2026-10-28。Mac正式版仍为0.2.0（46）；移动首发准备版本为0.2.1。源码、恢复及验证边界见[STATUS](STATUS.md)。
+## 历史准备证据（以下为早期阶段，当前以页首为准）
+
+历史记录：Mac当时正式版为0.2.0（46）；移动首发准备版本为0.2.1。源码、恢复及验证边界见[STATUS](STATUS.md)。
 
 ## 已完成准备
 
