@@ -846,3 +846,130 @@ private actor RemoteFixture {
     #expect(fixture.store.document?.id == id)
     #expect(fixture.store.document?.dates.committed == nil)
 }
+
+
+@Test(arguments: [false, true]) @MainActor
+func rejectedOptionalResourcesClearCredentialAndAllowRecovery(image: Bool) async throws {
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let server = RemoteFixture()
+    let vault = EphemeralGitHubCredentials()
+    let cache = GitHubOfflineCache(directory: fixture.root.appendingPathComponent("resource-cache"))
+    let store = ReaderStore(defaults: fixture.defaults, credentials: vault, githubFactory: { token in
+        GitHubReader(token: token, offlineCache: cache) { request, _ in
+            let path = request.url!.path
+            if path == "/repos/test/repo/commits" {
+                return .init(data: Data("[]".utf8), status: token != nil && !image ? 401 : 200)
+            }
+            if image, token != nil, path.hasSuffix("image.png") { return .init(data: Data(), status: 401) }
+            return try await server.response(request)
+        }
+    }, offlineCache: cache, sampleURL: nil)
+    #expect(await store.setGitHubCredential("github_pat_synthetic_optional_resource"))
+    #expect(await store.addGitHub("https://github.com/test/repo/tree/main/docs", reference: "main"))
+    let source = try #require(store.sources.first { $0.remote != nil })
+    let url = try #require(source.url).appendingPathComponent("readme.md")
+    store.open(url, source: source)
+    for _ in 0..<500 where store.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+    if image {
+        let load = try #require(store.document?.imageLoader)
+        await #expect(throws: GitHubReadError.credentialRejected) { try await load("image.png") }
+    }
+    for _ in 0..<100 where store.hasGitHubCredential || store.isUpdatingGitHubCredential {
+        try await Task.sleep(for: .milliseconds(10))
+    }
+    #expect(!store.hasGitHubCredential)
+    #expect(try vault.read() == nil)
+    #expect(store.document == nil && store.selectedKey == nil && !store.isLoading)
+    #expect(fixture.defaults.string(forKey: "lastDocument") == nil)
+    #expect(store.nodes.isEmpty)
+    #expect(store.error == GitHubReadError.credentialRejected.localizedDescription)
+    #expect(await cache.usage().count == 0)
+    // A public repository remains usable with the replacement anonymous session.
+    let restored = try #require(store.sources.first { $0.id == source.id })
+    store.open(url, source: restored)
+    for _ in 0..<500 where store.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+    #expect(store.document?.url == url)
+    #expect(store.error == nil)
+}
+
+private actor OptionalResourceGate {
+    var started = false
+    private var continuation: CheckedContinuation<Void, Never>?
+    func rejectAfterRelease() async -> GitHubReader.Response {
+        started = true
+        await withCheckedContinuation { continuation = $0 }
+        return .init(data: Data(), status: 401)
+    }
+    func release() { continuation?.resume(); continuation = nil }
+}
+
+@Test(arguments: [false, true]) @MainActor
+func lateOptionalResourceFailureCannotRevokeReplacementCredential(image: Bool) async throws {
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let server = RemoteFixture()
+    let gate = OptionalResourceGate()
+    let vault = EphemeralGitHubCredentials()
+    let cache = GitHubOfflineCache(directory: fixture.root.appendingPathComponent("race-cache"))
+    let oldToken = "github_pat_synthetic_old_resource"
+    let newToken = "github_pat_synthetic_new_resource"
+    let store = ReaderStore(defaults: fixture.defaults, credentials: vault, githubFactory: { token in
+        GitHubReader(token: token, offlineCache: cache) { request, _ in
+            let path = request.url!.path
+            if token == oldToken, image ? path.hasSuffix("image.png") : path == "/repos/test/repo/commits" {
+                return await gate.rejectAfterRelease()
+            }
+            if path == "/repos/test/repo/commits" { return .init(data: Data("[]".utf8), status: 200) }
+            return try await server.response(request)
+        }
+    }, offlineCache: cache, sampleURL: nil)
+    #expect(await store.setGitHubCredential(oldToken))
+    #expect(await store.addGitHub("https://github.com/test/repo/tree/main/docs", reference: "main"))
+    let source = try #require(store.sources.first { $0.remote != nil })
+    let url = try #require(source.url).appendingPathComponent("readme.md")
+    store.open(url, source: source)
+    for _ in 0..<500 where store.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+    var pending: Task<Data, Error>?
+    if image {
+        let load = try #require(store.document?.imageLoader)
+        pending = Task { try await load("image.png") }
+    }
+    for _ in 0..<100 where !(await gate.started) { try await Task.sleep(for: .milliseconds(10)) }
+    #expect(await gate.started)
+    #expect(await store.setGitHubCredential(newToken))
+    await gate.release()
+    if let pending { await #expect(throws: CancellationError.self) { try await pending.value } }
+    let restored = try #require(store.sources.first { $0.id == source.id })
+    store.open(url, source: restored)
+    for _ in 0..<500 where store.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+    try await Task.sleep(for: .milliseconds(50))
+    #expect(store.hasGitHubCredential)
+    #expect(try vault.read() == newToken)
+    #expect(store.document?.url == url)
+    #expect(store.error == nil)
+}
+
+@Test(arguments: [403, 429, 500]) @MainActor
+func optionalHistoryFailureKeepsReadingAndCredential(status: Int) async throws {
+    let fixture = try Fixture()
+    defer { fixture.clean() }
+    let server = RemoteFixture()
+    let vault = EphemeralGitHubCredentials()
+    let token = "github_pat_synthetic_unavailable_history"
+    try vault.write(token)
+    let reader = GitHubReader(token: token) { request, _ in
+        if request.url?.path == "/repos/test/repo/commits" { return .init(data: Data(), status: status) }
+        return try await server.response(request)
+    }
+    let store = ReaderStore(defaults: fixture.defaults, github: reader, credentials: vault, sampleURL: nil)
+    #expect(await store.addGitHub("https://github.com/test/repo/tree/main/docs", reference: "main"))
+    let source = try #require(store.sources.first { $0.remote != nil })
+    store.open(try #require(source.url).appendingPathComponent("readme.md"), source: source)
+    for _ in 0..<500 where store.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+    try await Task.sleep(for: .milliseconds(50))
+    #expect(store.hasGitHubCredential && store.document != nil)
+    #expect(try vault.read() == token)
+    #expect(store.document?.dates.committed == nil)
+    #expect(store.error == nil)
+}

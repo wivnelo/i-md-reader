@@ -83,8 +83,8 @@ private struct SafeHTML {
             guard let destination = safeDestination(link.destination, image: false) else { return children(node) }
             return "<a href=\"\(escape(destination))\">\(children(node))</a>"
         case let image as Markdown.Image:
-            guard allowRelativeImages else { return "<span class=\"resource-note\">图片需要所在文件夹的访问权限</span>" }
-            guard let source = safeDestination(image.source, image: true) else { return "<span class=\"resource-note\">暂不支持此图片地址</span>" }
+            guard allowRelativeImages else { return "<span class=\"resource-note\" data-reader-message=\"folder-access\">图片需要所在文件夹的访问权限</span>" }
+            guard let source = safeDestination(image.source, image: true) else { return "<span class=\"resource-note\" data-reader-message=\"unsupported-image\">暂不支持此图片地址</span>" }
             return "<img src=\"\(escape(source))\" alt=\"\(escape(image.plainText))\" loading=\"lazy\">"
         case is ThematicBreak: return "<hr>"
         case is LineBreak: return "<br>"

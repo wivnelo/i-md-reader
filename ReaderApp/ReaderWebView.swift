@@ -110,10 +110,10 @@ struct ReaderWebView: ReaderWebRepresentable {
         let labels = String(data: try! JSONEncoder().encode(document.dates.labels(language: language)), encoding: .utf8)!
         return """
         (()=>{const box=document.getElementById('reader-file-dates');if(!box)return;
-        const anchor=box.nextElementSibling, old=anchor.getBoundingClientRect().top, y=window.scrollY;
+        const anchor=box.nextElementSibling, old=anchor?.getBoundingClientRect().top ?? 0, y=window.scrollY;
         box.replaceChildren();const labels=\(labels);box.hidden=labels.length===0;
         labels.forEach(text=>{const item=document.createElement('span');item.textContent=text;box.append(item);});
-        if(y>0)window.scrollTo(0,y+anchor.getBoundingClientRect().top-old);})();
+        if(y>0 && anchor){const delta=anchor.getBoundingClientRect().top-old;window.scrollTo(0,window.scrollY+delta);}})();
         """
     }
     private var appearanceScript: String {

@@ -416,6 +416,13 @@ struct OpenDocument {
         return true
     }
 
+    // Optional dates/images share the same credential session as the document.
+    // A late failure from an older session must never revoke a newer credential.
+    private func handleGitHubResourceFailure(_ failure: Error, generation: UUID) async {
+        guard authenticationGeneration == generation, !isUpdatingGitHubCredential else { return }
+        _ = await clearRejectedGitHubCredential(failure)
+    }
+
     var orderedSources: [FolderSource] {
         let ordered = ranked(sources, order: sourceOrder, unknownFirst: true) { $0.id.uuidString }
         let pinned = ranked(ordered.filter { isPinned($0) }, order: pinnedSources) { $0.id.uuidString }
@@ -709,9 +716,14 @@ struct OpenDocument {
                     history = (location, path)
                     let base = remoteBase(location)
                     let reader = github
-                    imageLoader = { relative in
+                    let generation = authenticationGeneration
+                    imageLoader = { [weak store = self] relative in
                         let path = [base, relative].filter { !$0.isEmpty }.joined(separator: "/")
-                        return try await reader.image(location, path: path)
+                        do { return try await reader.image(location, path: path) }
+                        catch {
+                            await store?.handleGitHubResourceFailure(error, generation: generation)
+                            throw error
+                        }
                     }
                     rendered = await Task.detached(priority: .userInitiated) {
                         MarkdownRenderer().render(text)
@@ -737,15 +749,23 @@ struct OpenDocument {
                 document = OpenDocument(key: id, url: url, sourceID: source.id, access: access, rendered: rendered, initialProgress: positions[id] ?? 0, dates: dates, imageLoader: imageLoader)
                 if let history, let documentID = document?.id {
                     let reader = github
+                    let generation = authenticationGeneration
                     dateTask = Task { [weak store = self] in
-                        guard let date = try? await reader.latestCommitDate(history.0, path: history.1),
-                              !Task.isCancelled, let store, store.document?.id == documentID,
-                              store.selectedKey == id else { return }
-                        store.document?.dates = DocumentDates(committed: date)
+                        do {
+                            guard let date = try await reader.latestCommitDate(history.0, path: history.1),
+                                  !Task.isCancelled, let store, store.document?.id == documentID,
+                                  store.selectedKey == id else { return }
+                            store.document?.dates = DocumentDates(committed: date)
+                        } catch {
+                            await store?.handleGitHubResourceFailure(error, generation: generation)
+                        }
                     }
                 }
                 progress = positions[id] ?? 0
-                isReadingOffline = source.remote != nil ? await github.isUsingOfflineCache : false
+                let offline = source.remote != nil ? await github.isUsingOfflineCache : false
+                // A resource failure can revoke this session during the actor hop.
+                guard !Task.isCancelled else { return }
+                isReadingOffline = offline
                 defaults.set(id, forKey: "lastDocument")
             } catch {
                 guard !Task.isCancelled else { return }

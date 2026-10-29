@@ -2,10 +2,10 @@
   const bridge = window.webkit.messageHandlers.reader;
   let timer;
   const english = () => document.documentElement.dataset.uiLanguage === 'en';
-  document.querySelectorAll('.resource-note').forEach(note => {
-    if (note.textContent === '[图片暂未加载]') note.dataset.readerMessage = 'pending';
-    if (note.textContent === '[图片未加载：仅支持本地相对图片]') note.dataset.readerMessage = 'relative';
-  });
+  const resourceMessages = {
+    'folder-access': ['图片需要所在文件夹的访问权限', 'Images require access to their containing folder'],
+    'unsupported-image': ['暂不支持此图片地址', 'This image address is not supported yet']
+  };
   const updateInterface = () => {
     document.querySelectorAll('.copy').forEach(button => {
       button.textContent = button.dataset.copied === 'true'
@@ -14,9 +14,8 @@
     document.querySelectorAll('.table-scroll').forEach(table => table.setAttribute('aria-label', english() ? 'Table' : '表格'));
     document.querySelectorAll('input[type=checkbox][disabled]').forEach(box => box.setAttribute('aria-label', english() ? 'Task status' : '任务状态'));
     document.querySelectorAll('.resource-note[data-reader-message]').forEach(note => {
-      note.textContent = note.dataset.readerMessage === 'pending'
-        ? (english() ? '[Image not loaded]' : '[图片暂未加载]')
-        : (english() ? '[Image not loaded: only local relative images are supported]' : '[图片未加载：仅支持本地相对图片]');
+      const message = resourceMessages[note.dataset.readerMessage];
+      if (message) note.textContent = message[english() ? 1 : 0];
     });
   };
   updateInterface();

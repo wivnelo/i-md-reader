@@ -44,4 +44,38 @@ import JavaScriptCore
     #expect(rendered.body.contains("data-language=\"matlab\""))
     #expect(!rendered.body.contains("<script>"))
 }
+
+@Test @MainActor func resourceMessagesUseRendererIdentifiersAcrossLanguageChanges() throws {
+    let renderer = MarkdownRenderer()
+    let folder = renderer.render("![local](image.png)", allowRelativeImages: false).body
+    let unsupported = renderer.render("![remote](https://example.com/image.png)").body
+    #expect(folder.contains("data-reader-message=\"folder-access\""))
+    #expect(unsupported.contains("data-reader-message=\"unsupported-image\""))
+    #expect(renderer.render("").body.isEmpty)
+    #expect(renderer.render("---\ntitle: metadata only\n---\n").body.isEmpty)
+    let resources = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        .deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("ReaderApp/Resources")
+    let context = try #require(JSContext())
+    context.evaluateScript(#"""
+    var window = this;
+    window.webkit = {messageHandlers: {reader: {postMessage: function(){}}}};
+    var notes = [{dataset:{readerMessage:'folder-access'},textContent:''}, {dataset:{readerMessage:'unsupported-image'},textContent:''}];
+    var document = {documentElement:{dataset:{uiLanguage:'en'}},querySelectorAll:function(selector){return selector === '.resource-note[data-reader-message]' ? notes : [];}};
+    var languageChanged;
+    class MutationObserver { constructor(callback){languageChanged=callback;} observe(){} }
+    function addEventListener(){}
+    """#)
+    context.evaluateScript(try String(contentsOf: resources.appendingPathComponent("reader.js"), encoding: .utf8))
+    #expect(context.exception == nil)
+    for language in ["en", "zh-Hans", "en"] {
+        context.evaluateScript("document.documentElement.dataset.uiLanguage='\(language)';languageChanged();")
+        let expected = language == "en"
+            ? ["Images require access to their containing folder", "This image address is not supported yet"]
+            : ["图片需要所在文件夹的访问权限", "暂不支持此图片地址"]
+        for index in expected.indices {
+            #expect(context.evaluateScript("notes[\(index)].textContent")?.toString() == expected[index])
+        }
+        #expect(context.exception == nil)
+    }
+}
 #endif
