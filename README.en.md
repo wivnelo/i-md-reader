@@ -8,7 +8,7 @@
 
 ## Download
 
-- **Mac:** [Download the 0.2.1 release](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.1). Supports Apple Silicon and Intel; requires macOS 14 or later.
+- **Mac:** [Download the 0.2.2 release](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.2). Supports Apple Silicon and Intel; requires macOS 14 or later.
 - **iPhone / iPad:** 0.2.1 (51) has been submitted for App Store review and is not yet available.
 
 For Mac, download the `.dmg`, open it, and drag iMDReader to Applications. A ZIP is also available. The release is Developer ID signed, notarized by Apple, and checked with Gatekeeper. You can replace an existing installation without uninstalling or clearing your library.
@@ -38,3 +38,5 @@ Access to a single file does not grant access to its parent folder. Add the fold
 ## Help and feedback
 
 - [Support](https://wivnelo.github.io/i-md-reader/support.html) · [Privacy policy](https://wivnelo.github.io/i-md-reader/privacy.html) · [Report an issue](https://github.com/wivnelo/i-md-reader/issues)
+
+Development regression results, known issues, and validation limits are recorded in [STATUS](docs/STATUS.md).
