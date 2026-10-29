@@ -1,5 +1,7 @@
 # iMDReader 已确认产品约束
 
+- 当前正式Mac及本机运行均为0.2.2（52），日常从`/Applications/iMDReader.app`启动；不要将工程构建副本固定到Dock。历史构建缓存和旧App副本已清理，当前产物/移动51审核材料及历史诊断归档位置见docs/STATUS.md；不沿用已删除的DerivedData路径。
+
 - 2026-10-29用户授权修复已复现的2项P2与1项P3，并只发布Mac0.2.2（52）；其他已确认界面/功能不变，移动端不安装、上传或发布。此明确授权替代旧冻结规则对此三项修复的限制；当前发布结果见docs/STATUS.md。
 
 - 后续接手先读本文件、README、docs/STATUS.md及docs/app-store-preparation.md，并核对实际Git和发行状态。旧临时工作树已缺失，不重建或依赖它；不要覆盖原私有工作副本、复制凭据或按旧记录重复安装。

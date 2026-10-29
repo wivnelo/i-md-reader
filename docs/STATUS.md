@@ -1,5 +1,28 @@
 # iMDReader 开发与发行状态
 
+## 当前状态与产物整理 · 2026-10-29
+
+**Mac正式版与本机运行均为0.2.2（52）；重复更新提示已通过修正Dock旧入口解决，无需更改应用代码或再发版本。** 正式启动位置为`/Applications/iMDReader.app`。移动仍为已提交的0.2.1（51），本轮未安装、上传或发布；审核状态仅以10月28日最后读回为证，不冒充实时状态。
+
+用户授权清理后，已删除275项旧构建、候选包、重复下载、旧App备份及临时记录，合计约3.25GB（按删除项文件大小统计）。包含曾被Dock误启动的`mac51-derived`、其他DerivedData/Swift缓存、旧未签名移动候选、4个旧Mac备份和干净的旧公开准备克隆。已正常卸载重复下载的DMG；没有清理正在使用的模拟器容器、用户资料库、Keychain或恢复Git历史。
+
+| 持久保留 | 用途 |
+| --- | --- |
+| 当前`workspace/`、原私有副本及`backup/` | 继续开发及恢复既有未提交成果；业务源码摘要核对未变 |
+| `validation/release-0.2.2-52/` | 当前Mac正式DMG/ZIP、校验和、dSYM、公开历史bundle及发布/回归证据；已清掉重复下载副本与解包App |
+| `validation/iMDReader51-distribution.xcarchive`、`AppStoreExport51/` | 已提交移动51的分发归档、符号和IPA；IPA摘要再次匹配 |
+| `validation/store-screenshots51/final-upload/`、`app-store51-evidence/` | 已选定的8张商店图、上传/问卷及待跟进Apple支持证据；迁移后逐文件摘要一致 |
+| `validation/historical-validation-through-51.tar.gz` | 163份历史诊断/报告压缩归档，逐文件校验后移除散落原件；下方旧日志路径对应归档内路径 |
+| `validation/update-launch-20261029/`、`cleanup-20261029/` | 私有Dock备份、启动修正及清理清单/核验记录，不入公开仓库 |
+
+本轮校验：178份受保护源码/资源摘要未变；当前安装严格签名通过，当前Mac发行资产及移动IPA摘要保持一致；旧正式标签/资产未操作。此次为清理与文档同步，没有重复运行完整功能回归；0.2.2发布回归证据和未测边界见下文。未来编译缓存可按锁定依赖重建，日常启动不要固定工程构建目录里的App。
+
+## 本机重复更新提示排查 · 2026-10-29
+
+已定位并修正本机启动入口：用户已将正式0.2.2（52）安装到“应用程序”，下载DMG摘要与发行包一致；Dock却仍固定到`validation/mac51-derived`内的旧0.2.1（51）构建，所以每次启动仍提示更新。不是新版安装包版本错误，也未复现同版本更新误报。
+
+用户明确授权后，先备份Dock配置，再仅修正iMDReader目标及该项旧书签；其他固定图标/顺序和偏好保持不变。正常退出旧副本，重新启动后进程仅来自`/Applications/iMDReader.app`，“关于”读回0.2.2（52）。生产版本比较代码配合真实发行JSON的6项探针通过：旧版提示、同版/更高版不提示、并发/重复仅检查一次。未改业务代码、未重新发布、未改用户资料库或移动设备。配置备份和证据仅保留在本机`validation/update-launch-20261029/`，不入公开仓库。
+
 ## macOS 0.2.2（52）维护版 · 2026-10-29
 
 用户授权修复上轮审计的2项P2和1项P3，并仅发布macOS。**2026-10-29 16:00（Asia/Manila）[v0.2.2](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.2)已正式发布为Latest。** App与DMG均已获Apple公证Accepted，票据装订、严格签名、Gatekeeper和只读挂载检查通过；DMG、ZIP和SHA256SUMS从公开链接下载后摘要一致。源码/tag为公开历史上的`4f4f2fba3bdd47b44f345ca83182fd7252ca0133`；旧v0.1.0/v0.2.0/v0.2.1资产ID、大小及摘要未变。iPhone/iPad版本配置仍为0.2.1（51），本轮不安装、上传、提交审核或发布。
