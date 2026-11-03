@@ -17,6 +17,7 @@ import WebKit
     let web: WKWebView
     var labels: [String] = []
     var copied = ""
+    var anchor: Double?
 
     override init() {
         let config = WKWebViewConfiguration()
@@ -59,6 +60,7 @@ import WebKit
     }
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if let body = message.body as? [String: Any], body["type"] as? String == "copy", let text = body["text"] as? String { copied = text }
+        if let body = message.body as? [String: Any], body["type"] as? String == "progress", let value = body["anchor"] as? Double { anchor = value }
     }
     func verify() async throws {
         let item = cases[index]
@@ -96,6 +98,23 @@ import WebKit
             for _ in 0..<100 where copied.isEmpty { try await Task.sleep(for: .milliseconds(5)) }
             guard copied == "let number = 42" else { fail("isolated copy bridge") }
             copied = ""
+            // A block anchor brings the same block back to the top after a font change.
+            anchor = nil
+            _ = try await evaluate("document.getElementById('reading-anchor').scrollIntoView(); window.scrollBy(0, 3);")
+            for _ in 0..<100 where anchor == nil { try await Task.sleep(for: .milliseconds(10)) }
+            try await Task.sleep(for: .milliseconds(400)) // Keep the latest debounced report.
+            guard let saved = anchor, saved >= 2 else { fail("no block anchor reported") }
+            _ = try await evaluate("document.body.style.fontSize='26px'; window.scrollTo(0,0);")
+            _ = try await evaluate(DateScriptFixture.positionScript(saved))
+            try await Task.sleep(for: .milliseconds(30))
+            let restored = try await evaluate("(() => { const box = document.getElementById('reading-anchor').getBoundingClientRect(); return box.top <= 1 && box.bottom > 0; })()") as? Bool
+            guard restored == true else { fail("block anchor \(saved) did not restore its block") }
+            // Earlier whole-document ratios still restore proportionally.
+            _ = try await evaluate("document.body.style.fontSize='17px';")
+            _ = try await evaluate(DateScriptFixture.positionScript(0.5))
+            try await Task.sleep(for: .milliseconds(30))
+            let ratio = try await evaluate("Math.abs(scrollY - (document.documentElement.scrollHeight - innerHeight) * 0.5)") as? Double
+            guard let ratio, ratio < 2 else { fail("legacy ratio restore off by \(String(describing: ratio))") }
             _ = try await evaluate("window.scrollTo(0,0);")
         }
         if index == 0 || index == 1 || index == 12 || index == 13 {
@@ -112,7 +131,7 @@ import WebKit
         index += 1
         if index < cases.count { run() }
         else {
-            print("PASS: \(cases.count) WebKit combinations; empty/nonempty dates, missing metadata, scroll preservation, language round trips and copy bridge; \(screenshots) snapshots.")
+            print("PASS: \(cases.count) WebKit combinations; empty/nonempty dates, missing metadata, scroll preservation, block-anchor and ratio restore, language round trips and copy bridge; \(screenshots) snapshots.")
             NSApplication.shared.terminate(nil)
         }
     }

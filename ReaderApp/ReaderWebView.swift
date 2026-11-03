@@ -19,7 +19,7 @@ struct ReaderWebView: ReaderWebRepresentable {
     let findRequest: Int
     var findText: String = ""
     @Binding var anchor: String?
-    let onProgress: (Double) -> Void
+    let onProgress: (Double, Double?) -> Void
     let onInternalLink: (URL) -> Void
     let onError: (String) -> Void
     let onReady: () -> Void
@@ -116,6 +116,29 @@ struct ReaderWebView: ReaderWebRepresentable {
         if(y>0 && anchor){const delta=anchor.getBoundingClientRect().top-old;window.scrollTo(0,window.scrollY+delta);}})();
         """
     }
+    /// Restores a saved position: values from 2 name a top-level article block plus the fraction within it;
+    /// values in 0...1 are the earlier whole-document ratio. Re-aligns as images above load until the reader interacts.
+    static func positionScript(_ value: Double) -> String {
+        let value = value.isFinite ? value : 0
+        guard value >= 2 else {
+            return "window.scrollTo(0, Math.max(0,document.documentElement.scrollHeight-innerHeight)*\(min(1, max(0, value))));"
+        }
+        return """
+        (() => {
+          const blocks = document.querySelectorAll('article > :not(#reader-file-dates)');
+          const index = Math.floor(\(value) - 2), past = index >= blocks.length, target = blocks[Math.min(index, blocks.length - 1)];
+          if (!target) return;
+          const fraction = past ? 1 : \(value) - 2 - index;
+          const apply = () => { const box = target.getBoundingClientRect(); window.scrollTo(0, scrollY + box.top + box.height * fraction); };
+          apply();
+          let settled = false;
+          const settle = () => { settled = true; };
+          ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(type => addEventListener(type, settle, { once: true, passive: true }));
+          document.addEventListener('load', event => { if (!settled && event.target instanceof HTMLImageElement) apply(); }, true);
+          setTimeout(settle, 10000);
+        })();
+        """
+    }
     private var appearanceScript: String {
         let theme = dark ? "dark" : "light"
         return "document.documentElement.dataset.uiLanguage='\(language)';document.documentElement.dataset.theme='\(theme)';document.documentElement.style.cssText='\(palette.colors(dark: dark).cssVariables)';document.body.style.fontSize='\(fontSize)px';"
@@ -138,7 +161,7 @@ struct ReaderWebView: ReaderWebRepresentable {
         init(_ parent: ReaderWebView) { self.parent = parent; lastFindRequest = parent.findRequest }
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             guard message.frameInfo.isMainFrame, let body = message.body as? [String: Any], let type = body["type"] as? String else { return }
-            if type == "progress", let value = body["value"] as? Double { parent.onProgress(value) }
+            if type == "progress", let value = body["value"] as? Double { parent.onProgress(value, body["anchor"] as? Double) }
             if type == "copy", let text = body["text"] as? String, text.utf8.count <= 1_048_576 {
                 #if os(macOS)
                 NSPasteboard.general.clearContents()
@@ -158,8 +181,7 @@ struct ReaderWebView: ReaderWebRepresentable {
                 webView.evaluateJavaScript("document.getElementById(\(escaped))?.scrollIntoView();", completionHandler: nil)
                 return
             }
-            let progress = min(1, max(0, parent.document.initialProgress))
-            webView.evaluateJavaScript("window.scrollTo(0, Math.max(0,document.documentElement.scrollHeight-innerHeight)*\(progress));", completionHandler: nil)
+            webView.evaluateJavaScript(ReaderWebView.positionScript(parent.document.initialProgress), completionHandler: nil)
         }
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { parent.onReady(); parent.onError(error.localizedDescription) }
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { parent.onReady(); parent.onError(error.localizedDescription) }

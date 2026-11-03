@@ -42,8 +42,9 @@ extension SyncState {
         if order.value != snapshot.order { order = Stamped(snapshot.order, stamp) }
         if sampleRemoved.value != snapshot.sampleRemoved { sampleRemoved = Stamped(snapshot.sampleRemoved, stamp) }
         if palette.value != snapshot.palette { palette = Stamped(snapshot.palette, stamp) }
-        for (key, value) in snapshot.positions where value.isFinite && positions[key]?.value != min(1, max(0, value)) {
-            positions[key] = Stamped(min(1, max(0, value)), stamp)
+        for (key, raw) in snapshot.positions {
+            guard let value = Self.position(raw), positions[key]?.value != value else { continue }
+            positions[key] = Stamped(value, stamp)
         }
         normalize()
     }

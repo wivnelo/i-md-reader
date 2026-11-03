@@ -167,3 +167,32 @@ private func stamp(_ seconds: TimeInterval, _ device: String) -> SyncStamp {
     // Missing on disk is not a removal: the source stays synced so other devices keep it.
     #expect(restarted.syncSnapshot().sources.values.map(\.kind) == [.cloudFolder(path: "com~apple~CloudDocs/Gone")])
 }
+
+@Test @MainActor func progressSavesBlockAnchorAndTrimsLeastRecentlyRead() async throws {
+    let phone = try Device()
+    defer { phone.clean() }
+    let folder = phone.root.appendingPathComponent("Docs")
+    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+    try Data("# A\n\ntext".utf8).write(to: folder.appendingPathComponent("a.md"))
+    let recent = "00000000-0000-0000-0000-000000000000|/recent.md"
+    var seeded = [recent: 0.5]
+    for index in 0..<210 { seeded[UUID().uuidString + "|/\(index).md"] = 0.1 }
+    phone.defaults.set(seeded, forKey: "positions")
+    phone.defaults.set([recent], forKey: "positionRecency")
+    let store = ReaderStore(defaults: phone.defaults, github: GitHubReader(), sampleURL: nil)
+    store.addFolder(folder)
+    let source = try #require(store.sources.first { $0.url != nil && !$0.isSample })
+    store.open(folder.appendingPathComponent("a.md"), source: source)
+    for _ in 0..<200 where store.document == nil || store.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+    let key = try #require(store.document?.key)
+
+    store.recordProgress(0.3, documentKey: key, anchor: 5.25)
+    #expect(store.progress == 0.3)
+    let saved = try #require(phone.defaults.dictionary(forKey: "positions") as? [String: Double])
+    #expect(saved[key] == 5.25)
+    // Alphabetically first but recently read: kept, unlike the old alphabetical trim.
+    #expect(saved.count == 200 && saved[recent] == 0.5)
+    // Without an anchor the ratio is kept, as before.
+    store.recordProgress(0.6, documentKey: key)
+    #expect((phone.defaults.dictionary(forKey: "positions") as? [String: Double])?[key] == 0.6)
+}

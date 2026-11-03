@@ -129,3 +129,12 @@ private func github(_ url: String, id: UUID = UUID(), added: TimeInterval = 10, 
     let decoded = try JSONDecoder().decode(SyncState.self, from: JSONEncoder().encode(state))
     #expect(decoded == state)
 }
+
+@Test func blockAnchorsSurviveWhileLegacyRatiosStayClamped() {
+    #expect(SyncState.position(14.3) == 14.3 && SyncState.position(2) == 2)
+    #expect(SyncState.position(1.5) == 1 && SyncState.position(-1) == 0 && SyncState.position(.infinity) == nil)
+    var state = SyncState(stamp: stamp(0))
+    state.setPosition(7.25, for: "k", at: stamp(1))
+    state.absorb(SyncSnapshot(positions: ["k": 7.25, "old": 0.4]), at: stamp(2), now: Date())
+    #expect(state.positions["k"] == Stamped(7.25, stamp(1)) && state.positions["old"]?.value == 0.4)
+}

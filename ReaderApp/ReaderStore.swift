@@ -192,6 +192,8 @@ struct OpenDocument {
     private var remoteLocations: [UUID: GitHubLocation] = [:]
     @Published private(set) var isAddingGitHub = false
     private var positions: [String: Double]
+    /// Position keys from least to most recently read, for trimming.
+    private var positionRecency: [String]
     private var directoryRequests: [String: UUID] = [:]
     private var refreshRequests: [UUID: UUID] = [:]
     static let sampleID = UUID(uuidString: "E4072B41-1284-4D82-82BE-846370D11759")!
@@ -220,6 +222,7 @@ struct OpenDocument {
         pinnedSources = defaults.stringArray(forKey: "pinnedSources") ?? []
         expanded = Set(defaults.stringArray(forKey: "expanded") ?? [])
         positions = defaults.dictionary(forKey: "positions") as? [String: Double] ?? [:]
+        positionRecency = defaults.stringArray(forKey: "positionRecency") ?? []
         bookmarks = (try? JSONDecoder().decode([SavedSource].self, from: defaults.data(forKey: "sources") ?? Data())) ?? []
         pendingCloudFolders = (try? JSONDecoder().decode([UUID: PendingCloudFolder].self, from: defaults.data(forKey: "cloudFolders") ?? Data())) ?? [:]
         savedFiles = (try? JSONDecoder().decode([SavedRecentFile].self, from: defaults.data(forKey: "recentFiles") ?? Data())) ?? []
@@ -606,7 +609,7 @@ struct OpenDocument {
             sourceVersions[source.id, default: 0] += 1
             // A user-initiated document switch wins over an in-flight source refresh.
             if let current = document, current.sourceID == source.id, selectedKey == current.key, !isLoading {
-                positions[current.key] = progress
+                positions[current.key] = positions[current.key] ?? progress
                 open(current.url, source: source, isRefresh: true)
                 let task = readingTask
                 await task?.value
@@ -673,7 +676,7 @@ struct OpenDocument {
             if let current = document, current.isStandalone, selectedKey == current.key, !isLoading,
                (try? LocalDocuments.confined(current.url, to: url)) != nil,
                let source = sources.first(where: { $0.id == id }) {
-                positions[key(source: source, url: current.url)] = progress
+                positions[key(source: source, url: current.url)] = positions[current.key] ?? progress
                 defaults.set(positions, forKey: "positions")
                 open(current.url, source: source)
             }
@@ -1075,7 +1078,7 @@ struct OpenDocument {
             directoryErrors = directoryErrors.filter { !$0.key.hasPrefix(prefix) }.merging(failures) { _, new in new }
             sourceVersions[source.id, default: 0] += 1
             if let current = document, current.sourceID == source.id, selectedKey == current.key, !isLoading {
-                positions[current.key] = progress
+                positions[current.key] = positions[current.key] ?? progress
                 open(current.url, source: source, isRefresh: true)
                 await readingTask?.value
             }
@@ -1197,12 +1200,19 @@ struct OpenDocument {
         persistSources(); persistExpanded()
     }
 
-    func recordProgress(_ value: Double, documentKey: String) {
+    /// `value` is the whole-document ratio shown in the UI; `anchor` (block index + fraction, from 2) is what gets saved.
+    func recordProgress(_ value: Double, documentKey: String, anchor: Double? = nil) {
         guard value.isFinite, document?.key == documentKey else { return }
-        progress = min(1, max(0, value)); positions[documentKey] = progress
+        progress = min(1, max(0, value))
+        positions[documentKey] = anchor.flatMap(SyncState.position).flatMap { $0 >= 2 ? $0 : nil } ?? progress
+        positionRecency.removeAll { $0 == documentKey }; positionRecency.append(documentKey)
         if positions.count > 200 {
-            for key in positions.keys.sorted().prefix(positions.count - 200) where key != documentKey { positions.removeValue(forKey: key) }
+            // Least recently read first; keys saved before recency was tracked count as oldest.
+            let rank = Dictionary(positionRecency.enumerated().map { ($1, $0) }) { a, _ in a }
+            let oldest = positions.keys.sorted { (rank[$0] ?? -1, $0) < (rank[$1] ?? -1, $1) }
+            for key in oldest.prefix(positions.count - 200) { positions[key] = nil }
         }
-        defaults.set(positions, forKey: "positions")
+        positionRecency = positionRecency.filter { positions[$0] != nil }
+        defaults.set(positions, forKey: "positions"); defaults.set(positionRecency, forKey: "positionRecency")
     }
 }

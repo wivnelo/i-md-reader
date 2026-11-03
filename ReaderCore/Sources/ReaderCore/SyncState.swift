@@ -75,9 +75,14 @@ public struct SyncState: Codable, Sendable, Equatable {
         normalize()
     }
     public mutating func setPosition(_ value: Double, for key: String, at stamp: SyncStamp) {
-        guard value.isFinite else { return }
-        positions[key] = Stamped(min(1, max(0, value)), stamp)
+        guard let value = Self.position(value) else { return }
+        positions[key] = Stamped(value, stamp)
         trimPositions()
+    }
+    /// 0...1 is a whole-document ratio; values from 2 are block anchors (block index + fraction, offset by 2).
+    public static func position(_ value: Double) -> Double? {
+        guard value.isFinite else { return nil }
+        return value >= 2 ? value : min(1, max(0, value))
     }
 
     public struct Merge: Sendable, Equatable {

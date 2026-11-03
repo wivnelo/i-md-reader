@@ -246,7 +246,7 @@ struct ReaderScreen: View {
                             }.padding(.horizontal, 20).padding(.vertical, 8)
                         }
                         ReaderWebView(document: document, fontSize: scaledSize, dark: dark, palette: palette, language: language.resolved(), reduceMotion: reduceMotion, findRequest: findRequest, findText: searchText, anchor: $anchor,
-                                      onProgress: { store.recordProgress($0, documentKey: document.key) },
+                                      onProgress: { store.recordProgress($0, documentKey: document.key, anchor: $1) },
                                       onInternalLink: { url in
                                           if let source = store.sources.first(where: { $0.id == document.sourceID }) { store.open(url, source: source) }
                                       }, onError: { store.error = $0 }, onReady: {

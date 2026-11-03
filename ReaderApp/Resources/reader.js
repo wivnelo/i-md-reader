@@ -20,9 +20,19 @@
   };
   updateInterface();
   new MutationObserver(updateInterface).observe(document.documentElement, { attributes: true, attributeFilter: ['data-ui-language'] });
+  // Top-level article block at the top edge plus the fraction scrolled through it (encoded from 2),
+  // so a position survives font, width and late image changes across devices.
+  const anchor = () => {
+    const blocks = document.querySelectorAll('article > :not(#reader-file-dates)');
+    for (let index = 0; index < blocks.length; index++) {
+      const box = blocks[index].getBoundingClientRect();
+      if (box.bottom > 0) return 2 + index + (box.height > 0 ? Math.min(0.999, Math.max(0, -box.top / box.height)) : 0);
+    }
+    return blocks.length ? 2 + blocks.length - 1 : undefined;
+  };
   const report = () => {
     const distance = document.documentElement.scrollHeight - innerHeight;
-    bridge.postMessage({ type: 'progress', value: distance > 0 ? Math.min(1, Math.max(0, scrollY / distance)) : 0 });
+    bridge.postMessage({ type: 'progress', value: distance > 0 ? Math.min(1, Math.max(0, scrollY / distance)) : 0, anchor: anchor() });
   };
   addEventListener('scroll', () => { clearTimeout(timer); timer = setTimeout(report, 350); }, { passive: true });
   addEventListener('pagehide', report);
