@@ -27,6 +27,7 @@ struct ReaderScreen: View {
     @State private var selectingMarkdown = false
     @State private var addingGitHub = false
     @State private var managingGitHubAccess = false
+    @State private var managingSync = false
     #if os(iOS)
     @State private var managingOfflineCache = false
     #endif
@@ -350,6 +351,7 @@ struct ReaderScreen: View {
                     }
                     Menu {
                         Button("GitHub 授权", systemImage: "key") { managingGitHubAccess = true }
+                        Button("iCloud 同步", systemImage: "icloud") { managingSync = true }.disabled(sync == nil)
                         #if os(iOS)
                         Button("离线缓存", systemImage: "internaldrive") { managingOfflineCache = true }
                         Link(destination: URL(string: "https://wivnelo.github.io/i-md-reader/privacy.html")!) {
@@ -391,6 +393,7 @@ struct ReaderScreen: View {
         }
         .sheet(isPresented: $addingGitHub) { GitHubAddSheet(store: store) }
         .sheet(isPresented: $managingGitHubAccess) { GitHubAccessSheet(store: store) }
+        .sheet(isPresented: $managingSync) { if let sync { SyncSheet(sync: sync) } }
         #if os(iOS)
         .sheet(isPresented: $managingOfflineCache) { OfflineCacheSheet(store: store) }
         #endif
@@ -1005,6 +1008,41 @@ private struct GitHubAccessSheet: View {
             }
             working = false
         }
+    }
+}
+
+private struct SyncSheet: View {
+    @ObservedObject var sync: ReaderSync
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
+    private var status: LocalizedStringKey {
+        switch sync.status {
+        case .off: "已关闭"
+        case .signedOut: "iCloud 未登录"
+        case .syncing: "正在同步…"
+        case .synced: "已同步"
+        case .retrying: "暂时无法同步，稍后自动重试"
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Toggle("在设备间同步", isOn: Binding(get: { sync.isEnabled }, set: { sync.setEnabled($0) }))
+                    LabeledContent("状态") { Text(status) }
+                } footer: {
+                    Text("将来源、置顶与排序、配色和阅读位置同步到你的 iCloud，在同一 Apple 账户的 Mac、iPhone、iPad 间使用。不上传文档正文，不同步 GitHub 令牌和离线缓存。iCloud 云盘以外的本地文件夹只保留在本机；其他设备上的 iCloud 云盘文件夹需在该设备授权一次。")
+                }
+            }
+            .modifier(ReaderSheetFormStyle())
+            .navigationTitle(ReaderLanguage.message("iCloud 同步", locale: locale))
+        #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+        #endif
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("完成") { dismiss() } } }
+        }
+        .modifier(ReaderSheetSize())
     }
 }
 

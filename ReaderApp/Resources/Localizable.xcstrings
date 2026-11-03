@@ -2152,6 +2152,159 @@
           }
         }
       }
+    },
+    "iCloud 同步": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud sync"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 同步"
+          }
+        }
+      }
+    },
+    "在设备间同步": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sync across devices"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在设备间同步"
+          }
+        }
+      }
+    },
+    "状态": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态"
+          }
+        }
+      }
+    },
+    "已关闭": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已关闭"
+          }
+        }
+      }
+    },
+    "iCloud 未登录": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not signed in to iCloud"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 未登录"
+          }
+        }
+      }
+    },
+    "正在同步…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Syncing…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在同步…"
+          }
+        }
+      }
+    },
+    "已同步": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up to date"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已同步"
+          }
+        }
+      }
+    },
+    "暂时无法同步，稍后自动重试": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Can’t sync right now. Will retry automatically."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时无法同步，稍后自动重试"
+          }
+        }
+      }
+    },
+    "将来源、置顶与排序、配色和阅读位置同步到你的 iCloud，在同一 Apple 账户的 Mac、iPhone、iPad 间使用。不上传文档正文，不同步 GitHub 令牌和离线缓存。iCloud 云盘以外的本地文件夹只保留在本机；其他设备上的 iCloud 云盘文件夹需在该设备授权一次。": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Syncs your sources, pins and order, color palette and reading positions through your iCloud across Macs, iPhones and iPads signed in to the same Apple Account. Document text is never uploaded, and GitHub tokens and the offline cache are not synced. Local folders outside iCloud Drive stay on this device; iCloud Drive folders from other devices need to be authorized once on each device."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将来源、置顶与排序、配色和阅读位置同步到你的 iCloud，在同一 Apple 账户的 Mac、iPhone、iPad 间使用。不上传文档正文，不同步 GitHub 令牌和离线缓存。iCloud 云盘以外的本地文件夹只保留在本机；其他设备上的 iCloud 云盘文件夹需在该设备授权一次。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -10,15 +10,22 @@ import UIKit
 
 /// Mirrors ReaderStore's shared data into the user's private CloudKit database.
 /// Local data stays the source of truth for the UI; any CloudKit failure leaves the app working as before.
-@MainActor final class ReaderSync: CKSyncEngineDelegate {
+@MainActor final class ReaderSync: ObservableObject, CKSyncEngineDelegate {
     static let containerID = "iCloud.io.github.wivnelo.imdreader"
+    enum Status { case off, signedOut, syncing, synced, retrying }
+    @Published private(set) var status: Status = .off
+    @Published private(set) var isEnabled: Bool
     private struct Persisted: Codable {
         var state: SyncState
         var systemFields: [String: Data] = [:]
         var engine: CKSyncEngine.State.Serialization?
     }
     private let store: ReaderStore
+    private let container: CKContainer
     private let database: CKDatabase
+    private let defaults: UserDefaults
+    /// A save failed during the current exchange; the engine retries on its own schedule.
+    private var failedThisRound = false
     private let fileURL: URL
     private let device: String
     private var persisted: Persisted
@@ -33,7 +40,10 @@ import UIKit
     init(store: ReaderStore, defaults: UserDefaults = .standard, directory: URL? = nil,
          container: CKContainer = CKContainer(identifier: containerID)) {
         self.store = store
+        self.container = container
+        self.defaults = defaults
         database = container.privateCloudDatabase
+        isEnabled = defaults.object(forKey: "iCloudSyncEnabled") as? Bool ?? true
         let folder = directory ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Sync", isDirectory: true)
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
@@ -42,9 +52,7 @@ import UIKit
         else { device = UUID().uuidString; defaults.set(device, forKey: "syncDeviceID") }
         persisted = (try? JSONDecoder().decode(Persisted.self, from: Data(contentsOf: fileURL)))
             ?? Persisted(state: SyncState(stamp: .legacy(device: device)))
-        let fresh = persisted.engine == nil
-        if fresh { persisted = Self.legacy(store, device: device) }
-        startEngine(fresh: fresh)
+        if isEnabled { start() }
         observers.append(NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: defaults, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.scheduleCapture() }
         })
@@ -63,6 +71,35 @@ import UIKit
         var state = SyncState(stamp: .legacy(device: device))
         state.absorb(store.syncSnapshot(), at: .legacy(device: device), now: Date(timeIntervalSince1970: 0))
         return Persisted(state: state)
+    }
+
+    private func start() {
+        let fresh = persisted.engine == nil
+        if fresh { persisted = Self.legacy(store, device: device) }
+        status = .syncing
+        startEngine(fresh: fresh)
+        Task { [weak self] in
+            guard let self, let account = try? await self.container.accountStatus(), self.engine != nil else { return }
+            if account != .available { self.status = .signedOut }
+        }
+    }
+
+    /// Turning sync off stops all CloudKit traffic but keeps local data, the iCloud copy and sync bookkeeping,
+    /// so turning it back on continues where it left off.
+    func setEnabled(_ enabled: Bool) {
+        guard enabled != isEnabled else { return }
+        isEnabled = enabled
+        defaults.set(enabled, forKey: "iCloudSyncEnabled")
+        if enabled {
+            start()
+            Task { [weak self] in await self?.syncNow() }
+        } else {
+            capturing?.cancel(); capturing = nil
+            uploading?.cancel(); uploading = nil
+            engine = nil
+            status = .off
+            save()
+        }
     }
 
     private func startEngine(fresh: Bool) {
@@ -92,6 +129,7 @@ import UIKit
     }
 
     private func scheduleCapture() {
+        guard engine != nil else { return }
         capturing?.cancel()
         // Reading progress changes continuously; upload once scrolling settles.
         capturing = Task { [weak self] in
@@ -115,6 +153,7 @@ import UIKit
 
     private func capture() {
         capturing?.cancel(); capturing = nil
+        guard engine != nil else { return }
         let old = persisted.state
         persisted.state.absorb(store.syncSnapshot(), at: SyncStamp(time: .now, device: device), now: .now)
         let delta = SyncRecords.changes(from: old, to: persisted.state)
@@ -157,13 +196,20 @@ import UIKit
     }
 
     func handleEvent(_ event: CKSyncEngine.Event, syncEngine: CKSyncEngine) async {
+        guard syncEngine === engine else { return } // A stopped or replaced engine may still report.
         switch event {
+        case .willFetchChanges, .willSendChanges:
+            if status != .signedOut { status = .syncing }
+        case .didFetchChanges, .didSendChanges:
+            if status != .signedOut { status = failedThisRound ? .retrying : .synced }
+            failedThisRound = false
         case .stateUpdate(let update):
             persisted.engine = update.stateSerialization; save()
         case .accountChange(let change):
             switch change.changeType {
-            case .signIn: break
-            case .signOut, .switchAccounts: reset()
+            case .signIn: status = .syncing
+            case .signOut: status = .signedOut; reset()
+            case .switchAccounts: reset()
             @unknown default: break
             }
         case .fetchedDatabaseChanges(let changes):
@@ -186,6 +232,7 @@ import UIKit
                     persisted.systemFields[name] = nil
                     enqueue(([name], []))
                 default:
+                    failedThisRound = true
                     log.error("Sync save failed: \(failure.error.localizedDescription)")
                 }
             }
@@ -203,6 +250,7 @@ import UIKit
     }
 
     func nextRecordZoneChangeBatch(_ context: CKSyncEngine.SendChangesContext, syncEngine: CKSyncEngine) async -> CKSyncEngine.RecordZoneChangeBatch? {
+        guard syncEngine === engine else { return nil }
         let changes = syncEngine.state.pendingRecordZoneChanges.filter { context.options.scope.contains($0) }
         return await CKSyncEngine.RecordZoneChangeBatch(pendingChanges: changes) { id in await self.record(for: id) }
     }
