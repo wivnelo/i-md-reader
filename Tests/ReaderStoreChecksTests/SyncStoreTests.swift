@@ -36,13 +36,14 @@ private func stamp(_ seconds: TimeInterval, _ device: String) -> SyncStamp {
     mac.defaults.set([key: 0.6, sampleKey: 0.2, UUID().uuidString + "|/local.md": 0.9], forKey: "positions")
     let macStore = ReaderStore(defaults: mac.defaults, github: GitHubReader(), sampleURL: mac.root.appendingPathComponent("Sample"))
     state.absorb(macStore.syncSnapshot(), at: stamp(10, "mac"), now: Date())
-    #expect(state.pinned.value == [repo] && state.palette.value == "sand")
+    #expect(state.pinned.value == [repo])
     #expect(Set(state.positions.keys) == [key, sampleKey])
 
     phone.store.applySynced(state)
     #expect(phone.store.sources.contains { $0.id == repo && $0.remote?.reference == "main" })
     #expect(phone.store.orderedSources.first?.id == repo)
-    #expect(phone.defaults.string(forKey: "readerPalette") == "sand")
+    // Color palette stays per device.
+    #expect(phone.defaults.string(forKey: "readerPalette") == nil)
     #expect((phone.defaults.dictionary(forKey: "positions") as? [String: Double])?[key] == 0.6)
     // Phone now reports exactly the synced state, so absorbing its snapshot changes nothing.
     let before = state

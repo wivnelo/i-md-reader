@@ -214,6 +214,11 @@ struct ReaderScreen: View {
             .navigationTitle("")
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            // Pull down: exchange iCloud changes now, then re-list local folders.
+            .refreshable {
+                await sync?.syncNow()
+                await store.refreshLocalSources()
+            }
         #endif
             .toolbar {
                 #if os(iOS)
@@ -1032,7 +1037,7 @@ private struct SyncSheet: View {
                     Toggle("在设备间同步", isOn: Binding(get: { sync.isEnabled }, set: { sync.setEnabled($0) }))
                     LabeledContent("状态") { Text(status) }
                 } footer: {
-                    Text("将来源、置顶与排序、配色和阅读位置同步到你的 iCloud，在同一 Apple 账户的 Mac、iPhone、iPad 间使用。不上传文档正文，不同步 GitHub 令牌和离线缓存。iCloud 云盘以外的本地文件夹只保留在本机；其他设备上的 iCloud 云盘文件夹需在该设备授权一次。")
+                    Text("将来源、置顶与排序和阅读位置同步到你的 iCloud，在同一 Apple 账户的 Mac、iPhone、iPad 间使用。不上传文档正文，不同步 GitHub 令牌、离线缓存和外观设置。iCloud 云盘以外的本地文件夹只保留在本机；其他设备上的 iCloud 云盘文件夹需在该设备授权一次。")
                 }
             }
             .modifier(ReaderSheetFormStyle())

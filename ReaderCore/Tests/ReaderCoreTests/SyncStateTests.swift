@@ -13,15 +13,15 @@ private func github(_ url: String, id: UUID = UUID(), added: TimeInterval = 10, 
     let source = github("https://github.com/test/repo")
     var mac = SyncState(stamp: stamp(0, "mac")); mac.add(source)
     mac.pinned = Stamped([source.id], stamp(20, "mac"))
-    mac.palette = Stamped("mist", stamp(5, "mac"))
+    mac.sampleRemoved = Stamped(true, stamp(5, "mac"))
     mac.setPosition(0.4, for: source.id.uuidString + "|/a.md", at: stamp(30, "mac"))
     var phone = SyncState(stamp: stamp(0, "phone"))
-    phone.palette = Stamped("sand", stamp(25, "phone"))
+    phone.sampleRemoved = Stamped(false, stamp(25, "phone"))
     phone.setPosition(0.9, for: source.id.uuidString + "|/a.md", at: stamp(40, "phone"))
 
     let one = SyncState.merge(mac, phone).state, two = SyncState.merge(phone, mac).state
     #expect(one == two)
-    #expect(one.palette.value == "sand" && one.pinned.value == [source.id])
+    #expect(one.sampleRemoved.value == false && one.pinned.value == [source.id])
     #expect(one.positions[source.id.uuidString + "|/a.md"]?.value == 0.9)
     // Same time: the device name breaks the tie identically everywhere.
     #expect(stamp(5, "ipad") < stamp(5, "mac"))
@@ -138,3 +138,20 @@ private func github(_ url: String, id: UUID = UUID(), added: TimeInterval = 10, 
     state.absorb(SyncSnapshot(positions: ["k": 7.25, "old": 0.4]), at: stamp(2), now: Date())
     #expect(state.positions["k"] == Stamped(7.25, stamp(1)) && state.positions["old"]?.value == 0.4)
 }
+
+#if os(macOS)
+@Test func macDesktopAndDocumentsMapToTheirICloudDrivePaths() {
+    let home = URL(fileURLWithPath: "/Users/someone")
+    let synced: (URL) -> Bool = { _ in true }, local: (URL) -> Bool = { _ in false }
+    let notes = URL(fileURLWithPath: "/Users/someone/Documents/003_KnowledgeBase")
+    // Same identity as iPhone/iPad, where the folder appears under iCloud Drive.
+    #expect(CloudDrivePath.identity(of: notes, home: home, isUbiquitous: synced) == "com~apple~CloudDocs/Documents/003_KnowledgeBase")
+    #expect(CloudDrivePath.identity(of: URL(fileURLWithPath: "/private/var/mobile/Library/Mobile Documents/com~apple~CloudDocs/Documents/003_KnowledgeBase"))
+            == "com~apple~CloudDocs/Documents/003_KnowledgeBase")
+    #expect(CloudDrivePath.identity(of: URL(fileURLWithPath: "/Users/someone/Desktop/Plan"), home: home, isUbiquitous: synced) == "com~apple~CloudDocs/Desktop/Plan")
+    // Not synced to iCloud, or outside Desktop/Documents: stays device-only.
+    #expect(CloudDrivePath.identity(of: notes, home: home, isUbiquitous: local) == nil)
+    #expect(CloudDrivePath.identity(of: URL(fileURLWithPath: "/Users/someone/Projects/x"), home: home, isUbiquitous: synced) == nil)
+    #expect(CloudDrivePath.identity(of: URL(fileURLWithPath: "/Users/other/Documents/x"), home: home, isUbiquitous: synced) == nil)
+}
+#endif

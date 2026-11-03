@@ -17,7 +17,7 @@ private func record(_ name: String) -> CKRecord {
     state.absorb(SyncSnapshot(sources: [id: repo], pinned: [id], positions: [id.uuidString + "|/a.md": 0.3]),
                  at: stamp(10), now: Date(timeIntervalSince1970: 10))
     #expect(state.sources[id]?.stamp == stamp(10) && state.pinned.stamp == stamp(10))
-    #expect(state.order.stamp == .legacy(device: "mac") && state.palette.stamp == .legacy(device: "mac"))
+    #expect(state.order.stamp == .legacy(device: "mac") && state.sampleRemoved.stamp == .legacy(device: "mac"))
 
     let before = state
     state.absorb(SyncSnapshot(sources: [id: repo], pinned: [id], positions: [id.uuidString + "|/a.md": 0.3]),
@@ -39,7 +39,7 @@ private func record(_ name: String) -> CKRecord {
                             name: "Notes", addedAt: Date(timeIntervalSince1970: 6), stamp: stamp(6))
     var state = SyncState(stamp: stamp(1)); state.add(source); state.add(folder)
     state.pinned = Stamped([source.id], stamp(7)); state.order = Stamped([folder.id, source.id], stamp(8))
-    state.sampleRemoved = Stamped(true, stamp(9)); state.palette = Stamped("sand", stamp(10, "phone"))
+    state.sampleRemoved = Stamped(true, stamp(9))
     let key = source.id.uuidString + "|/a.md"
     state.setPosition(0.42, for: key, at: stamp(11))
     state.remove(folder.id, at: stamp(12))
@@ -52,7 +52,7 @@ private func record(_ name: String) -> CKRecord {
     }
     #expect(rebuilt.sources == state.sources && rebuilt.removed == state.removed)
     #expect(rebuilt.pinned == state.pinned && rebuilt.order.value == [source.id])
-    #expect(rebuilt.sampleRemoved == state.sampleRemoved && rebuilt.palette == state.palette)
+    #expect(rebuilt.sampleRemoved == state.sampleRemoved)
     #expect(rebuilt.positions == state.positions)
 
     // A newer local value no longer matches what the server holds.

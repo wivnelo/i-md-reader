@@ -56,13 +56,12 @@ public struct SyncState: Codable, Sendable, Equatable {
     public var pinned: Stamped<[UUID]>
     public var order: Stamped<[UUID]>
     public var sampleRemoved: Stamped<Bool>
-    public var palette: Stamped<String?>
     /// Keyed like ReaderStore positions: `<source UUID>|/<relative path>`.
     public var positions: [String: Stamped<Double>] = [:]
 
     public init(stamp: SyncStamp) {
         pinned = Stamped([], stamp); order = Stamped([], stamp)
-        sampleRemoved = Stamped(false, stamp); palette = Stamped(nil, stamp)
+        sampleRemoved = Stamped(false, stamp)
     }
 
     public var activeSources: [SyncSource] {
@@ -101,7 +100,6 @@ public struct SyncState: Codable, Sendable, Equatable {
         state.pinned = a.pinned.newer(b.pinned)
         state.order = a.order.newer(b.order)
         state.sampleRemoved = a.sampleRemoved.newer(b.sampleRemoved)
-        state.palette = a.palette.newer(b.palette)
         state.positions.merge(b.positions) { $0.newer($1) }
         let remapped = state.foldDuplicates()
         state.normalize()
@@ -159,10 +157,25 @@ public struct SyncState: Codable, Sendable, Equatable {
 public enum CloudDrivePath {
     /// The device-independent location of an item inside iCloud Drive or an app's
     /// iCloud container, or nil when the URL lives elsewhere (On My iPad, external drives).
-    public static func identity(of url: URL) -> String? {
+    public static func identity(of url: URL, home: URL = userHome,
+                                isUbiquitous: (URL) -> Bool = { (try? $0.resourceValues(forKeys: [.isUbiquitousItemKey]))?.isUbiquitousItem == true }) -> String? {
         let parts = url.standardizedFileURL.pathComponents
-        guard let index = parts.firstIndex(of: "Mobile Documents"), index > 0, index + 1 < parts.count,
-              parts[index - 1] == "Library" else { return nil }
-        return parts[(index + 1)...].joined(separator: "/").precomposedStringWithCanonicalMapping
+        if let index = parts.firstIndex(of: "Mobile Documents"), index > 0, index + 1 < parts.count, parts[index - 1] == "Library" {
+            return parts[(index + 1)...].joined(separator: "/").precomposedStringWithCanonicalMapping
+        }
+        #if os(macOS)
+        // With "Desktop & Documents" in iCloud, macOS keeps these folders in the home directory
+        // while iPhone and iPad show them under iCloud Drive.
+        let base = home.standardizedFileURL.pathComponents
+        guard parts.count > base.count, Array(parts.prefix(base.count)) == base,
+              ["Desktop", "Documents"].contains(parts[base.count]), isUbiquitous(url) else { return nil }
+        return (["com~apple~CloudDocs"] + parts[base.count...]).joined(separator: "/").precomposedStringWithCanonicalMapping
+        #else
+        return nil
+        #endif
     }
+
+    /// The real home directory; a sandboxed app's NSHomeDirectory points into its container instead.
+    public static let userHome: URL = getpwuid(getuid()).map { URL(fileURLWithPath: String(cString: $0.pointee.pw_dir)) }
+        ?? URL(fileURLWithPath: NSHomeDirectory())
 }

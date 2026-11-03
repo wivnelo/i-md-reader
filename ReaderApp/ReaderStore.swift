@@ -566,6 +566,11 @@ struct OpenDocument {
 
     /// Refresh only this source. Replace cached listings after a successful root scan;
     /// a failed refresh retains the previous snapshot and the current reading view.
+    /// Re-lists every reachable local folder; GitHub sources keep their own refresh to respect API limits.
+    func refreshLocalSources() async {
+        for source in sources where source.remote == nil && !source.isSample && source.access != nil { await refresh(source) }
+    }
+
     func refresh(_ source: FolderSource) async {
         if source.remote != nil { await refreshRemote(source); return }
         guard let access = source.access else { await retryLocalSource(source); return }
@@ -1115,7 +1120,6 @@ struct OpenDocument {
         let ids = { (values: [String]) in values.compactMap(UUID.init(uuidString:)).filter { !self.isLocalOnly($0) } }
         return SyncSnapshot(sources: shared, pinned: ids(pinnedSources), order: ids(sourceOrder),
                             sampleRemoved: defaults.bool(forKey: "readingSampleRemoved"),
-                            palette: defaults.string(forKey: "readerPalette"),
                             positions: positions.filter { key, _ in
                                 UUID(uuidString: String(key.prefix { $0 != "|" })).map(synced.contains) ?? false
                             })
@@ -1162,9 +1166,6 @@ struct OpenDocument {
         }
         pinnedSources = merge(pinnedSources, state.pinned.value); defaults.set(pinnedSources, forKey: "pinnedSources")
         sourceOrder = merge(sourceOrder, state.order.value); defaults.set(sourceOrder, forKey: "sourceOrder")
-        if let palette = state.palette.value, palette != defaults.string(forKey: "readerPalette") {
-            defaults.set(palette, forKey: "readerPalette")
-        }
         var moved = false
         for (key, position) in state.positions where positions[key] != position.value
             && state.syncablePositionKey(key, fixed: [Self.sampleID]) {

@@ -2289,19 +2289,19 @@
         }
       }
     },
-    "将来源、置顶与排序、配色和阅读位置同步到你的 iCloud，在同一 Apple 账户的 Mac、iPhone、iPad 间使用。不上传文档正文，不同步 GitHub 令牌和离线缓存。iCloud 云盘以外的本地文件夹只保留在本机；其他设备上的 iCloud 云盘文件夹需在该设备授权一次。": {
+    "将来源、置顶与排序和阅读位置同步到你的 iCloud，在同一 Apple 账户的 Mac、iPhone、iPad 间使用。不上传文档正文，不同步 GitHub 令牌、离线缓存和外观设置。iCloud 云盘以外的本地文件夹只保留在本机；其他设备上的 iCloud 云盘文件夹需在该设备授权一次。": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Syncs your sources, pins and order, color palette and reading positions through your iCloud across Macs, iPhones and iPads signed in to the same Apple Account. Document text is never uploaded, and GitHub tokens and the offline cache are not synced. Local folders outside iCloud Drive stay on this device; iCloud Drive folders from other devices need to be authorized once on each device."
+            "value": "Syncs your sources, pins and order, and reading positions through your iCloud across Macs, iPhones and iPads signed in to the same Apple Account. Document text is never uploaded, and GitHub tokens, the offline cache and appearance settings are not synced. Local folders outside iCloud Drive stay on this device; iCloud Drive folders from other devices need to be authorized once on each device."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "将来源、置顶与排序、配色和阅读位置同步到你的 iCloud，在同一 Apple 账户的 Mac、iPhone、iPad 间使用。不上传文档正文，不同步 GitHub 令牌和离线缓存。iCloud 云盘以外的本地文件夹只保留在本机；其他设备上的 iCloud 云盘文件夹需在该设备授权一次。"
+            "value": "将来源、置顶与排序和阅读位置同步到你的 iCloud，在同一 Apple 账户的 Mac、iPhone、iPad 间使用。不上传文档正文，不同步 GitHub 令牌、离线缓存和外观设置。iCloud 云盘以外的本地文件夹只保留在本机；其他设备上的 iCloud 云盘文件夹需在该设备授权一次。"
           }
         }
       }

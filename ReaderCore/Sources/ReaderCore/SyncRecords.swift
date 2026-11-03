@@ -14,12 +14,11 @@ public struct SyncSnapshot: Sendable, Equatable {
     public var pinned: [UUID]
     public var order: [UUID]
     public var sampleRemoved: Bool
-    public var palette: String?
     public var positions: [String: Double]
     public init(sources: [UUID: Source] = [:], pinned: [UUID] = [], order: [UUID] = [], sampleRemoved: Bool = false,
-                palette: String? = nil, positions: [String: Double] = [:]) {
+                positions: [String: Double] = [:]) {
         self.sources = sources; self.pinned = pinned; self.order = order
-        self.sampleRemoved = sampleRemoved; self.palette = palette; self.positions = positions
+        self.sampleRemoved = sampleRemoved; self.positions = positions
     }
 }
 
@@ -41,7 +40,6 @@ extension SyncState {
         if pinned.value != snapshot.pinned { pinned = Stamped(snapshot.pinned, stamp) }
         if order.value != snapshot.order { order = Stamped(snapshot.order, stamp) }
         if sampleRemoved.value != snapshot.sampleRemoved { sampleRemoved = Stamped(snapshot.sampleRemoved, stamp) }
-        if palette.value != snapshot.palette { palette = Stamped(snapshot.palette, stamp) }
         for (key, raw) in snapshot.positions {
             guard let value = Self.position(raw), positions[key]?.value != value else { continue }
             positions[key] = Stamped(value, stamp)
@@ -90,7 +88,7 @@ public enum SyncRecords {
         where old.sources[id] != new.sources[id] || old.removed[id] != new.removed[id] {
             save.insert(sourceName(id))
         }
-        if old.pinned != new.pinned || old.order != new.order || old.sampleRemoved != new.sampleRemoved || old.palette != new.palette {
+        if old.pinned != new.pinned || old.order != new.order || old.sampleRemoved != new.sampleRemoved {
             save.insert(layoutName)
         }
         for (key, value) in new.positions where old.positions[key] != value { save.insert(positionName(key)) }
@@ -106,9 +104,8 @@ public enum SyncRecords {
             record["pinned"] = state.pinned.value.map(\.uuidString).joined(separator: ",")
             record["order"] = state.order.value.map(\.uuidString).joined(separator: ",")
             record["sampleRemoved"] = state.sampleRemoved.value as NSNumber
-            record["palette"] = state.palette.value as NSString?
             for (field, stamp) in [("pinned", state.pinned.stamp), ("order", state.order.stamp),
-                                   ("sampleRemoved", state.sampleRemoved.stamp), ("palette", state.palette.stamp)] {
+                                   ("sampleRemoved", state.sampleRemoved.stamp)] {
                 write(stamp, field, record)
             }
             return record
@@ -145,7 +142,6 @@ public enum SyncRecords {
             if let value = record["sampleRemoved"] as? Bool, let stamp = read("sampleRemoved", record) {
                 state.sampleRemoved = Stamped(value, stamp)
             }
-            if let stamp = read("palette", record) { state.palette = Stamped(record["palette"] as? String, stamp) }
         } else if let id = sourceID(name) {
             if let stamp = read("source", record), let kind = kind(record),
                let name = record["name"] as? String, let added = record["addedAt"] as? Date {
@@ -163,7 +159,7 @@ public enum SyncRecords {
         let other = fragment(record), name = record.recordID.recordName
         if name == layoutName {
             return other.pinned == state.pinned && other.order == state.order
-                && other.sampleRemoved == state.sampleRemoved && other.palette == state.palette
+                && other.sampleRemoved == state.sampleRemoved
         }
         if let id = sourceID(name) { return other.sources[id] == state.sources[id] && other.removed[id] == state.removed[id] }
         return other.positions.allSatisfy { state.positions[$0.key] == $0.value } && !other.positions.isEmpty

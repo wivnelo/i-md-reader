@@ -64,6 +64,18 @@ import UIKit
         observers.append(NotificationCenter.default.addObserver(forName: resign, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.capture() }
         })
+        #if os(macOS)
+        let active = NSApplication.didBecomeActiveNotification
+        #else
+        let active = UIApplication.didBecomeActiveNotification
+        #endif
+        // A silent push can be delayed or dropped; coming back to the app always catches up.
+        observers.append(NotificationCenter.default.addObserver(forName: active, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, self.engine != nil else { return }
+                Task { await self.syncNow() }
+            }
+        })
     }
 
     /// Existing local data predates sync, so any value already in iCloud wins over it.
@@ -77,6 +89,12 @@ import UIKit
         let fresh = persisted.engine == nil
         if fresh { persisted = Self.legacy(store, device: device) }
         status = .syncing
+        // CKSyncEngine learns about other devices' changes through silent CloudKit pushes; no user prompt is involved.
+        #if os(macOS)
+        NSApplication.shared.registerForRemoteNotifications()
+        #else
+        UIApplication.shared.registerForRemoteNotifications()
+        #endif
         startEngine(fresh: fresh)
         Task { [weak self] in
             guard let self, let account = try? await self.container.accountStatus(), self.engine != nil else { return }
