@@ -8,8 +8,8 @@
 
 ## 下载
 
-- **Mac：** [下载 0.2.2 正式版](https://github.com/wivnelo/i-md-reader/releases/tag/v0.2.2)。支持 Apple Silicon 和 Intel，系统要求 macOS 14 或更高版本。
-- **iPhone / iPad：** 0.2.1（51）已提交 App Store 审核，尚未上架。
+- **Mac：** [下载 0.3.0 正式版](https://github.com/wivnelo/i-md-reader/releases/tag/v0.3.0)。支持 Apple Silicon 和 Intel，系统要求 macOS 14 或更高版本。
+- **iPhone / iPad：** 0.2.1（51）已提交 App Store 审核，尚未上架；iCloud 同步将随后续移动版本提供。
 
 Mac 推荐下载 `.dmg`，打开后将 iMDReader 拖入“应用程序”；也可下载 ZIP。发行包已通过 Developer ID 签名、Apple 公证和 Gatekeeper 检查。更新时无需卸载，保留已有资料库。更新前先退出 iMDReader，替换后从“应用程序”启动；若 Dock 仍打开旧版，移除旧图标，再将“应用程序”里的 iMDReader 重新固定到 Dock。
 
@@ -33,6 +33,7 @@ Mac 推荐下载 `.dmg`，打开后将 iMDReader 拖入“应用程序”；也�
 - **管理来源：** 保留文件夹层级、置顶常用来源，并快速回到最近阅读的文件。
 - **GitHub 阅读：** 支持公开仓库、子目录和单篇文档；私有仓库可使用自己的细粒度只读令牌，令牌保存在设备 Keychain。
 - **离线阅读：** 已读取的 GitHub 内容在缓存可用时可离线查看；未缓存内容仍需网络，缓存不等于完整仓库备份。
+- **iCloud 同步：** 在同一 Apple 账户的设备间同步来源、置顶与排序和阅读位置，可在“•••”中关闭；不上传文档正文，iCloud 云盘以外的本地文件夹只留在本机。
 - **界面语言：** 简体中文和 English；文档内容和文件名保持原样。
 
 ## 帮助与反馈
