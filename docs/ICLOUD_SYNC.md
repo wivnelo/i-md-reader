@@ -1,6 +1,6 @@
 # iCloud 多端同步技术方案（草案）
 
-状态：2026-11-03 起草；同日用户确认第 8 节 6 项全部按建议执行，P0 签名与 Mac CloudKit 往返已通过，下一步 P1。本文是计划，不代表已实现或已验收。
+状态：2026-11-03 起草；同日用户确认第 8 节 6 项全部按建议执行，P0 签名与 Mac CloudKit 往返已通过；P1 同步模型与合并规则已实现并通过单元测试，下一步 P2。本文是计划，不代表已实现或已验收。
 
 ## 1. 目标与边界
 
@@ -140,3 +140,11 @@ Position 单独成记录，避免滚动时频繁改写一个大记录；记录�
 - 自动签名构建：Mac Debug 内嵌开发描述文件，iOS 真机 Debug 生成新开发描述文件；两端签名产物均含该容器、CloudKit 与推送授权。
 - Mac 实际往返：临时探针在 App 界面与 `ReaderStore` 创建前运行（不读写本机资料库），iCloud 账户可用，私有库开发环境写入、读回、删除一条记录均成功；探针代码已删除。
 - 未完成：iOS 实际 CloudKit 往返（需已登录 iCloud 的模拟器或真机）；Mac Developer ID 发行描述文件、iOS App Store 描述文件及 CloudKit Schema 生产部署留到发布阶段。
+
+### P1 · 2026-11-03
+
+- 新增 `ReaderCore/Sources/ReaderCore/SyncState.swift`（纯 Swift，不依赖 CloudKit）：`SyncStamp`（时间 + 设备，时间相同按设备名决出，各端结果一致）、`Stamped` 字段级最后修改者胜、`SyncSource`（GitHub / iCloud 云盘文件夹）、删除墓碑、`SyncState.merge` 与去重重映射，以及 `CloudDrivePath.identity` 识别 iCloud 云盘相对路径（统一 Unicode 规范化，非 iCloud 位置返回 nil）。
+- 合并规则：与合并方向无关；墓碑晚于来源修改时来源视为已移除，并清理其置顶、排序和阅读位置，后来写入的置顶不能复活已移除来源；同一内容（GitHub 规范化后的 owner/repo/路径/ref，或同一 iCloud 路径）保留添加最早者，把置顶、排序、阅读位置迁移过去并返回 `remapped` 供 App 迁移本机书签。
+- 首次开启：本机旧数据使用 `SyncStamp.legacy`（1970 年），远端已有值优先，本机独有项保留并上传。
+- 阅读位置上限 200 条，按最近读取时间淘汰；修正现有 `ReaderStore.recordProgress` 按键名字母序淘汰的问题需在 P2 接入时替换。
+- 测试：`SyncStateTests` 7 项通过；ReaderCore 全部 49 项通过（1 项真实网络测试按默认跳过）。仅为模型层，App 尚未接入，不代表任何同步行为已可用。
