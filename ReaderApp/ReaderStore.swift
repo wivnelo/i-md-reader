@@ -77,6 +77,14 @@ struct SavedSource: Codable, Identifiable {
     var id: UUID
     var name: String
     var bookmark: Data
+    /// Location inside iCloud Drive, shared across devices; nil for device-only folders.
+    var cloudPath: String? = nil
+}
+
+/// An iCloud Drive folder synced from another device but not yet authorized here.
+struct PendingCloudFolder: Codable {
+    var path: String
+    var name: String
 }
 
 enum ReaderBookmarkOptions {
@@ -164,6 +172,7 @@ struct OpenDocument {
     @Published private var pinnedSources: [String]
     @Published private var sourceOrder: [String]
     private var bookmarks: [SavedSource]
+    private var pendingCloudFolders: [UUID: PendingCloudFolder]
     private var readingTask: Task<Void, Never>?
     private var dateTask: Task<Void, Never>?
     private let defaults: UserDefaults
@@ -212,6 +221,7 @@ struct OpenDocument {
         expanded = Set(defaults.stringArray(forKey: "expanded") ?? [])
         positions = defaults.dictionary(forKey: "positions") as? [String: Double] ?? [:]
         bookmarks = (try? JSONDecoder().decode([SavedSource].self, from: defaults.data(forKey: "sources") ?? Data())) ?? []
+        pendingCloudFolders = (try? JSONDecoder().decode([UUID: PendingCloudFolder].self, from: defaults.data(forKey: "cloudFolders") ?? Data())) ?? [:]
         savedFiles = (try? JSONDecoder().decode([SavedRecentFile].self, from: defaults.data(forKey: "recentFiles") ?? Data())) ?? []
         if credentialFailure { error = CredentialError.unavailable.localizedDescription }
         for index in savedFiles.indices {
@@ -240,11 +250,17 @@ struct OpenDocument {
                     bookmarks[index].bookmark = try url.bookmarkData(options: ReaderBookmarkOptions.creation, includingResourceValuesForKeys: nil, relativeTo: nil)
                     refreshedBookmarks = true
                 }
+                if saved.cloudPath == nil, let path = CloudDrivePath.identity(of: url) {
+                    bookmarks[index].cloudPath = path; refreshedBookmarks = true
+                }
                 sources.append(FolderSource(id: saved.id, name: saved.name, access: access, isSample: false))
             } catch {
                 if Self.isExplicitPermissionDenial(error) { deniedBookmarks.insert(saved.id) }
                 else { sources.append(FolderSource(id: saved.id, name: saved.name, access: nil, isSample: false)) }
             }
+        }
+        for (id, pending) in pendingCloudFolders where !bookmarks.contains(where: { $0.id == id }) {
+            sources.append(FolderSource(id: id, name: pending.name, access: nil, isSample: false))
         }
         let remote = (try? JSONDecoder().decode([SavedGitHubSource].self, from: defaults.data(forKey: "githubSources") ?? Data())) ?? []
         for saved in remote {
@@ -625,12 +641,16 @@ struct OpenDocument {
         let access = ScopedAccess(url)
         do {
             let bookmark = try url.bookmarkData(options: ReaderBookmarkOptions.creation, includingResourceValuesForKeys: nil, relativeTo: nil)
-            // Re-selecting the same location should not create duplicate roots.
+            let cloudPath = CloudDrivePath.identity(of: url)
+            // Re-selecting the same location should not create duplicate roots. A synced iCloud
+            // folder waiting for authorization here is bound to its existing ID and keeps its progress.
             let existing = sources.first(where: { !$0.isSample && $0.url?.standardizedFileURL == url.standardizedFileURL })?.id
-            let id = existing ?? UUID()
+            let pending = cloudPath.flatMap { path in pendingCloudFolders.first { $0.value.path == path }?.key }
+            let id = existing ?? pending ?? UUID()
             let prefix = id.uuidString + "|"
             let sameFolder = sources.first(where: { $0.id == id })?.url?.standardizedFileURL == url.standardizedFileURL
-            if !sameFolder {
+            if pending == id { pendingCloudFolders[id] = nil; persistCloudFolders() }
+            else if !sameFolder {
                 expanded = expanded.filter { !$0.hasPrefix(prefix) }
                 positions = positions.filter { !$0.key.hasPrefix(prefix) }
                 defaults.set(positions, forKey: "positions")
@@ -641,7 +661,7 @@ struct OpenDocument {
             }
             refreshRequests[id] = nil; refreshingSources.remove(id)
             invalidateDirectoryLoads(id)
-            let saved = SavedSource(id: id, name: url.lastPathComponent, bookmark: bookmark)
+            let saved = SavedSource(id: id, name: url.lastPathComponent, bookmark: bookmark, cloudPath: cloudPath)
             bookmarks.removeAll { $0.id == id }; bookmarks.append(saved)
             sources.removeAll { $0.id == id }
             sources.insert(FolderSource(id: id, name: saved.name, access: access, isSample: false), at: 0)
@@ -681,6 +701,7 @@ struct OpenDocument {
         }
         persistRemoteSources()
         bookmarks.removeAll { $0.id == source.id }
+        if pendingCloudFolders.removeValue(forKey: source.id) != nil { persistCloudFolders() }
         let prefix = source.id.uuidString + "|"
         nodes = nodes.filter { !$0.key.hasPrefix(prefix) }
         directoryErrors = directoryErrors.filter { !$0.key.hasPrefix(prefix) }
@@ -697,6 +718,20 @@ struct OpenDocument {
     }
     private func persistSources() {
         if let data = try? JSONEncoder().encode(bookmarks) { defaults.set(data, forKey: "sources") }
+    }
+    private func persistCloudFolders() {
+        if let data = try? JSONEncoder().encode(pendingCloudFolders) { defaults.set(data, forKey: "cloudFolders") }
+    }
+
+    func isAwaitingAuthorization(_ source: FolderSource) -> Bool { pendingCloudFolders[source.id] != nil }
+
+    /// Binds a synced iCloud folder to this device only when the picked folder is the same iCloud Drive location.
+    func authorizeCloudFolder(_ source: FolderSource, url: URL) {
+        guard let pending = pendingCloudFolders[source.id] else { return }
+        guard CloudDrivePath.identity(of: url) == pending.path else {
+            error = "所选文件夹不是同一个 iCloud 云盘位置，未完成授权。"; return
+        }
+        addFolder(url)
     }
 
     func open(_ url: URL, source: FolderSource, isRefresh: Bool = false) {
@@ -1057,14 +1092,21 @@ struct OpenDocument {
 
     // MARK: iCloud sync
 
-    /// Local folders are device-only until P3; GitHub sources and the sample share IDs across devices.
-    private func isLocalOnly(_ id: UUID) -> Bool { bookmarks.contains { $0.id == id } }
+    /// Folders outside iCloud Drive stay on this device; GitHub sources, iCloud folders and the sample share IDs.
+    private func isLocalOnly(_ id: UUID) -> Bool { bookmarks.contains { $0.id == id && $0.cloudPath == nil } }
+    private func cloudPath(of id: UUID) -> String? {
+        bookmarks.first { $0.id == id }?.cloudPath ?? pendingCloudFolders[id]?.path
+    }
 
     func syncSnapshot() -> SyncSnapshot {
         var shared: [UUID: SyncSnapshot.Source] = [:]
         for source in sources {
-            guard let saved = source.remote else { continue }
-            shared[source.id] = .init(kind: .github(url: saved.url, reference: saved.reference), name: source.name)
+            if let saved = source.remote {
+                shared[source.id] = .init(kind: .github(url: saved.url, reference: saved.reference), name: source.name)
+            } else if let path = cloudPath(of: source.id) {
+                // Unavailable or not-yet-authorized iCloud folders stay synced; only removal deletes them.
+                shared[source.id] = .init(kind: .cloudFolder(path: path), name: source.name)
+            }
         }
         let synced = Set(shared.keys).union([Self.sampleID])
         let ids = { (values: [String]) in values.compactMap(UUID.init(uuidString:)).filter { !self.isLocalOnly($0) } }
@@ -1090,6 +1132,23 @@ struct OpenDocument {
             sources.insert(Self.remoteSource(saved, link: link), at: 0); added = true
         }
         if added { persistRemoteSources() }
+        let folders = Dictionary(uniqueKeysWithValues: state.activeSources.compactMap { source -> (UUID, PendingCloudFolder)? in
+            guard case let .cloudFolder(path) = source.kind else { return nil }
+            return (source.id, PendingCloudFolder(path: path, name: source.name))
+        })
+        for source in sources where source.remote == nil && !source.isSample && cloudPath(of: source.id) != nil && folders[source.id] == nil {
+            // Folded duplicates move to the surviving ID instead of disappearing from this device.
+            if let path = cloudPath(of: source.id), let target = folders.first(where: { $0.value.path == path })?.key,
+               bookmarks.contains(where: { $0.id == source.id }), !bookmarks.contains(where: { $0.id == target }) {
+                rebind(source.id, to: target)
+            } else { remove(source) }
+        }
+        var waiting = false
+        for (id, folder) in folders where !sources.contains(where: { $0.id == id }) {
+            pendingCloudFolders[id] = folder; waiting = true
+            sources.append(FolderSource(id: id, name: folder.name, access: nil, isSample: false))
+        }
+        if waiting { persistCloudFolders() }
         if let sample = sources.first(where: \.isSample), state.sampleRemoved.value { remove(sample) }
         else if !state.sampleRemoved.value, defaults.bool(forKey: "readingSampleRemoved"), let url = sampleURL {
             defaults.set(false, forKey: "readingSampleRemoved")
@@ -1109,6 +1168,33 @@ struct OpenDocument {
             positions[key] = position.value; moved = true
         }
         if moved { defaults.set(positions, forKey: "positions") }
+    }
+
+    /// Moves a bound folder and its local state to the ID another device already uses for it.
+    private func rebind(_ old: UUID, to new: UUID) {
+        guard let index = bookmarks.firstIndex(where: { $0.id == old }) else { return }
+        let from = old.uuidString + "|", to = new.uuidString + "|"
+        let move = { (key: String) in key.hasPrefix(from) ? to + key.dropFirst(from.count) : key }
+        if document?.sourceID == old { readingTask?.cancel(); dateTask?.cancel(); document = nil; selectedKey = nil; isLoading = false }
+        invalidateDirectoryLoads(old)
+        sources.removeAll { $0.id == new && $0.access == nil }
+        if pendingCloudFolders.removeValue(forKey: new) != nil { persistCloudFolders() }
+        bookmarks[index].id = new
+        if let source = sources.firstIndex(where: { $0.id == old }) {
+            let previous = sources[source]
+            sources[source] = FolderSource(id: new, name: previous.name, access: previous.access, isSample: false)
+        }
+        positions = Dictionary(positions.map { (move($0.key), $0.value) }) { a, _ in a }
+        expanded = Set(expanded.map(move))
+        nodes = nodes.filter { !$0.key.hasPrefix(from) }
+        directoryErrors = directoryErrors.filter { !$0.key.hasPrefix(from) }
+        pinnedSources = pinnedSources.map { $0 == old.uuidString ? new.uuidString : $0 }
+        sourceOrder = sourceOrder.map { $0 == old.uuidString ? new.uuidString : $0 }
+        if let last = defaults.string(forKey: "lastDocument") { defaults.set(move(last), forKey: "lastDocument") }
+        sourceVersions[new, default: 0] += 1
+        defaults.set(positions, forKey: "positions"); defaults.set(pinnedSources, forKey: "pinnedSources")
+        defaults.set(sourceOrder, forKey: "sourceOrder")
+        persistSources(); persistExpanded()
     }
 
     func recordProgress(_ value: Double, documentKey: String) {

@@ -22,6 +22,8 @@ struct ReaderScreen: View {
     @State private var visibility: NavigationSplitViewVisibility = .detailOnly
     @State private var compactColumn: NavigationSplitViewColumn = .detail
     @State private var importing = false
+    /// A synced iCloud folder waiting for this device's authorization when the folder picker opens.
+    @State private var authorizing: FolderSource?
     @State private var selectingMarkdown = false
     @State private var addingGitHub = false
     @State private var managingGitHubAccess = false
@@ -111,11 +113,12 @@ struct ReaderScreen: View {
                             if let root = source.url {
                                 TreeDirectory(store: store, source: source, url: root, level: 0, selection: colors.selection, draggingFolder: $draggingFolder, onOpenDocument: showReadingColumn)
                             } else {
-                                Text("文件夹暂时无法访问，请稍后重试。")
+                                Text(store.isAwaitingAuthorization(source) ? "在这台设备上授权后即可阅读。" : "文件夹暂时无法访问，请稍后重试。")
                                     .font(.caption).foregroundStyle(.secondary).padding(14)
                             }
                         } header: {
-                            SourceHeader(store: store, source: source, selection: colors.selection, draggingFolder: $draggingFolder, insertion: $sourceInsertion)
+                            SourceHeader(store: store, source: source, selection: colors.selection, draggingFolder: $draggingFolder, insertion: $sourceInsertion,
+                                         onAuthorize: { authorizing = source; selectingMarkdown = false; importing = true })
                                 .background { SourceHeaderBackground() }
                         }
                     }
@@ -397,9 +400,11 @@ struct ReaderScreen: View {
             case .success(let urls):
                 if let url = urls.first {
                     if selectingMarkdown { store.openFileURL(url) }
+                    else if let target = authorizing { store.authorizeCloudFolder(target, url: url) }
                     else { store.addFolder(url) }
                 }
-            case .failure(let error): store.error = error.localizedDescription
+                authorizing = nil
+            case .failure(let error): store.error = error.localizedDescription; authorizing = nil
             }
         }
         .alert(ReaderLanguage.message("无法完成操作", locale: language.locale), isPresented: Binding(get: { store.error != nil }, set: { if !$0 { store.error = nil } })) {
@@ -702,6 +707,7 @@ private struct SourceHeader: View {
     let selection: Color
     @Binding var draggingFolder: String?
     @Binding var insertion: SourceInsertion?
+    var onAuthorize: () -> Void = {}
     #if !os(macOS)
     @State private var showingRemove = false
     @GestureState private var drag: CGFloat = 0
@@ -724,7 +730,8 @@ private struct SourceHeader: View {
                     HStack {
                         Label(source.name, systemImage: "folder").font(SidebarTypography.row).fontWeight(.semibold)
                         Spacer()
-                        Button("重试") { Task { await store.retryLocalSource(source) } }
+                        if store.isAwaitingAuthorization(source) { Button("授权", action: onAuthorize) }
+                        else { Button("重试") { Task { await store.retryLocalSource(source) } } }
                     }.padding(14).frame(minHeight: 56)
                         .modifier(SourceReorder(store: store, item: source.id.uuidString + "|", dragging: $draggingFolder))
                 }

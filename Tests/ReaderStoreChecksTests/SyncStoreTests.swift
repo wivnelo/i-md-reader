@@ -95,3 +95,75 @@ private func stamp(_ seconds: TimeInterval, _ device: String) -> SyncStamp {
     phone.store.applySynced(state)
     #expect(phone.store.sources.contains { $0.isSample } && !phone.store.syncSnapshot().sampleRemoved)
 }
+
+/// A folder laid out like iCloud Drive inside the device's temporary root.
+@MainActor private func cloudFolder(_ device: Device, _ name: String) throws -> URL {
+    let url = device.root.appendingPathComponent("Library/Mobile Documents/com~apple~CloudDocs/" + name)
+    try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+    return url
+}
+
+@Test @MainActor func cloudFolderWaitsForAuthorizationAndKeepsProgress() throws {
+    let mac = try Device(), phone = try Device()
+    defer { mac.clean(); phone.clean() }
+    mac.store.addFolder(try cloudFolder(mac, "Notes"))
+    let snapshot = mac.store.syncSnapshot()
+    let (id, item) = try #require(snapshot.sources.first)
+    #expect(item.kind == .cloudFolder(path: "com~apple~CloudDocs/Notes") && item.name == "Notes")
+
+    var state = SyncState(stamp: stamp(0, "mac"))
+    state.absorb(snapshot, at: stamp(1, "mac"), now: Date())
+    state.setPosition(0.7, for: id.uuidString + "|/a.md", at: stamp(2, "mac"))
+    phone.store.applySynced(state)
+    let pending = try #require(phone.store.sources.first { $0.id == id })
+    #expect(pending.url == nil && phone.store.isAwaitingAuthorization(pending))
+    // Waiting here must not read as a removal when this device's snapshot is absorbed.
+    #expect(phone.store.syncSnapshot().sources[id] == item)
+    let restarted = ReaderStore(defaults: phone.defaults, github: GitHubReader(), sampleURL: nil)
+    #expect(restarted.sources.contains { $0.id == id && restarted.isAwaitingAuthorization($0) })
+
+    phone.store.authorizeCloudFolder(pending, url: try cloudFolder(phone, "Other"))
+    #expect(phone.store.error != nil && phone.store.isAwaitingAuthorization(pending))
+    phone.store.error = nil
+    phone.store.authorizeCloudFolder(pending, url: try cloudFolder(phone, "Notes"))
+    let bound = try #require(phone.store.sources.first { $0.id == id })
+    #expect(bound.url != nil && !phone.store.isAwaitingAuthorization(bound) && phone.store.error == nil)
+    #expect(phone.store.syncSnapshot().positions[id.uuidString + "|/a.md"] == 0.7)
+    #expect(phone.store.syncSnapshot().sources[id] == item)
+}
+
+@Test @MainActor func independentlyAddedCloudFolderRebindsToTheSyncedID() throws {
+    let mac = try Device(), phone = try Device()
+    defer { mac.clean(); phone.clean() }
+    mac.store.addFolder(try cloudFolder(mac, "Shared"))
+    phone.store.addFolder(try cloudFolder(phone, "Shared"))
+    let macID = try #require(mac.store.syncSnapshot().sources.keys.first)
+    let phoneID = try #require(phone.store.syncSnapshot().sources.keys.first)
+    phone.store.togglePin(try #require(phone.store.sources.first { $0.id == phoneID }))
+    phone.defaults.set([phoneID.uuidString + "|/b.md": 0.4], forKey: "positions")
+    let reloaded = ReaderStore(defaults: phone.defaults, github: GitHubReader(), sampleURL: nil)
+
+    var macState = SyncState(stamp: stamp(0, "mac")); macState.absorb(mac.store.syncSnapshot(), at: stamp(1, "mac"), now: Date(timeIntervalSince1970: 1))
+    var phoneState = SyncState(stamp: stamp(0, "phone")); phoneState.absorb(reloaded.syncSnapshot(), at: stamp(5, "phone"), now: Date(timeIntervalSince1970: 5))
+    let merged = SyncState.merge(phoneState, macState)
+    #expect(merged.remapped == [phoneID: macID])
+    reloaded.applySynced(merged.state)
+    let source = try #require(reloaded.sources.first { $0.id == macID })
+    #expect(source.url != nil && !reloaded.sources.contains { $0.id == phoneID })
+    #expect(reloaded.isPinned(source))
+    #expect(reloaded.syncSnapshot().positions[macID.uuidString + "|/b.md"] == 0.4)
+}
+
+@Test @MainActor func unavailableCloudFolderStaysSyncedWhileLocalFoldersDoNot() throws {
+    let phone = try Device()
+    defer { phone.clean() }
+    let cloud = try cloudFolder(phone, "Gone")
+    let local = phone.root.appendingPathComponent("Local")
+    try FileManager.default.createDirectory(at: local, withIntermediateDirectories: true)
+    phone.store.addFolder(cloud); phone.store.addFolder(local)
+    #expect(phone.store.syncSnapshot().sources.count == 1)
+    try FileManager.default.removeItem(at: cloud)
+    let restarted = ReaderStore(defaults: phone.defaults, github: GitHubReader(), sampleURL: nil)
+    // Missing on disk is not a removal: the source stays synced so other devices keep it.
+    #expect(restarted.syncSnapshot().sources.values.map(\.kind) == [.cloudFolder(path: "com~apple~CloudDocs/Gone")])
+}

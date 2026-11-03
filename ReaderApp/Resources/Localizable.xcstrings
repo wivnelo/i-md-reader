@@ -2101,6 +2101,57 @@
           }
         }
       }
+    },
+    "授权": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Authorize"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "授权"
+          }
+        }
+      }
+    },
+    "在这台设备上授权后即可阅读。": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Authorize on this device to read it."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在这台设备上授权后即可阅读。"
+          }
+        }
+      }
+    },
+    "所选文件夹不是同一个 iCloud 云盘位置，未完成授权。": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The selected folder is not the same iCloud Drive location, so it was not authorized."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所选文件夹不是同一个 iCloud 云盘位置，未完成授权。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
