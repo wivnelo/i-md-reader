@@ -18,6 +18,7 @@ struct ReaderScreen: View {
     }
 
     @StateObject private var store = ReaderStore()
+    @State private var sync: ReaderSync?
     @State private var visibility: NavigationSplitViewVisibility = .detailOnly
     @State private var compactColumn: NavigationSplitViewColumn = .detail
     @State private var importing = false
@@ -404,7 +405,10 @@ struct ReaderScreen: View {
         .alert(ReaderLanguage.message("无法完成操作", locale: language.locale), isPresented: Binding(get: { store.error != nil }, set: { if !$0 { store.error = nil } })) {
             Button("好", role: .cancel) { store.error = nil }
         } message: { Text(ReaderLanguage.message(store.error ?? "", locale: language.locale)) }
-        .task { await store.configureOfflineCache(); store.restoreLastDocument() }
+        .task {
+            await store.configureOfflineCache(); store.restoreLastDocument()
+            if sync == nil { sync = ReaderSync(store: store) }
+        }
         .environment(\.locale, language.locale)
         #if os(macOS)
         .focusedSceneValue(\.readerActions, ReaderActions(

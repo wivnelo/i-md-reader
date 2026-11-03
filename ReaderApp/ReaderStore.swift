@@ -171,6 +171,7 @@ struct OpenDocument {
     private let credentials: any GitHubCredentialStorage
     private let githubFactory: @Sendable (String?) -> GitHubReader
     private let offlineCache: GitHubOfflineCache?
+    private let sampleURL: URL?
     @Published private(set) var cachedBytes = 0
     @Published private(set) var cachedItems = 0
     @Published private(set) var cacheCapacityMB = 128
@@ -192,6 +193,7 @@ struct OpenDocument {
          offlineCache: GitHubOfflineCache? = nil,
          sampleURL: URL? = Bundle.main.url(forResource: "Samples", withExtension: nil)) {
         self.defaults = defaults
+        self.sampleURL = sampleURL
         let vault = credentials ?? (github == nil ? GitHubKeychain() : EphemeralGitHubCredentials())
         self.credentials = vault
         let cache = offlineCache ?? (github == nil ? GitHubOfflineCache.shared : nil)
@@ -1051,6 +1053,62 @@ struct OpenDocument {
                 self.error = "刷新失败，已保留之前的内容。\n\(error.localizedDescription)"
             }
         }
+    }
+
+    // MARK: iCloud sync
+
+    /// Local folders are device-only until P3; GitHub sources and the sample share IDs across devices.
+    private func isLocalOnly(_ id: UUID) -> Bool { bookmarks.contains { $0.id == id } }
+
+    func syncSnapshot() -> SyncSnapshot {
+        var shared: [UUID: SyncSnapshot.Source] = [:]
+        for source in sources {
+            guard let saved = source.remote else { continue }
+            shared[source.id] = .init(kind: .github(url: saved.url, reference: saved.reference), name: source.name)
+        }
+        let synced = Set(shared.keys).union([Self.sampleID])
+        let ids = { (values: [String]) in values.compactMap(UUID.init(uuidString:)).filter { !self.isLocalOnly($0) } }
+        return SyncSnapshot(sources: shared, pinned: ids(pinnedSources), order: ids(sourceOrder),
+                            sampleRemoved: defaults.bool(forKey: "readingSampleRemoved"),
+                            palette: defaults.string(forKey: "readerPalette"),
+                            positions: positions.filter { key, _ in
+                                UUID(uuidString: String(key.prefix { $0 != "|" })).map(synced.contains) ?? false
+                            })
+    }
+
+    /// Brings local data in line with merged sync state. Afterwards syncSnapshot() matches the state,
+    /// so nothing echoes back. The open document keeps its scroll position; new values apply on next open.
+    func applySynced(_ state: SyncState) {
+        let remote = Dictionary(uniqueKeysWithValues: state.activeSources.compactMap { source -> (UUID, SavedGitHubSource)? in
+            guard case let .github(url, reference) = source.kind else { return nil }
+            return (source.id, SavedGitHubSource(id: source.id, url: url, reference: reference))
+        })
+        for source in sources where source.remote != nil && remote[source.id] == nil { remove(source) }
+        var added = false
+        for (id, saved) in remote where !sources.contains(where: { $0.id == id }) {
+            guard let link = try? GitHubLink(saved.url) else { continue }
+            sources.insert(Self.remoteSource(saved, link: link), at: 0); added = true
+        }
+        if added { persistRemoteSources() }
+        if let sample = sources.first(where: \.isSample), state.sampleRemoved.value { remove(sample) }
+        else if !state.sampleRemoved.value, defaults.bool(forKey: "readingSampleRemoved"), let url = sampleURL {
+            defaults.set(false, forKey: "readingSampleRemoved")
+            sources.append(FolderSource(id: Self.sampleID, name: "阅读示例", access: ScopedAccess(url), isSample: true))
+        }
+        let merge = { (local: [String], synced: [UUID]) in
+            mergeSyncedOrder(local: local.compactMap(UUID.init(uuidString:)), remote: synced, isLocalOnly: self.isLocalOnly).map(\.uuidString)
+        }
+        pinnedSources = merge(pinnedSources, state.pinned.value); defaults.set(pinnedSources, forKey: "pinnedSources")
+        sourceOrder = merge(sourceOrder, state.order.value); defaults.set(sourceOrder, forKey: "sourceOrder")
+        if let palette = state.palette.value, palette != defaults.string(forKey: "readerPalette") {
+            defaults.set(palette, forKey: "readerPalette")
+        }
+        var moved = false
+        for (key, position) in state.positions where positions[key] != position.value
+            && state.syncablePositionKey(key, fixed: [Self.sampleID]) {
+            positions[key] = position.value; moved = true
+        }
+        if moved { defaults.set(positions, forKey: "positions") }
     }
 
     func recordProgress(_ value: Double, documentKey: String) {
