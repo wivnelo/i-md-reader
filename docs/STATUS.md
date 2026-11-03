@@ -1,8 +1,12 @@
 # iMDReader 开发与发行状态
 
-## iCloud 多端同步（0.3.0 开发中）· 2026-11-03
+## macOS 0.3.0（53）正式发布 · 2026-11-04
 
-**本地 main 已实现 iCloud 同步与阅读位置锚点，尚未发布；当前正式版仍为 Mac 0.2.2（52）、移动 0.2.1（51，等待审核）。** 方案、决策与分阶段证据见 [ICLOUD_SYNC](ICLOUD_SYNC.md)。
+**[v0.3.0](https://github.com/wivnelo/i-md-reader/releases/tag/v0.3.0) 已于 2026-11-04 发布为 Latest，标签源码 `f837087`；本机已从公开 DMG 安装 0.3.0（53）。** App 为 Universal（x86_64/arm64），App 与 DMG 均获 Apple 公证 Accepted 并装订票据，Gatekeeper 判定 Notarized Developer ID；DMG 挂载内 App 版本与 Gatekeeper 通过；从公开链接下载的 DMG/ZIP 与 SHA256SUMS 一致，Latest 资产命名符合 App 内更新检查。CloudKit Schema 已部署生产环境；README 与隐私政策（生效日期 2026-11-04）随发布推送。旧版标签与资产未动。移动端仍为 0.2.1（51，等待审核）；iOS 0.3.0 App Store 包已在本地导出（Apple Distribution，生产 iCloud 环境），上传与审核须等 0.2.1 结果并另行授权，在此之前 Mac 正式版与移动端不互相同步。
+
+## iCloud 多端同步 · 2026-11-03
+
+方案、决策与分阶段证据见 [ICLOUD_SYNC](ICLOUD_SYNC.md)。
 
 - 已完成：CloudKit 容器与两端授权；同步模型与合并规则；GitHub 来源、置顶/排序、示例移除、阅读位置同步（配色经联测后改为各设备独立）；iCloud 云盘文件夹跨设备识别与“待授权”绑定；阅读位置改为顶层内容块锚点（用户同意）并修正按字母序淘汰；“•••”新增“iCloud 同步”开关（默认开启）与状态。
 - 测试：ReaderCore 54 项、状态测试 44 项、WebKit 实际脚本 64 组合通过（真实网络 2 项按默认跳过）；Mac 与 iOS 编译通过，仅既有 `MacFindField` 告警。Mac 开发环境 CloudKit 双实例往返通过。

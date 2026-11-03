@@ -1,6 +1,6 @@
 # iCloud 多端同步技术方案（草案）
 
-状态：2026-11-03 起草；同日用户确认第 8 节 6 项全部按建议执行，P0 签名与 Mac CloudKit 往返已通过；P1 同步模型与 P2 GitHub 来源、布局、配色、阅读位置同步已实现，Mac 单机双实例端到端通过；P3 iCloud 云盘文件夹同步已实现；跨设备增量拉取待真机验证，阅读位置已改为顶层内容块锚点（用户同意）；P4 开关与状态、隐私政策已完成；三台真机联测五项通过（配色改为不同步），待发布。本文是计划，不代表已实现或已验收。
+状态：2026-11-03 起草，2026-11-04 Mac 0.3.0 已发布；同日用户确认第 8 节 6 项全部按建议执行，P0 签名与 Mac CloudKit 往返已通过；P1 同步模型与 P2 GitHub 来源、布局、配色、阅读位置同步已实现，Mac 单机双实例端到端通过；P3 iCloud 云盘文件夹同步已实现；跨设备增量拉取待真机验证，阅读位置已改为顶层内容块锚点（用户同意）；P4 开关与状态、隐私政策已完成；三台真机联测五项通过（配色改为不同步），待发布。本文是计划，不代表已实现或已验收。
 
 ## 1. 目标与边界
 
@@ -202,4 +202,4 @@ Position 单独成记录，避免滚动时频繁改写一个大记录；记录�
 - 版本号三端统一为 0.3.0（53）。
 - 用户批准后生成正式描述文件并本地导出（未公证、未上传）：Mac 以 Developer ID Application 签名、内嵌 Developer ID 描述文件，强化运行时开启；iOS 以 Apple Distribution 签名、内嵌 App Store 描述文件，`get-task-allow` 为 false。两端 `aps-environment` 为 production、`icloud-container-environment` 为 Production，严格验签通过。产物位于本地 `build/releases/v0.3.0/`（不入库）。
 - 用户批准后在 CloudKit Console 先删除开发环境中仅供 P0 测试的 Probe 记录类型（无数据），再将 Layout、Position、Source 及其索引部署到生产环境；生产环境回读为 Layout 18、Position 10、Source 15 字段及系统 Users，无 Probe。Layout 中旧的配色字段随之存在于生产 Schema，App 不再读写。
-- 待办：Mac 公证、staple、Gatekeeper 与 GitHub Release，同时推送 README/隐私政策（生效日期改为发布日）；iOS 0.3.0 上传与审核须等 0.2.1 审核结果，均需用户分别授权。
+- 2026-11-04 用户批准后 Mac 0.3.0 发布：App/DMG 公证、装订、Gatekeeper 通过，README 与隐私政策（生效日期 2026-11-04）随 `f837087` 推送，GitHub Release v0.3.0 为 Latest，公开下载校验一致，本机已安装正式版。待办：iOS 0.3.0 上传与审核须等 0.2.1 审核结果并另行授权。
