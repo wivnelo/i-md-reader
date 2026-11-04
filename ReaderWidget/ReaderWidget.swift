@@ -66,41 +66,48 @@ private struct ContinueReadingView: View {
     @Environment(\.widgetFamily) private var family
     let entry: ReadingTimelineEntry
 
+    /// How many documents fit without clipping the header.
+    private var limit: Int {
+        switch family { case .systemSmall: 1; case .systemMedium: 2; default: 5 }
+    }
+
     var body: some View {
-        Group {
-            if let first = entry.items.first {
-                if family == .systemSmall { item(first, large: true).widgetURL(first.url) }
-                else {
-                    VStack(alignment: .leading, spacing: 8) {
-                        header
-                        ForEach(entry.items.prefix(3), id: \.self) { item in Link(destination: item.url) { self.item(item, large: false) } }
-                        Spacer(minLength: 0)
-                    }
-                }
+        VStack(alignment: .leading, spacing: family == .systemLarge ? 12 : 8) {
+            header
+            if entry.items.isEmpty {
+                Spacer(minLength: 0)
+                Text(text("打开 iMDReader 开始阅读", "Open iMDReader to start reading")).font(.callout).foregroundStyle(Mist.secondary)
+            } else if family == .systemSmall, let first = entry.items.first {
+                Spacer(minLength: 0)
+                row(first, titleLines: 3)
             } else {
-                VStack(alignment: .leading, spacing: 6) {
-                    header
-                    Spacer(minLength: 0)
-                    Text(text("打开 iMDReader 开始阅读", "Open iMDReader to start reading")).font(.callout).foregroundStyle(Mist.secondary)
-                }
+                ForEach(entry.items.prefix(limit), id: \.self) { item in Link(destination: item.url) { row(item, titleLines: 1) } }
             }
+            Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .widgetURL(family == .systemSmall ? entry.items.first?.url : nil)
         .containerBackground(Mist.paper, for: .widget)
     }
 
     private var header: some View {
-        Label(text("继续阅读", "Continue Reading"), systemImage: "book").font(.caption.weight(.semibold)).foregroundStyle(Mist.accent)
+        HStack(spacing: 6) {
+            Image(systemName: "doc.text").font(.caption.weight(.semibold))
+            Text("iMDReader").font(.subheadline.weight(.semibold))
+            Spacer(minLength: 4)
+            if family != .systemSmall { Text(text("继续阅读", "Continue Reading")).font(.caption2).foregroundStyle(Mist.secondary) }
+        }
+        .foregroundStyle(Mist.accent)
+        .lineLimit(1)
     }
 
-    private func item(_ item: ReadingItem, large: Bool) -> some View {
-        VStack(alignment: .leading, spacing: large ? 6 : 3) {
-            if large { header; Spacer(minLength: 0) }
-            Text(item.title).font(large ? .headline : .subheadline.weight(.semibold)).foregroundStyle(Mist.ink).lineLimit(large ? 3 : 1)
+    private func row(_ item: ReadingItem, titleLines: Int) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(item.title).font(.subheadline.weight(.semibold)).foregroundStyle(Mist.ink).lineLimit(titleLines)
             HStack(spacing: 6) {
                 Text(item.source).lineLimit(1)
                 Spacer(minLength: 4)
-                Text(item.progress, format: .percent.precision(.fractionLength(0))).monospacedDigit()
+                Text(min(1, max(0, item.progress)), format: .percent.precision(.fractionLength(0))).monospacedDigit()
             }.font(.caption2).foregroundStyle(Mist.secondary)
             ProgressView(value: min(1, max(0, item.progress))).tint(Mist.accent)
         }
@@ -112,7 +119,7 @@ struct ContinueReadingWidget: Widget {
         StaticConfiguration(kind: "ContinueReading", provider: ReadingProvider()) { ContinueReadingView(entry: $0) }
             .configurationDisplayName(text("继续阅读", "Continue Reading"))
             .description(text("回到最近阅读的文档。", "Return to the documents you read recently."))
-            .supportedFamilies([.systemSmall, .systemMedium])
+            .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }
 

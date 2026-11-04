@@ -235,7 +235,9 @@ struct OpenDocument {
         expanded = Set(defaults.stringArray(forKey: "expanded") ?? [])
         positions = defaults.dictionary(forKey: "positions") as? [String: Double] ?? [:]
         positionRecency = defaults.stringArray(forKey: "positionRecency") ?? []
-        readingHistory = (try? JSONDecoder().decode([ReadingEntry].self, from: defaults.data(forKey: "readingHistory") ?? Data())) ?? []
+        // Entries saved before 0.3.0 (53) could hold a block anchor in place of the ratio.
+        readingHistory = ((try? JSONDecoder().decode([ReadingEntry].self, from: defaults.data(forKey: "readingHistory") ?? Data())) ?? [])
+            .map { entry in var entry = entry; entry.progress = Self.displayProgress(entry.progress); return entry }
         bookmarks = (try? JSONDecoder().decode([SavedSource].self, from: defaults.data(forKey: "sources") ?? Data())) ?? []
         pendingCloudFolders = (try? JSONDecoder().decode([UUID: PendingCloudFolder].self, from: defaults.data(forKey: "cloudFolders") ?? Data())) ?? [:]
         savedFiles = (try? JSONDecoder().decode([SavedRecentFile].self, from: defaults.data(forKey: "recentFiles") ?? Data())) ?? []
@@ -820,7 +822,7 @@ struct OpenDocument {
                         }
                     }
                 }
-                progress = positions[id] ?? 0
+                progress = Self.displayProgress(positions[id])
                 let offline = source.remote != nil ? await github.isUsingOfflineCache : false
                 // A resource failure can revoke this session during the actor hop.
                 guard !Task.isCancelled else { return }
@@ -986,7 +988,7 @@ struct OpenDocument {
                 persistRecentFiles()
                 document = OpenDocument(key: key, url: input, sourceID: id, access: access,
                                         rendered: result.0, initialProgress: positions[key] ?? 0, dates: result.2, isStandalone: true)
-                progress = positions[key] ?? 0
+                progress = Self.displayProgress(positions[key])
                 defaults.set(key, forKey: "lastDocument")
                 noteReading(source: "单个文件")
             } catch {
@@ -1245,6 +1247,12 @@ struct OpenDocument {
     }
 
     /// `value` is the whole-document ratio shown in the UI; `anchor` (block index + fraction, from 2) is what gets saved.
+    /// A saved block anchor (from 2) is not a document ratio; show 0 until the page reports one.
+    static func displayProgress(_ saved: Double?) -> Double {
+        guard let saved, saved.isFinite, saved <= 1 else { return 0 }
+        return max(0, saved)
+    }
+
     func recordProgress(_ value: Double, documentKey: String, anchor: Double? = nil) {
         guard value.isFinite, document?.key == documentKey else { return }
         progress = min(1, max(0, value))

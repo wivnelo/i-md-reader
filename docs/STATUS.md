@@ -5,8 +5,10 @@
 **iOS 0.2.1（51）于 2026-11-03 被 App Review 以 Guideline 4.2（Minimum Functionality）拒绝**：认为内容与功能不足以“有用、独特、像 App”，未指出崩溃或具体违规（App Store Connect 回读，无附件）。用户决定以 0.3.0 重新提交并补充原生功能。
 
 - 第一阶段已实现：阅读记录（最近 20 篇，标题/来源/进度/纯文本摘要，移除来源或最近文件时清理）；Spotlight 索引已读文章，点按结果直接打开；App Intents 快捷指令“继续阅读”“打开文档”（中英文说法）。状态测试 45 项通过，Mac 与 iOS 编译通过；模拟器 Spotlight 不为第三方 App 建索引无法验证，iPhone/iPad 开发版真机验证 Spotlight 与两个快捷指令均正常（用户确认）。
-- 第二阶段已实现：iPhone/iPad“继续阅读”小组件（小号显示最近一篇、中号最近 3 篇，标题/来源/进度，雾蓝配色随系统深浅与中英文，点按以 `imdreader://open?key=` 回到原位置）。阅读记录经 App Group `group.io.github.wivnelo.imdreader` 共享，仅可见内容变化时刷新。工程新增 `iMDReaderWidget` 扩展并嵌入 iOS App，Bundle ID 改由 `IMD_BUNDLE_ID` 派生（扩展为 `.widget`）。用户批准后在开发者后台新建该 App Group 并关联 iOS 与小组件 App ID（中途误入 Mac App ID 已核对未改动）。iOS 设备构建签名含 App Group，Mac 构建不受影响；真机添加小组件、显示与点按跳转均正常（用户确认）。
-- 待办：重新导出 iOS 0.3.0 App Store 包；新的审核说明与演示视频；以 0.3.0 提交并回复审核消息。
+- 第二阶段已实现：iPhone/iPad“继续阅读”小组件（小号显示最近一篇、中号最近 3 篇（后按反馈调整，见下），标题/来源/进度，雾蓝配色随系统深浅与中英文，点按以 `imdreader://open?key=` 回到原位置）。阅读记录经 App Group `group.io.github.wivnelo.imdreader` 共享，仅可见内容变化时刷新。工程新增 `iMDReaderWidget` 扩展并嵌入 iOS App，Bundle ID 改由 `IMD_BUNDLE_ID` 派生（扩展为 `.widget`）。用户批准后在开发者后台新建该 App Group 并关联 iOS 与小组件 App ID（中途误入 Mac App ID 已核对未改动）。iOS 设备构建签名含 App Group，Mac 构建不受影响；真机添加小组件、显示与点按跳转均正常（用户确认）。
+- 小组件按用户反馈调整：顶部固定显示“iMDReader”标题与“继续阅读”，不再遮挡；小号 1 篇、中号最多 2 篇，新增大号最多 5 篇。录屏中发现阅读位置锚点值（≥2）被当作进度显示（小组件 664%、正文 900%），已改为只显示 0–1 的比例进度、启动时清洗旧记录并在小组件端限幅；状态测试 46 项通过，iPhone/iPad 重装后用户重录视频，抽帧确认无超过 100% 的进度。
+- 审核材料（本地，不入库）：演示文件夹已放入 iCloud 云盘，公开演示仓库 [wivnelo/imdreader-demo](https://github.com/wivnelo/imdreader-demo)（用户批准）；审核备注、给 Apple 的回复与去音轨压缩视频（124 秒，61 MB）位于 `build/releases/v0.3.0/review/`。
+- 待办：重新导出 iOS 0.3.0（53）App Store 包；上传、改版本号并选择构建、填写备注、附视频、回复审核并提交（逐项授权）。
 
 ## macOS 0.3.0（53）正式发布 · 2026-11-04
 

@@ -58,10 +58,10 @@ import WidgetKit
     }
 
     private func publish(_ history: [ReadingEntry]) {
-        guard let shared = UserDefaults(suiteName: Self.appGroup), let data = try? JSONEncoder().encode(Array(history.prefix(3))) else { return }
+        guard let shared = UserDefaults(suiteName: Self.appGroup), let data = try? JSONEncoder().encode(Array(history.prefix(5))) else { return }
         shared.set(data, forKey: "readingHistory")
         // Scrolling changes progress constantly; refresh the widget only when what it shows changes visibly.
-        let visible = history.prefix(3).map { "\($0.key)|\($0.title)|\(Int($0.progress * 20))" }.joined(separator: "\n")
+        let visible = history.prefix(5).map { "\($0.key)|\($0.title)|\(Int($0.progress * 20))" }.joined(separator: "\n")
         guard visible != shown else { return }
         shown = visible
         WidgetCenter.shared.reloadTimelines(ofKind: "ContinueReading")

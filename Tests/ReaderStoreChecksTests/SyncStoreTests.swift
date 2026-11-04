@@ -226,3 +226,25 @@ private func stamp(_ seconds: TimeInterval, _ device: String) -> SyncStamp {
     restarted.remove(try #require(restarted.sources.first { $0.id == source.id }))
     #expect(restarted.readingHistory.isEmpty)
 }
+
+@Test @MainActor func reopeningAnAnchoredDocumentNeverShowsTheAnchorAsAPercentage() async throws {
+    #expect(ReaderStore.displayProgress(6.64) == 0 && ReaderStore.displayProgress(0.4) == 0.4 && ReaderStore.displayProgress(nil) == 0)
+    let phone = try Device()
+    defer { phone.clean() }
+    let folder = phone.root.appendingPathComponent("Docs")
+    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+    try Data("# Notes\n\ntext".utf8).write(to: folder.appendingPathComponent("a.md"))
+    let store = ReaderStore(defaults: phone.defaults, github: GitHubReader(), sampleURL: nil)
+    store.addFolder(folder)
+    let source = try #require(store.sources.first { $0.url != nil })
+    store.open(folder.appendingPathComponent("a.md"), source: source)
+    for _ in 0..<200 where store.document == nil || store.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+    let key = try #require(store.document?.key)
+    store.recordProgress(0.66, documentKey: key, anchor: 6.64)
+
+    let reopened = ReaderStore(defaults: phone.defaults, github: GitHubReader(), sampleURL: nil)
+    #expect(reopened.openDocument(key: key))
+    for _ in 0..<200 where reopened.document == nil || reopened.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+    #expect(reopened.document?.initialProgress == 6.64)
+    #expect(reopened.progress <= 1 && (reopened.readingHistory.first?.progress ?? 0) <= 1)
+}
