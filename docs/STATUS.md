@@ -8,11 +8,12 @@
 - 第二阶段已实现：iPhone/iPad“继续阅读”小组件（小号显示最近一篇、中号最近 3 篇（后按反馈调整，见下），标题/来源/进度，雾蓝配色随系统深浅与中英文，点按以 `imdreader://open?key=` 回到原位置）。阅读记录经 App Group `group.io.github.wivnelo.imdreader` 共享，仅可见内容变化时刷新。工程新增 `iMDReaderWidget` 扩展并嵌入 iOS App，Bundle ID 改由 `IMD_BUNDLE_ID` 派生（扩展为 `.widget`）。用户批准后在开发者后台新建该 App Group 并关联 iOS 与小组件 App ID（中途误入 Mac App ID 已核对未改动）。iOS 设备构建签名含 App Group，Mac 构建不受影响；真机添加小组件、显示与点按跳转均正常（用户确认）。
 - 小组件按用户反馈调整：顶部固定显示“iMDReader”标题与“继续阅读”，不再遮挡；小号 1 篇、中号最多 2 篇，新增大号最多 5 篇。录屏中发现阅读位置锚点值（≥2）被当作进度显示（小组件 664%、正文 900%），已改为只显示 0–1 的比例进度、启动时清洗旧记录并在小组件端限幅；状态测试 46 项通过，iPhone/iPad 重装后用户重录视频，抽帧确认无超过 100% 的进度。
 - 审核材料（本地，不入库）：演示文件夹已放入 iCloud 云盘，公开演示仓库 [wivnelo/imdreader-demo](https://github.com/wivnelo/imdreader-demo)（用户批准）；审核备注、给 Apple 的回复与去音轨压缩视频（124 秒，61 MB）位于 `build/releases/v0.3.0/review/`。
-- 待办：重新导出 iOS 0.3.0（53）App Store 包；上传、改版本号并选择构建、填写备注、附视频、回复审核并提交（逐项授权）。
+- **2026-11-04 10:47 已重新提交 iOS 0.3.0（53），状态“等待审核”，仍为手动发布。** 逐项授权完成：重新归档导出（App 与小组件均 Apple Distribution 严格验签，iCloud/推送生产环境，App Group，关闭调试）并经 Xcode 上传；在 App Store Connect 将被拒版本改为 0.3.0、选择构建 53；构建 53 出口合规按 51 同样回答“无非豁免加密”；审核备注换为 0.3.0 英文说明（2,645 字符，回读一致）；在审核消息中回复 Apple 并附 9.7 MB 压缩演示视频（Chrome 上传单文件 10 MB 上限，61 MB 版本保留本地），然后重新提交。
+- 待办：等待审核结果；通过后由用户决定手动发布。本地 main 领先公开 main 3 个提交（Spotlight/快捷指令、小组件、小组件调整），尚未推送。
 
 ## macOS 0.3.0（53）正式发布 · 2026-11-04
 
-**[v0.3.0](https://github.com/wivnelo/i-md-reader/releases/tag/v0.3.0) 已于 2026-11-04 发布为 Latest，标签源码 `f837087`；本机已从公开 DMG 安装 0.3.0（53）。** App 为 Universal（x86_64/arm64），App 与 DMG 均获 Apple 公证 Accepted 并装订票据，Gatekeeper 判定 Notarized Developer ID；DMG 挂载内 App 版本与 Gatekeeper 通过；从公开链接下载的 DMG/ZIP 与 SHA256SUMS 一致，Latest 资产命名符合 App 内更新检查。CloudKit Schema 已部署生产环境；README 与隐私政策（生效日期 2026-11-04）随发布推送。旧版标签与资产未动。移动端仍为 0.2.1（51，等待审核）；iOS 0.3.0 App Store 包已在本地导出（Apple Distribution，生产 iCloud 环境），上传与审核须等 0.2.1 结果并另行授权，在此之前 Mac 正式版与移动端不互相同步。
+**[v0.3.0](https://github.com/wivnelo/i-md-reader/releases/tag/v0.3.0) 已于 2026-11-04 发布为 Latest，标签源码 `f837087`；本机已从公开 DMG 安装 0.3.0（53）。** App 为 Universal（x86_64/arm64），App 与 DMG 均获 Apple 公证 Accepted 并装订票据，Gatekeeper 判定 Notarized Developer ID；DMG 挂载内 App 版本与 Gatekeeper 通过；从公开链接下载的 DMG/ZIP 与 SHA256SUMS 一致，Latest 资产命名符合 App 内更新检查。CloudKit Schema 已部署生产环境；README 与隐私政策（生效日期 2026-11-04）随发布推送。旧版标签与资产未动。移动端 0.2.1（51）后被拒，已改以 0.3.0（53）重新提交审核（见上节）；上架前 Mac 正式版与移动端不互相同步。
 
 ## iCloud 多端同步 · 2026-11-03
 
