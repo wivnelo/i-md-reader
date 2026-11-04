@@ -1,5 +1,12 @@
 # iMDReader 开发与发行状态
 
+## iOS 审核被拒与改进 · 2026-11-04
+
+**iOS 0.2.1（51）于 2026-11-03 被 App Review 以 Guideline 4.2（Minimum Functionality）拒绝**：认为内容与功能不足以“有用、独特、像 App”，未指出崩溃或具体违规（App Store Connect 回读，无附件）。用户决定以 0.3.0 重新提交并补充原生功能。
+
+- 第一阶段已实现：阅读记录（最近 20 篇，标题/来源/进度/纯文本摘要，移除来源或最近文件时清理）；Spotlight 索引已读文章，点按结果直接打开；App Intents 快捷指令“继续阅读”“打开文档”（中英文说法）。状态测试 45 项通过，Mac 与 iOS 编译通过；模拟器 Spotlight 不为第三方 App 建索引无法验证，iPhone/iPad 开发版真机验证 Spotlight 与两个快捷指令均正常（用户确认）。
+- 待办：继续阅读小组件（需新扩展 App ID 与 App Group，账号改动待批准）；新的审核说明与演示视频；以 0.3.0 提交并回复审核消息。
+
 ## macOS 0.3.0（53）正式发布 · 2026-11-04
 
 **[v0.3.0](https://github.com/wivnelo/i-md-reader/releases/tag/v0.3.0) 已于 2026-11-04 发布为 Latest，标签源码 `f837087`；本机已从公开 DMG 安装 0.3.0（53）。** App 为 Universal（x86_64/arm64），App 与 DMG 均获 Apple 公证 Accepted 并装订票据，Gatekeeper 判定 Notarized Developer ID；DMG 挂载内 App 版本与 Gatekeeper 通过；从公开链接下载的 DMG/ZIP 与 SHA256SUMS 一致，Latest 资产命名符合 App 内更新检查。CloudKit Schema 已部署生产环境；README 与隐私政策（生效日期 2026-11-04）随发布推送。旧版标签与资产未动。移动端仍为 0.2.1（51，等待审核）；iOS 0.3.0 App Store 包已在本地导出（Apple Distribution，生产 iCloud 环境），上传与审核须等 0.2.1 结果并另行授权，在此之前 Mac 正式版与移动端不互相同步。

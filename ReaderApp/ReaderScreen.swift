@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreSpotlight
 #if os(macOS)
 import AppKit
 #endif
@@ -19,6 +20,7 @@ struct ReaderScreen: View {
 
     @StateObject private var store = ReaderStore()
     @State private var sync: ReaderSync?
+    @State private var spotlight: ReaderSpotlight?
     @State private var visibility: NavigationSplitViewVisibility = .detailOnly
     @State private var compactColumn: NavigationSplitViewColumn = .detail
     @State private var importing = false
@@ -403,6 +405,19 @@ struct ReaderScreen: View {
         .sheet(isPresented: $managingOfflineCache) { OfflineCacheSheet(store: store) }
         #endif
         .onOpenURL { store.openFileURL($0); showReadingColumn() }
+        // Spotlight results and Shortcuts both arrive as a document key.
+        .onContinueUserActivity(CSSearchableItemActionType) { activity in
+            if let key = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String { ReaderRouter.shared.request = .open(key) }
+        }
+        .onReceive(ReaderRouter.shared.$request) { request in
+            guard let request else { return }
+            ReaderRouter.shared.request = nil
+            let key: String? = switch request {
+            case .continueReading: store.readingHistory.first?.key
+            case let .open(key): key
+            }
+            if let key, store.openDocument(key: key) { showReadingColumn() }
+        }
         .fileImporter(isPresented: $importing, allowedContentTypes: selectingMarkdown ? Self.markdownPickerTypes : [.folder], allowsMultipleSelection: false) { result in
             switch result {
             case .success(let urls):
@@ -421,6 +436,7 @@ struct ReaderScreen: View {
         .task {
             await store.configureOfflineCache(); store.restoreLastDocument()
             if sync == nil { sync = ReaderSync(store: store) }
+            if spotlight == nil { spotlight = ReaderSpotlight(store: store) }
         }
         .environment(\.locale, language.locale)
         #if os(macOS)

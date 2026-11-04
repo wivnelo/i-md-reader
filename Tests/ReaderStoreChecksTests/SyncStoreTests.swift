@@ -197,3 +197,32 @@ private func stamp(_ seconds: TimeInterval, _ device: String) -> SyncStamp {
     store.recordProgress(0.6, documentKey: key)
     #expect((phone.defaults.dictionary(forKey: "positions") as? [String: Double])?[key] == 0.6)
 }
+
+@Test @MainActor func readingHistoryFeedsSpotlightAndShortcutsAndForgetsRemovedSources() async throws {
+    let phone = try Device()
+    defer { phone.clean() }
+    let folder = phone.root.appendingPathComponent("Notes")
+    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+    try Data("# Merkle Trees\n\nHashes <b>combine</b> & verify.".utf8).write(to: folder.appendingPathComponent("tree.md"))
+    let store = ReaderStore(defaults: phone.defaults, github: GitHubReader(), sampleURL: nil)
+    store.addFolder(folder)
+    let source = try #require(store.sources.first { $0.url != nil })
+    store.open(folder.appendingPathComponent("tree.md"), source: source)
+    for _ in 0..<200 where store.document == nil || store.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+    let key = try #require(store.document?.key)
+
+    let entry = try #require(store.readingHistory.first)
+    #expect(entry.key == key && entry.title == "Merkle Trees" && entry.source == "Notes")
+    #expect(entry.excerpt.contains("Hashes <b>combine</b> & verify.") && !entry.excerpt.contains("<p>"))
+    store.recordProgress(0.5, documentKey: key, anchor: 3.2)
+    #expect(store.readingHistory.first?.progress == 0.5)
+
+    // Shortcuts and Spotlight reopen by key, including after a restart.
+    let restarted = ReaderStore(defaults: phone.defaults, github: GitHubReader(), sampleURL: nil)
+    #expect(restarted.readingHistory.map(\.key) == [key])
+    #expect(restarted.openDocument(key: key))
+    #expect(!restarted.openDocument(key: UUID().uuidString + "|/missing.md"))
+
+    restarted.remove(try #require(restarted.sources.first { $0.id == source.id }))
+    #expect(restarted.readingHistory.isEmpty)
+}

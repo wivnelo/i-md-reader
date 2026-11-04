@@ -133,6 +133,17 @@ struct SavedRecentFile: Codable, Identifiable {
     var bookmark: Data
 }
 
+/// A document read recently, for Spotlight, Shortcuts and "continue reading".
+struct ReadingEntry: Codable, Identifiable, Equatable {
+    var id: String { key }
+    let key: String
+    var title: String
+    var source: String
+    var excerpt: String
+    var progress: Double
+    var date: Date
+}
+
 struct RecentFile: Identifiable {
     let id: UUID
     let name: String
@@ -192,6 +203,7 @@ struct OpenDocument {
     private var remoteLocations: [UUID: GitHubLocation] = [:]
     @Published private(set) var isAddingGitHub = false
     private var positions: [String: Double]
+    @Published private(set) var readingHistory: [ReadingEntry]
     /// Position keys from least to most recently read, for trimming.
     private var positionRecency: [String]
     private var directoryRequests: [String: UUID] = [:]
@@ -223,6 +235,7 @@ struct OpenDocument {
         expanded = Set(defaults.stringArray(forKey: "expanded") ?? [])
         positions = defaults.dictionary(forKey: "positions") as? [String: Double] ?? [:]
         positionRecency = defaults.stringArray(forKey: "positionRecency") ?? []
+        readingHistory = (try? JSONDecoder().decode([ReadingEntry].self, from: defaults.data(forKey: "readingHistory") ?? Data())) ?? []
         bookmarks = (try? JSONDecoder().decode([SavedSource].self, from: defaults.data(forKey: "sources") ?? Data())) ?? []
         pendingCloudFolders = (try? JSONDecoder().decode([UUID: PendingCloudFolder].self, from: defaults.data(forKey: "cloudFolders") ?? Data())) ?? [:]
         savedFiles = (try? JSONDecoder().decode([SavedRecentFile].self, from: defaults.data(forKey: "recentFiles") ?? Data())) ?? []
@@ -722,6 +735,7 @@ struct OpenDocument {
         positions = positions.filter { !$0.key.hasPrefix(prefix) }
         if defaults.string(forKey: "lastDocument")?.hasPrefix(prefix) == true { defaults.removeObject(forKey: "lastDocument") }
         defaults.set(positions, forKey: "positions")
+        forgetReading { $0.hasPrefix(prefix) }
         persistSources(); persistExpanded()
     }
     private func persistSources() {
@@ -812,6 +826,7 @@ struct OpenDocument {
                 guard !Task.isCancelled else { return }
                 isReadingOffline = offline
                 defaults.set(id, forKey: "lastDocument")
+                noteReading(source: source.name)
             } catch {
                 guard !Task.isCancelled else { return }
                 if source.remote != nil, await clearRejectedGitHubCredential(error) { return }
@@ -829,19 +844,44 @@ struct OpenDocument {
     }
     func restoreLastDocument() {
         guard !handledIncomingFile else { return }
-        if let last = defaults.string(forKey: "lastDocument"), let recent = recentFiles.first(where: { $0.key == last }) {
-            openRecent(recent)
-            return
-        }
-        if let id = defaults.string(forKey: "lastDocument"), let separator = id.firstIndex(of: "|"),
-           let source = sources.first(where: { $0.id.uuidString == String(id[..<separator]) }), let root = source.url {
-            let relative = String(id[id.index(after: separator)...]).trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-            open(root.appendingPathComponent(relative), source: source)
-        } else if let sample = sources.first(where: \.isSample), let root = sample.url {
+        if let last = defaults.string(forKey: "lastDocument"), openDocument(key: last) { return }
+        if let sample = sources.first(where: \.isSample), let root = sample.url {
             expanded.insert(key(source: sample, url: root)); persistExpanded()
             open(root.appendingPathComponent("为阅读留一点空间.md"), source: sample)
         }
     }
+    /// Opens a document by its position key (`<source>|/<path>` or `file:<id>`); false when its source is gone or unavailable.
+    @discardableResult func openDocument(key: String) -> Bool {
+        if let recent = recentFiles.first(where: { $0.key == key }) { openRecent(recent); return true }
+        guard let separator = key.firstIndex(of: "|"),
+              let source = sources.first(where: { $0.id.uuidString == String(key[..<separator]) }), let root = source.url else { return false }
+        let relative = String(key[key.index(after: separator)...]).trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        open(root.appendingPathComponent(relative), source: source)
+        return true
+    }
+
+    private func noteReading(source: String) {
+        guard let document else { return }
+        let title = document.rendered.headings.first?.title ?? document.url.deletingPathExtension().lastPathComponent
+        // Plain-text excerpt for Spotlight; the rendered body is already escaped, allowlisted HTML.
+        let text = document.rendered.body.replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression)
+            .replacingOccurrences(of: "&lt;", with: "<").replacingOccurrences(of: "&gt;", with: ">")
+            .replacingOccurrences(of: "&quot;", with: "\"").replacingOccurrences(of: "&#39;", with: "'").replacingOccurrences(of: "&amp;", with: "&")
+            .split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        let entry = ReadingEntry(key: document.key, title: title, source: source, excerpt: String(text.prefix(240)),
+                                 progress: progress, date: Date())
+        readingHistory = [entry] + readingHistory.filter { $0.key != entry.key }.prefix(19)
+        persistReadingHistory()
+    }
+    private func forgetReading(where shouldForget: (String) -> Bool) {
+        let kept = readingHistory.filter { !shouldForget($0.key) }
+        guard kept.count != readingHistory.count else { return }
+        readingHistory = kept; persistReadingHistory()
+    }
+    private func persistReadingHistory() {
+        if let data = try? JSONEncoder().encode(readingHistory) { defaults.set(data, forKey: "readingHistory") }
+    }
+
     private func persistRecentFiles() {
         if let data = try? JSONEncoder().encode(savedFiles) { defaults.set(data, forKey: "recentFiles") }
     }
@@ -870,6 +910,7 @@ struct OpenDocument {
         savedFiles.removeAll()
         defaults.set(positions, forKey: "positions")
         persistRecentFiles()
+        forgetReading { $0.hasPrefix("file:") }
         // Keep the current document and its exact file grant alive for reading.
     }
 
@@ -885,6 +926,7 @@ struct OpenDocument {
         if defaults.string(forKey: "lastDocument") == recent.key { defaults.removeObject(forKey: "lastDocument") }
         defaults.set(positions, forKey: "positions")
         persistRecentFiles()
+        forgetReading { $0 == recent.key }
     }
 
     /// Receive either a document picker grant or a system open-in-place URL.
@@ -946,6 +988,7 @@ struct OpenDocument {
                                         rendered: result.0, initialProgress: positions[key] ?? 0, dates: result.2, isStandalone: true)
                 progress = positions[key] ?? 0
                 defaults.set(key, forKey: "lastDocument")
+                noteReading(source: "单个文件")
             } catch {
                 guard !Task.isCancelled else { return }
                 self.error = error.localizedDescription
@@ -1206,6 +1249,9 @@ struct OpenDocument {
         guard value.isFinite, document?.key == documentKey else { return }
         progress = min(1, max(0, value))
         positions[documentKey] = anchor.flatMap(SyncState.position).flatMap { $0 >= 2 ? $0 : nil } ?? progress
+        if let index = readingHistory.firstIndex(where: { $0.key == documentKey }), abs(readingHistory[index].progress - progress) >= 0.01 {
+            readingHistory[index].progress = progress; readingHistory[index].date = Date(); persistReadingHistory()
+        }
         positionRecency.removeAll { $0 == documentKey }; positionRecency.append(documentKey)
         if positions.count > 200 {
             // Least recently read first; keys saved before recency was tracked count as oldest.
