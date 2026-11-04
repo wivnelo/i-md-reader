@@ -21,6 +21,9 @@ struct ReaderScreen: View {
     @StateObject private var store = ReaderStore()
     @State private var sync: ReaderSync?
     @State private var spotlight: ReaderSpotlight?
+    #if os(iOS)
+    @State private var widgetFeed: ReaderWidgetFeed?
+    #endif
     @State private var visibility: NavigationSplitViewVisibility = .detailOnly
     @State private var compactColumn: NavigationSplitViewColumn = .detail
     @State private var importing = false
@@ -404,7 +407,16 @@ struct ReaderScreen: View {
         #if os(iOS)
         .sheet(isPresented: $managingOfflineCache) { OfflineCacheSheet(store: store) }
         #endif
-        .onOpenURL { store.openFileURL($0); showReadingColumn() }
+        .onOpenURL { url in
+            // imdreader://open?key=… comes from the Continue Reading widget; anything else is a file to open.
+            if url.scheme == "imdreader" {
+                if let key = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "key" })?.value {
+                    ReaderRouter.shared.request = .open(key)
+                }
+                return
+            }
+            store.openFileURL(url); showReadingColumn()
+        }
         // Spotlight results and Shortcuts both arrive as a document key.
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
             if let key = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String { ReaderRouter.shared.request = .open(key) }
@@ -437,6 +449,9 @@ struct ReaderScreen: View {
             await store.configureOfflineCache(); store.restoreLastDocument()
             if sync == nil { sync = ReaderSync(store: store) }
             if spotlight == nil { spotlight = ReaderSpotlight(store: store) }
+            #if os(iOS)
+            if widgetFeed == nil { widgetFeed = ReaderWidgetFeed(store: store) }
+            #endif
         }
         .environment(\.locale, language.locale)
         #if os(macOS)

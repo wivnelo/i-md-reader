@@ -3,6 +3,9 @@ import Combine
 import CoreSpotlight
 import Foundation
 import UniformTypeIdentifiers
+#if os(iOS)
+import WidgetKit
+#endif
 
 /// Requests from Spotlight and Shortcuts that the reader screen carries out.
 @MainActor final class ReaderRouter: ObservableObject {
@@ -42,6 +45,29 @@ import UniformTypeIdentifiers
         })
     }
 }
+
+#if os(iOS)
+/// Shares the reading history with the Continue Reading widget through the App Group.
+@MainActor final class ReaderWidgetFeed {
+    static let appGroup = "group.io.github.wivnelo.imdreader"
+    private var shown = ""
+    private var subscription: AnyCancellable?
+
+    init(store: ReaderStore) {
+        subscription = store.$readingHistory.sink { [weak self] history in self?.publish(history) }
+    }
+
+    private func publish(_ history: [ReadingEntry]) {
+        guard let shared = UserDefaults(suiteName: Self.appGroup), let data = try? JSONEncoder().encode(Array(history.prefix(3))) else { return }
+        shared.set(data, forKey: "readingHistory")
+        // Scrolling changes progress constantly; refresh the widget only when what it shows changes visibly.
+        let visible = history.prefix(3).map { "\($0.key)|\($0.title)|\(Int($0.progress * 20))" }.joined(separator: "\n")
+        guard visible != shown else { return }
+        shown = visible
+        WidgetCenter.shared.reloadTimelines(ofKind: "ContinueReading")
+    }
+}
+#endif
 
 struct ReadingDocument: AppEntity {
     static let typeDisplayRepresentation: TypeDisplayRepresentation = "文档"
