@@ -1,8 +1,40 @@
 # iMDReader 开发与发行状态
 
+## iOS 收费模型开发（未发布）· 2026-11-11
+
+本轮在 `feat/storekit-purchase`，起点 `be333408ae46837e7158c6633abaac2f2f7914ec`，按 KB main 合并提交 `3bc39f7`（PR #22） 第十一节与 4.3 接入「14 天全功能免费试用 + 到期后买断」。正式 0.3.0（53）仍免费；不改版本、不合 main、不创建 ASC 商品、不启动 App/安装/上传/发布。Mac 永远关闭收费，无购买界面；CloudKit 及其启动参数未改。
+
+- 已完成：两个已定非消耗型 ID；ReaderCore 五态纯逻辑与可注入缓存协议；生产 originalAppVersion 数字 build≤53 的老用户已定 B（sandbox/xcode 排除；取不到 AppTransaction 按新用户，不另存标记）；Keychain 独立本机缓存与最大已见时间；iOS 主动领取/买断/恢复、家庭共享买断与撤销、按 11.3 的锁定层（语言、版本、数据管理保留；Spotlight/快捷指令/小组件/深链落到购买页，解锁后恢复原文档/来源）、自动说明页、最后三天提示；五语言购买文案与本地 StoreKit 配置。方案、ASC 五语言清单及重装实测步骤见 [IAP](IAP.md)。
+- 开关：iOS Release 默认启用；iOS DEBUG 仅 `-IMDPurchaseEnabled` 启用；非 iOS 永远关闭。**发版前必须先在 ASC 配好 lifetime 和 trial14d，否则 Release 会锁功能且无法试用/购买。**
+- 验证通过：Swift 6.1.2，直接复制实际 PurchaseAccess.swift 与 PurchaseAccessTests.swift 到 `/tmp/imd-purchase-checks` 的无依赖临时包，Debug/Release 各 10 项 swift-testing 全通过（非 App host）。覆盖五态、恰好14天、撤销、共享、离线/无缓存、老用户数字/环境排除、水印回拨、交易保留/缓存清空及内存协议往返。三个 iOS App 源文件以 arm64-apple-ios17.0 语法解析通过，不能等同 Apple SDK 类型检查；购买文案五语言、translated/comment/占位符、商品限长/价格/家庭共享、严格 UTF-8 和 diff 空白检查通过。
+- 完整 ReaderCore 测试未通过运行门槛：已尝试 `swift test --package-path ReaderCore --scratch-path /tmp/imd-reader-core-build --skip-update`，依赖可用后编译被现有 `OfflineCache.swift` 的 `no such module 'CryptoKit'` 阻塞（Linux）；未为此改业务代码或依赖。购买纯逻辑已隔离运行，不冒充全套通过。复现命令见 IAP。
+- 固定回归门槛影响与限制：本轮影响 iOS 设置购买入口、阅读/资料库锁定与新增语言标签；品牌代码、导航、加号三项、置顶、配色、Mac 查找不变。所有语言实际画面、短屏/明暗、锁定后设置可达性、iPhone 单栏旋转与 iPad 双栏交互均未测；未启动真机/模拟器，不以语法或逻辑测试替代视觉/交互验收。
+- 待办：Apple SDK 编译；Xcode 本地购买/取消/待批准/恢复/撤销与五语言布局回归；Boss 提供可装开发包或 TestFlight 的真机及沙盒账号（或授权已有账号），按 IAP 执行同账号领取→记录 originalPurchaseDate→删除但保留购买记录→重装不再领取→恢复的上线前必测。未增加 StoreKitTest App host，纯逻辑覆盖不能替代真实重装收据验证。
+- KB 边界：已对照 KB main 合并提交 `3bc39f7`（PR #22，方案正文与 `40fde35` 相同） 第十一节、4.3 与 9.1。11.2 隐私在独立 PR #2，11.1 DSA 由 Boss 在 ASC 申报。旧占位、老用户待选、按单项高级功能收费及到期保留只读建议均不沿用。
+
+## 五语言本地化（开发分支，未发行）· 2026-11-11
+
+分支 feat/l10n-ja-ko-zh-hant：在 zh-Hans、en 之外新增 zh-Hant、ja、ko。范围：String Catalog 158 个 key 五语言齐全，ReaderLanguage 语言解析与运行时消息表、语言选择菜单、网页控件文案、Widget、快捷指令短语与标题、日期标签，以及长文案布局保护；knownRegions 已加入三种语言。版本号未改，未提交审核、未发版。
+
+验证：scripts/check-localizations.py（JSON、五语言完整、占位符一致、严格 UTF-8、区域与 reader.js/ReaderLanguage 覆盖；已装 OpenCC 做繁简探测）0 error；reader.js 用 Node 做五语言行为检查；ReaderLanguage 与 DocumentDates 在 Linux 用 Swift 6.1 独立编译并运行检查，其余 Swift 文件仅语法解析。**没有 Xcode，App 与 Widget 未编译，Swift 测试未在 Apple 平台运行，模拟器/真机的布局、语言切换、Siri 短语和 Widget 均未测。** 日、韩、繁体译文由 AI 起草，未经母语审校。固定回归门槛中语言、外观排版、Mac 查找与移动设置须在 Apple 平台回归后才能写成通过。机制与步骤见 [LOCALIZATION](LOCALIZATION.md)。
+
+- 语言名一律使用各语言自称（简体中文、繁體中文、English、日本語、한국어；Apple 惯例），校验脚本已将这五个 key 列入白名单。OpenCC 扫描 zh-Hant：除白名单中的「简体中文」外，未发现混入简体字。
+- 语言选择器保持菜单，是否改回分段等产品或 Boss 定，本分支不自行决定；备选分支 `feat/l10n-ja-ko-zh-hant-segmented` 已恢复分段（已推送、未开 PR）。五种语言加「跟随系统」共六个选项放进分段控件，iPhone 竖屏宽度可能不够（【推断】，未在真机或模拟器验证）。
+- 三语言 App Store 商店元数据草稿按原要求不进本 PR，存放在仓库外；是否入库由产品定。
+
 ## iOS 0.3.0（53）正式发布 · 2026-11-11
 
 **iPhone/iPad 0.3.0（53）已通过 App Review，用户批准后于 2026-11-11 在 App Store Connect 手动发布，状态“可分发”，覆盖 174 个国家或地区**（App Store 页面生效可能有数小时延迟，本轮未从商店前台核验）。发布前用户批准更新推广文本（无需审核）：中文与英文均加入 iCloud 同步与“继续阅读”小组件；英文原稿 209 字符超出 170 上限，按同义缩短为 162 字符；两种语言保存后重新加载回读一致。截图（iPhone/iPad 各 2 张，来自 0.2.1）与描述在“等待开发者发布”状态下锁定、未改，用户决定先发布，新功能截图与描述随下一版本更新。Mac 0.3.0 正式版与移动正式版现可经生产 CloudKit 互相同步（尚未做正式版跨端联测）。
+
+## 折叠屏/可变尺寸适配审查 · 2026-11-11（开发中，未发版）
+
+- 源码核对【已验证】：未设 UIRequiresFullScreen；iPad 四向、iPhone 三向；无 UIScreen.main；无按机型写死的尺寸。单/双栏另有固定断点：`adaptLayout` 在 `size.width < 900`、宽小于高、或 `horizontalSizeClass` 为 compact 时走单栏（regular 宽度下由此决定单栏还是双栏）。多窗口（UIApplicationSupportsMultipleScenes）按既有决定保持关闭，本分支未改。
+- 【推断/待 Mac 验证】NavigationSplitView 随窗口尺寸与 size class 在单/双栏间切换；选中文档存于 store，推断不随折叠/展开丢失，运行时未测。iPad 与 compact iPhone 的品牌位置推断与改动前一致，未运行验证。
+- 本分支唯一代码改动（现方案，品牌位置条件待 Boss 确认，代码先不动）：品牌位置原按 iPad/iPhone idiom 判断，改为 idiom 为 iPad 或水平 size class 为 regular。
+- 品牌位置两个备选方案，等 Boss 定：
+  - 现方案（本分支）：iPhone 水平 size class 为 regular 即用 iPad 顶栏。Plus/Max 横屏一般为 regular 宽度（【推断】，待模拟器确认），品牌会从侧栏顶栏移到阅读区顶栏左侧，改变已确认的 iPhone 工具栏，与 AGENTS.md 冲突，须 Boss 确认。
+  - 收窄方案（分支 `feat/adaptive-layout-narrow`，已推送、未开 PR）：仅当 iPhone 水平与垂直 size class 均为 regular（折叠屏展开内屏）时才用 iPad 布局。Plus/Max 横屏为 regular×compact，品牌位置与现网一致，不违反 AGENTS.md。该前提依据 Apple 公开说明：iPhone Duo 内屏为 regular×regular，外屏竖向 compact×regular、横向 compact×compact，见 [Prepare - iPhone Duo](https://developer.apple.com/iphone-duo/prepare/) 与 Tech Talk [Prepare your app for iPhone Duo](https://developer.apple.com/videos/play/tech-talks/111461/)。Boss 若选收窄方案，可将该分支快进进本 PR 分支。
+- 未在任何真机或模拟器测试。Apple 已公布 iPhone Duo，Xcode 27.1 提供 Duo 模拟器（出处同上）。Duo 模拟器及 iPad 调整窗口验证待 Mac 执行。
 
 ## iOS 审核被拒与改进 · 2026-11-04
 
@@ -24,6 +56,7 @@
 
 方案、决策与分阶段证据见 [ICLOUD_SYNC](ICLOUD_SYNC.md)。
 
+- 启动崩溃修复：新增启动参数 `-IMDDisableCloudKit`；缺 iCloud 容器授权或带该参数时不创建 CKContainer；容器创建后、启动引擎前做账户预检，预检抛错或账户受限时关闭同步（开关置灰，状态“已关闭”）。研发已在 macOS `swift test` 自测通过，启动冒烟与界面回归待测。
 - 已完成：CloudKit 容器与两端授权；同步模型与合并规则；GitHub 来源、置顶/排序、示例移除、阅读位置同步（配色经联测后改为各设备独立）；iCloud 云盘文件夹跨设备识别与“待授权”绑定；阅读位置改为顶层内容块锚点（用户同意）并修正按字母序淘汰；“•••”新增“iCloud 同步”开关（默认开启）与状态。
 - 测试：ReaderCore 54 项、状态测试 44 项、WebKit 实际脚本 64 组合通过（真实网络 2 项按默认跳过）；Mac 与 iOS 编译通过，仅既有 `MacFindField` 告警。Mac 开发环境 CloudKit 双实例往返通过。
 - 受影响的固定回归门槛：所有语言标签——新增 15 条中英文案，模拟器中文浅色/英文深色画面通过，Mac 画面未截；功能按钮——加号与菜单三项未改；置顶分组——仅远端合并改变置顶内容，分组样式未改，状态测试通过；移动端既定功能——“•••”菜单新增一项、iPhone 模拟器画面通过，iPad 与真机未测；阅读区布局、品牌与背景、外观排版、Mac 查找、移动窄屏配色——未改动相关代码。

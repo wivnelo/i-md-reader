@@ -1,0 +1,82 @@
+{
+  "identifier": "4D0DA810-3EBB-4BC9-9625-BA31884EA513",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "2.99",
+      "familyShareable": true,
+      "internalID": "CF45DB5E-180D-428D-8567-18C91CD3C36D",
+      "localizations": [
+        {
+          "description": "Buy once, unlock forever on iPhone and iPad.",
+          "displayName": "Lifetime Unlock",
+          "locale": "en_US"
+        },
+        {
+          "description": "一次购买，永久解锁，iPhone 和 iPad 通用。",
+          "displayName": "永久解锁",
+          "locale": "zh_Hans"
+        },
+        {
+          "description": "一度の購入で永久にアンロック。iPhone と iPad で利用可。",
+          "displayName": "永久アンロック",
+          "locale": "ja"
+        },
+        {
+          "description": "한 번 구매로 영구 잠금 해제. iPhone·iPad 지원.",
+          "displayName": "평생 잠금 해제",
+          "locale": "ko"
+        },
+        {
+          "description": "一次購買，永久解鎖，iPhone 和 iPad 通用。",
+          "displayName": "永久解鎖",
+          "locale": "zh_Hant"
+        }
+      ],
+      "productID": "com.readerprototype.3z4gd8c2jp.ipadmarkdownreader.lifetime",
+      "referenceName": "Lifetime Unlock",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "0.00",
+      "familyShareable": false,
+      "internalID": "9F534810-3EBB-4BC9-9625-BA31884EA513",
+      "localizations": [
+        {
+          "description": "Try every feature free for 14 days.",
+          "displayName": "14-day Trial",
+          "locale": "en_US"
+        },
+        {
+          "description": "免费试用全部功能14天，到期后需购买永久解锁。",
+          "displayName": "14天试用",
+          "locale": "zh_Hans"
+        },
+        {
+          "description": "全機能を14日間無料でお試し。期間後は買い切りが必要です。",
+          "displayName": "14日間トライアル",
+          "locale": "ja"
+        },
+        {
+          "description": "모든 기능을 14일간 무료로 체험. 이후 구매가 필요합니다.",
+          "displayName": "14일 체험",
+          "locale": "ko"
+        },
+        {
+          "description": "免費試用全部功能14天，到期後需購買永久解鎖。",
+          "displayName": "14天試用",
+          "locale": "zh_Hant"
+        }
+      ],
+      "productID": "com.readerprototype.3z4gd8c2jp.ipadmarkdownreader.trial14d",
+      "referenceName": "14-day Trial",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {},
+  "subscriptionGroups": [],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}
