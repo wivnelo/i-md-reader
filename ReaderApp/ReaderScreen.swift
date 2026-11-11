@@ -36,6 +36,7 @@ struct ReaderScreen: View {
     #if os(iOS)
     @State private var managingOfflineCache = false
     @State private var managingPurchase = false
+    @State private var launchGate = PurchaseLaunchGate()
     #endif
     #if os(iOS)
     @State private var appearanceAvailableSize = CGSize(width: 375, height: 667)
@@ -365,9 +366,7 @@ struct ReaderScreen: View {
                         Button("iCloud 同步", systemImage: "icloud") { managingSync = true }.disabled(sync == nil)
                         #if os(iOS)
                         Button("离线缓存", systemImage: "internaldrive") { managingOfflineCache = true }
-                        if PremiumAccess.showsPurchaseEntry(config: .current) {
-                            Button("解锁 iMDReader", systemImage: "lock.open") { managingPurchase = true }
-                        }
+                        PurchaseMenuEntry(isPresented: $managingPurchase)
                         Link(destination: URL(string: "https://wivnelo.github.io/i-md-reader/privacy.html")!) {
                             Label("隐私政策", systemImage: "hand.raised")
                         }
@@ -405,6 +404,9 @@ struct ReaderScreen: View {
             renderingID = id
             if id != nil { showReadingColumn() }
         }
+        #if os(iOS)
+        .purchaseContentLock()
+        #endif
         .sheet(isPresented: $addingGitHub) { GitHubAddSheet(store: store) }
         .sheet(isPresented: $managingGitHubAccess) { GitHubAccessSheet(store: store) }
         .sheet(isPresented: $managingSync) { if let sync { SyncSheet(sync: sync) } }
@@ -412,30 +414,36 @@ struct ReaderScreen: View {
         .sheet(isPresented: $managingOfflineCache) { OfflineCacheSheet(store: store) }
         #endif
         #if os(iOS)
-        .purchaseEntry(isPresented: $managingPurchase)
+        .purchaseEntry(isPresented: $managingPurchase,
+                       openGitHub: { managingGitHubAccess = true },
+                       openSync: { managingSync = true },
+                       openCache: { managingOfflineCache = true },
+                       storeSources: store,
+                       onUnlocked: { resumePurchaseLaunch() })
         #endif
         .onOpenURL { url in
             // imdreader://open?key=… comes from the Continue Reading widget; anything else is a file to open.
             if url.scheme == "imdreader" {
                 if let key = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "key" })?.value {
-                    ReaderRouter.shared.request = .open(key)
+                    receivePurchaseLaunch(.openKey(key))
                 }
                 return
             }
-            store.openFileURL(url); showReadingColumn()
+            receivePurchaseLaunch(.openFile(url))
         }
         // Spotlight results and Shortcuts both arrive as a document key.
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
-            if let key = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String { ReaderRouter.shared.request = .open(key) }
+            if let key = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String {
+                receivePurchaseLaunch(.openKey(key))
+            }
         }
         .onReceive(ReaderRouter.shared.$request) { request in
             guard let request else { return }
             ReaderRouter.shared.request = nil
-            let key: String? = switch request {
-            case .continueReading: store.readingHistory.first?.key
-            case let .open(key): key
+            switch request {
+            case .continueReading: receivePurchaseLaunch(.continueReading)
+            case let .open(key): receivePurchaseLaunch(.openKey(key))
             }
-            if let key, store.openDocument(key: key) { showReadingColumn() }
         }
         .fileImporter(isPresented: $importing, allowedContentTypes: selectingMarkdown ? Self.markdownPickerTypes : [.folder], allowsMultipleSelection: false) { result in
             switch result {
@@ -469,6 +477,46 @@ struct ReaderScreen: View {
             find: { findFocusRequest += 1 }))
         #endif
 
+    }
+
+    private var isPurchaseLocked: Bool {
+        #if os(iOS)
+        PurchaseStore.shared.config.isEnabled && !PurchaseStore.shared.isUnlocked
+        #else
+        false
+        #endif
+    }
+
+    private func receivePurchaseLaunch(_ intent: PurchaseLaunchGate.Intent) {
+        #if os(iOS)
+        if let ready = launchGate.receive(intent, isLocked: isPurchaseLocked) {
+            performPurchaseLaunch(ready)
+        } else {
+            managingPurchase = true
+        }
+        #else
+        performPurchaseLaunch(intent)
+        #endif
+    }
+
+    private func resumePurchaseLaunch() {
+        #if os(iOS)
+        if let intent = launchGate.takePendingIfUnlocked(isPurchaseLocked) {
+            performPurchaseLaunch(intent)
+        }
+        #endif
+    }
+
+    private func performPurchaseLaunch(_ intent: PurchaseLaunchGate.Intent) {
+        switch intent {
+        case .continueReading:
+            if let key = store.readingHistory.first?.key, store.openDocument(key: key) { showReadingColumn() }
+        case let .openKey(key):
+            if store.openDocument(key: key) { showReadingColumn() }
+        case let .openFile(url):
+            store.openFileURL(url)
+            showReadingColumn()
+        }
     }
 
     private func showReadingColumn() {
