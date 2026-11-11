@@ -1,21 +1,26 @@
 (() => {
   const bridge = window.webkit.messageHandlers.reader;
   let timer;
-  const english = () => document.documentElement.dataset.uiLanguage === 'en';
-  const resourceMessages = {
-    'folder-access': ['图片需要所在文件夹的访问权限', 'Images require access to their containing folder'],
-    'unsupported-image': ['暂不支持此图片地址', 'This image address is not supported yet']
+  // [copy, copied, table, task status, folder-access note, unsupported-image note]
+  const messages = {
+    "zh-Hans": ["复制", "已复制", "表格", "任务状态", "图片需要所在文件夹的访问权限", "暂不支持此图片地址"],
+    "zh-Hant": ["複製", "已複製", "表格", "任務狀態", "圖片需要所在資料夾的存取權限", "暫不支援此圖片位址"],
+    "en": ["Copy", "Copied", "Table", "Task status", "Images require access to their containing folder", "This image address is not supported yet"],
+    "ja": ["コピー", "コピーしました", "表", "タスクの状態", "画像を含むフォルダへのアクセスが必要です", "この画像のアドレスにはまだ対応していません"],
+    "ko": ["복사", "복사됨", "표", "작업 상태", "이미지가 있는 폴더에 대한 접근 권한이 필요합니다", "아직 지원하지 않는 이미지 주소입니다"]
   };
+  const words = () => messages[document.documentElement.dataset.uiLanguage] || messages["zh-Hans"];
   const updateInterface = () => {
+    const text = words();
     document.querySelectorAll('.copy').forEach(button => {
       button.textContent = button.dataset.copied === 'true'
-        ? (english() ? 'Copied' : '已复制') : (english() ? 'Copy' : '复制');
+        ? text[1] : text[0];
     });
-    document.querySelectorAll('.table-scroll').forEach(table => table.setAttribute('aria-label', english() ? 'Table' : '表格'));
-    document.querySelectorAll('input[type=checkbox][disabled]').forEach(box => box.setAttribute('aria-label', english() ? 'Task status' : '任务状态'));
+    document.querySelectorAll('.table-scroll').forEach(table => table.setAttribute('aria-label', text[2]));
+    document.querySelectorAll('input[type=checkbox][disabled]').forEach(box => box.setAttribute('aria-label', text[3]));
     document.querySelectorAll('.resource-note[data-reader-message]').forEach(note => {
-      const message = resourceMessages[note.dataset.readerMessage];
-      if (message) note.textContent = message[english() ? 1 : 0];
+      const index = { 'folder-access': 4, 'unsupported-image': 5 }[note.dataset.readerMessage];
+      if (index !== undefined) note.textContent = text[index];
     });
   };
   updateInterface();

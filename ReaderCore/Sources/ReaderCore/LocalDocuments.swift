@@ -24,16 +24,33 @@ public struct DocumentDates: Sendable, Equatable {
         return Self(modified: values?.contentModificationDate)
     }
     public func labels(language: String, timeZone: TimeZone = .current) -> [String] {
-        let chinese = language.lowercased().hasPrefix("zh")
+        let code = language.replacingOccurrences(of: "_", with: "-").lowercased()
+        let traditional = code.hasPrefix("zh-hant") || ["zh-tw", "zh-hk", "zh-mo"].contains(where: { code == $0 || code.hasPrefix($0 + "-") })
+        let chinese = code.hasPrefix("zh") && !traditional
+        let japanese = code.hasPrefix("ja")
+        let korean = code.hasPrefix("ko")
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: chinese ? "zh_Hans_CN" : "en_US")
+        formatter.locale = Locale(identifier: traditional ? "zh_Hant_TW" : japanese ? "ja_JP" : korean ? "ko_KR" : chinese ? "zh_Hans_CN" : "en_US")
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.timeZone = timeZone
-        formatter.dateFormat = chinese ? "yyyy年M月d日 HH:mm zzz" : "MMM d, yyyy HH:mm zzz"
+        if traditional || japanese || korean {
+            formatter.setLocalizedDateFormatFromTemplate("yMMMdHHmmzzz")
+        } else {
+            formatter.dateFormat = chinese ? "yyyy年M月d日 HH:mm zzz" : "MMM d, yyyy HH:mm zzz"
+        }
         guard let date = committed ?? modified else { return [] }
-        let label = committed != nil
-            ? (chinese ? "变更时间（提交 · 当前版本）" : "Changed (commit · current revision)")
-            : (chinese ? "变更时间" : "Changed")
+        let label: String
+        if traditional {
+            label = committed != nil ? "變更時間（提交 · 目前版本）" : "變更時間"
+        } else if japanese {
+            label = committed != nil ? "変更日時（コミット · 現在のリビジョン）" : "変更日時"
+        } else if korean {
+            label = committed != nil ? "변경 시간 (커밋 · 현재 리비전)" : "변경 시간"
+        } else {
+            label = committed != nil
+                ? (chinese ? "变更时间（提交 · 当前版本）" : "Changed (commit · current revision)")
+                : (chinese ? "变更时间" : "Changed")
+        }
         return [label + " · " + formatter.string(from: date)]
     }
 }

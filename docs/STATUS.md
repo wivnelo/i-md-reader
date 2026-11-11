@@ -1,5 +1,11 @@
 # iMDReader 开发与发行状态
 
+## 五语言本地化（开发分支，未发行）· 2026-11-11
+
+分支 feat/l10n-ja-ko-zh-hant：在 zh-Hans、en 之外新增 zh-Hant、ja、ko。范围：String Catalog 158 个 key 五语言齐全，ReaderLanguage 语言解析与运行时消息表、语言选择菜单、网页控件文案、Widget、快捷指令短语与标题、日期标签，以及长文案布局保护；knownRegions 已加入三种语言。版本号未改，未提交审核、未发版。
+
+验证：scripts/check-localizations.py（JSON、五语言完整、占位符一致、严格 UTF-8、区域与 reader.js/ReaderLanguage 覆盖）通过；reader.js 用 Node 做五语言行为检查；ReaderLanguage 与 DocumentDates 在 Linux 用 Swift 6.1 独立编译并运行检查，其余 Swift 文件仅语法解析。**没有 Xcode，App 与 Widget 未编译，Swift 测试未在 Apple 平台运行，模拟器/真机的布局、语言切换、Siri 短语和 Widget 均未测。** 日、韩、繁体译文由 AI 起草，未经母语审校。固定回归门槛中语言、外观排版、Mac 查找与移动设置须在 Apple 平台回归后才能写成通过。机制与步骤见 [LOCALIZATION](LOCALIZATION.md)。
+
 ## iOS 0.3.0（53）正式发布 · 2026-11-11
 
 **iPhone/iPad 0.3.0（53）已通过 App Review，用户批准后于 2026-11-11 在 App Store Connect 手动发布，状态“可分发”，覆盖 174 个国家或地区**（App Store 页面生效可能有数小时延迟，本轮未从商店前台核验）。发布前用户批准更新推广文本（无需审核）：中文与英文均加入 iCloud 同步与“继续阅读”小组件；英文原稿 209 字符超出 170 上限，按同义缩短为 162 字符；两种语言保存后重新加载回读一致。截图（iPhone/iPad 各 2 张，来自 0.2.1）与描述在“等待开发者发布”状态下锁定、未改，用户决定先发布，新功能截图与描述随下一版本更新。Mac 0.3.0 正式版与移动正式版现可经生产 CloudKit 互相同步（尚未做正式版跨端联测）。
