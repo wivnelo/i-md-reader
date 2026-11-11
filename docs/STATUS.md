@@ -4,6 +4,12 @@
 
 **iPhone/iPad 0.3.0（53）已通过 App Review，用户批准后于 2026-11-11 在 App Store Connect 手动发布，状态“可分发”，覆盖 174 个国家或地区**（App Store 页面生效可能有数小时延迟，本轮未从商店前台核验）。发布前用户批准更新推广文本（无需审核）：中文与英文均加入 iCloud 同步与“继续阅读”小组件；英文原稿 209 字符超出 170 上限，按同义缩短为 162 字符；两种语言保存后重新加载回读一致。截图（iPhone/iPad 各 2 张，来自 0.2.1）与描述在“等待开发者发布”状态下锁定、未改，用户决定先发布，新功能截图与描述随下一版本更新。Mac 0.3.0 正式版与移动正式版现可经生产 CloudKit 互相同步（尚未做正式版跨端联测）。
 
+## 折叠屏/可变尺寸适配审查 · 2026-11-11（开发中，未发版）
+
+- 审查结论：未设UIRequiresFullScreen，iPad四向、iPhone三向；NavigationSplitView随窗口尺寸与size class在单/双栏间切换，选中文档存于store，不随折叠/展开丢失；无UIScreen.main与固定机型尺寸。多窗口（UIApplicationSupportsMultipleScenes）按既有决定保持关闭，未改。
+- 本分支唯一改动：品牌位置原按iPad/iPhone idiom判断，改为idiom为iPad或水平size class为regular，使iPhone展开内屏（regular）与iPad布局一致；iPad与compact iPhone行为不变。注意：Plus/Max机型横屏（regular）同样会把品牌放到阅读区左侧，待Mac模拟器确认是否接受。
+- 未在任何真机或模拟器测试；iPhone Duo模拟器（Xcode 27.1）及iPad调整窗口验证待Mac执行。
+
 ## iOS 审核被拒与改进 · 2026-11-04
 
 **iOS 0.2.1（51）于 2026-11-03 被 App Review 以 Guideline 4.2（Minimum Functionality）拒绝**：认为内容与功能不足以“有用、独特、像 App”，未指出崩溃或具体违规（App Store Connect 回读，无附件）。用户决定以 0.3.0 重新提交并补充原生功能。

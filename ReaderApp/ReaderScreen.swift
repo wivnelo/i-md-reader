@@ -59,6 +59,9 @@ struct ReaderScreen: View {
     @AppStorage("readerTheme") private var theme = "system"
     #if os(iOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    private var usesRegularChrome: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad || horizontalSizeClass == .regular
+    }
     #else
     @State private var findText = ""
     @State private var findFocusRequest = 0
@@ -227,7 +230,7 @@ struct ReaderScreen: View {
         #endif
             .toolbar {
                 #if os(iOS)
-                if UIDevice.current.userInterfaceIdiom != .pad {
+                if !usesRegularChrome {
                     ToolbarItem(placement: leadingToolbar) { readerBrand }
                 }
                 #endif
@@ -323,7 +326,7 @@ struct ReaderScreen: View {
         #endif
             .toolbar {
                 #if os(iOS)
-                if UIDevice.current.userInterfaceIdiom == .pad {
+                if usesRegularChrome {
                     ToolbarItem(placement: .topBarLeading) { readerBrand }
                 }
                 #endif
