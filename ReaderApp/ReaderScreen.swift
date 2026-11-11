@@ -35,6 +35,7 @@ struct ReaderScreen: View {
     @State private var managingSync = false
     #if os(iOS)
     @State private var managingOfflineCache = false
+    @State private var managingPurchase = false
     #endif
     #if os(iOS)
     @State private var appearanceAvailableSize = CGSize(width: 375, height: 667)
@@ -368,6 +369,9 @@ struct ReaderScreen: View {
                         Button("iCloud 同步", systemImage: "icloud") { managingSync = true }.disabled(sync == nil)
                         #if os(iOS)
                         Button("离线缓存", systemImage: "internaldrive") { managingOfflineCache = true }
+                        if PremiumAccess.showsPurchaseEntry(config: .current) {
+                            Button("解锁 iMDReader", systemImage: "lock.open") { managingPurchase = true }
+                        }
                         Link(destination: URL(string: "https://wivnelo.github.io/i-md-reader/privacy.html")!) {
                             Label("隐私政策", systemImage: "hand.raised")
                         }
@@ -410,6 +414,9 @@ struct ReaderScreen: View {
         .sheet(isPresented: $managingSync) { if let sync { SyncSheet(sync: sync) } }
         #if os(iOS)
         .sheet(isPresented: $managingOfflineCache) { OfflineCacheSheet(store: store) }
+        #endif
+        #if os(iOS)
+        .purchaseEntry(isPresented: $managingPurchase)
         #endif
         .onOpenURL { url in
             // imdreader://open?key=… comes from the Continue Reading widget; anything else is a file to open.
