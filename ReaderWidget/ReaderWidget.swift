@@ -27,7 +27,7 @@ private struct ReadingTimelineEntry: TimelineEntry {
 
 private struct ReadingProvider: TimelineProvider {
     func placeholder(in context: Context) -> ReadingTimelineEntry {
-        ReadingTimelineEntry(date: .now, items: [ReadingItem(key: "", title: text("为阅读留一点空间", "Make Room for Reading"),
+        ReadingTimelineEntry(date: .now, items: [ReadingItem(key: "", title: text("为阅读留一点空间", "Make Room for Reading", "為閱讀留一點空間", "読書のためのひとときを", "독서를 위한 작은 여유"),
                                                            source: "iMDReader", progress: 0.4)])
     }
     func getSnapshot(in context: Context, completion: @escaping (ReadingTimelineEntry) -> Void) {
@@ -44,8 +44,13 @@ private struct ReadingProvider: TimelineProvider {
 }
 
 /// Follows the system language; the widget has no in-app language override.
-private func text(_ chinese: String, _ english: String) -> String {
-    Locale.preferredLanguages.first?.hasPrefix("zh") == true ? chinese : english
+private func text(_ chinese: String, _ english: String, _ traditional: String, _ japanese: String, _ korean: String) -> String {
+    let code = (Locale.preferredLanguages.first ?? "").replacingOccurrences(of: "_", with: "-").lowercased()
+    if code.hasPrefix("zh-hant") || ["zh-tw", "zh-hk", "zh-mo"].contains(where: { code == $0 || code.hasPrefix($0 + "-") }) { return traditional }
+    if code.hasPrefix("zh") { return chinese }
+    if code.hasPrefix("ja") { return japanese }
+    if code.hasPrefix("ko") { return korean }
+    return english
 }
 
 /// The app's default mist palette, matching light and dark mode.
@@ -76,7 +81,7 @@ private struct ContinueReadingView: View {
             header
             if entry.items.isEmpty {
                 Spacer(minLength: 0)
-                Text(text("打开 iMDReader 开始阅读", "Open iMDReader to start reading")).font(.callout).foregroundStyle(Mist.secondary)
+                Text(text("打开 iMDReader 开始阅读", "Open iMDReader to start reading", "打開 iMDReader 開始閱讀", "iMDReader を開いて読み始めましょう", "iMDReader를 열어 읽기를 시작하세요")).font(.callout).foregroundStyle(Mist.secondary)
             } else if family == .systemSmall, let first = entry.items.first {
                 Spacer(minLength: 0)
                 row(first, titleLines: 3)
@@ -95,17 +100,26 @@ private struct ContinueReadingView: View {
             Image(systemName: "doc.text").font(.caption.weight(.semibold))
             Text("iMDReader").font(.subheadline.weight(.semibold))
             Spacer(minLength: 4)
-            if family != .systemSmall { Text(text("继续阅读", "Continue Reading")).font(.caption2).foregroundStyle(Mist.secondary) }
+            if family != .systemSmall { Text(text("继续阅读", "Continue Reading", "繼續閱讀", "続きを読む", "이어서 읽기")).font(.caption2).foregroundStyle(Mist.secondary) }
         }
         .foregroundStyle(Mist.accent)
         .lineLimit(1)
+    }
+
+    private func sourceName(_ item: ReadingItem) -> String {
+        if item.key.hasPrefix("file:") { return text("单个文件", "Single File", "單一檔案", "単一ファイル", "단일 파일") }
+        // Stable built-in sample source ID; user-created folder names stay verbatim.
+        if item.key.hasPrefix("E4072B41-1284-4D82-82BE-846370D11759|") {
+            return text("阅读示例", "Reading Samples", "閱讀範例", "サンプル", "읽기 예제")
+        }
+        return item.source
     }
 
     private func row(_ item: ReadingItem, titleLines: Int) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(item.title).font(.subheadline.weight(.semibold)).foregroundStyle(Mist.ink).lineLimit(titleLines)
             HStack(spacing: 6) {
-                Text(item.source).lineLimit(1)
+                Text(sourceName(item)).lineLimit(1)
                 Spacer(minLength: 4)
                 Text(min(1, max(0, item.progress)), format: .percent.precision(.fractionLength(0))).monospacedDigit()
             }.font(.caption2).foregroundStyle(Mist.secondary)
@@ -117,8 +131,8 @@ private struct ContinueReadingView: View {
 struct ContinueReadingWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "ContinueReading", provider: ReadingProvider()) { ContinueReadingView(entry: $0) }
-            .configurationDisplayName(text("继续阅读", "Continue Reading"))
-            .description(text("回到最近阅读的文档。", "Return to the documents you read recently."))
+            .configurationDisplayName(text("继续阅读", "Continue Reading", "繼續閱讀", "続きを読む", "이어서 읽기"))
+            .description(text("回到最近阅读的文档。", "Return to the documents you read recently.", "回到最近閱讀的文件。", "最近読んだ書類に戻ります。", "최근에 읽은 문서로 돌아갑니다."))
             .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }

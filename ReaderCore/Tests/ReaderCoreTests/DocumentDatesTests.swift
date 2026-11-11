@@ -65,3 +65,25 @@ private actor HistoryTransport {
     let limited = GitHubReader { _, _ in .init(data: Data(), status: 429) }
     await #expect(throws: (any Error).self) { try await limited.latestCommitDate(location, path: "a.md") }
 }
+
+@Test func datesSupportTraditionalChineseJapaneseAndKorean() {
+    let date = Date(timeIntervalSince1970: 0)
+    for (language, locale, local, remote) in [
+        ("zh-Hant", "zh_Hant_TW", "變更時間", "變更時間（提交 · 目前版本）"),
+        ("ja", "ja_JP", "変更日時", "変更日時（コミット · 現在のリビジョン）"),
+        ("ko", "ko_KR", "변경 시간", "변경 시간 (커밋 · 현재 리비전)")
+    ] {
+        for offset in [-8 * 3600, 8 * 3600] {
+            let zone = TimeZone(secondsFromGMT: offset)!
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: locale)
+            formatter.calendar = Calendar(identifier: .gregorian)
+            formatter.timeZone = zone
+            formatter.setLocalizedDateFormatFromTemplate("yMMMdHHmmzzz")
+            let value = formatter.string(from: date)
+            #expect(DocumentDates(modified: date).labels(language: language, timeZone: zone) == [local + " · " + value])
+            #expect(DocumentDates(modified: Date(), committed: date).labels(language: language, timeZone: zone) == [remote + " · " + value])
+            #expect(DocumentDates().labels(language: language, timeZone: zone).isEmpty)
+        }
+    }
+}

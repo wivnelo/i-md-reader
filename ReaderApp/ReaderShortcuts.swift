@@ -75,7 +75,13 @@ struct ReadingDocument: AppEntity {
     let id: String
     let title: String
     let source: String
-    var displayRepresentation: DisplayRepresentation { DisplayRepresentation(title: "\(title)", subtitle: "\(source)") }
+    private var localizedSource: String {
+        let language = ReaderLanguage(rawValue: UserDefaults.standard.string(forKey: "readerLanguage") ?? "system") ?? .system
+        if id.hasPrefix("file:") { return ReaderLanguage.message("单个文件", locale: language.locale) }
+        if id.hasPrefix("E4072B41-1284-4D82-82BE-846370D11759|") { return ReaderLanguage.message("阅读示例", locale: language.locale) }
+        return source
+    }
+    var displayRepresentation: DisplayRepresentation { DisplayRepresentation(title: "\(title)", subtitle: "\(localizedSource)") }
 }
 
 struct ReadingDocumentQuery: EntityQuery {
@@ -113,11 +119,14 @@ struct OpenReadingIntent: AppIntent {
 struct ReaderShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(intent: ContinueReadingIntent(),
-                    phrases: ["在 \(.applicationName) 继续阅读", "Continue reading in \(.applicationName)"],
+                    phrases: ["在 \(.applicationName) 继续阅读", "Continue reading in \(.applicationName)",
+                              "在 \(.applicationName) 繼續閱讀", "\(.applicationName) で続きを読む", "\(.applicationName)에서 이어서 읽기"],
                     shortTitle: "继续阅读", systemImageName: "book")
         AppShortcut(intent: OpenReadingIntent(),
                     phrases: ["用 \(.applicationName) 打开文档", "Open a document in \(.applicationName)",
-                              "用 \(.applicationName) 打开 \(\.$document)", "Open \(\.$document) in \(.applicationName)"],
+                              "用 \(.applicationName) 打开 \(\.$document)", "Open \(\.$document) in \(.applicationName)",
+                              "用 \(.applicationName) 打開文件", "\(.applicationName) で書類を開く", "\(.applicationName)에서 문서 열기",
+                              "用 \(.applicationName) 打開 \(\.$document)", "\(.applicationName) で \(\.$document) を開く", "\(.applicationName)에서 \(\.$document) 열기"],
                     shortTitle: "打开文档", systemImageName: "doc.text")
     }
 }
