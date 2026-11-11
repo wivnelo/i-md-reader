@@ -92,6 +92,20 @@ private enum AccountFailure: Error { case unavailable }
     }
 }
 
+@Test @MainActor func allowedButDisabledPreferenceNeverCreatesBackend() throws {
+    let device = try AvailabilityDevice()
+    defer { device.clean() }
+    device.defaults.set(false, forKey: "iCloudSyncEnabled")
+    var backendCalls = 0
+    let sync = ReaderSync(store: device.store, defaults: device.defaults, directory: device.root,
+                          verdict: .allowed, makeBackend: {
+        backendCalls += 1
+        return CloudKitBackend(accountStatus: { .available }, database: { fatalError("A disabled preference must never request a database") })
+    })
+    #expect(backendCalls == 0)
+    #expect(sync.isAvailable && !sync.isEnabled && sync.status == .off)
+}
+
 private actor PendingAccount {
     private var continuation: CheckedContinuation<CKAccountStatus, any Error>?
     var isWaiting: Bool { continuation != nil }
