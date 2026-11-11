@@ -9,7 +9,7 @@ let package = Package(
     targets: [
         .target(name: "ReaderStoreChecks", dependencies: ["ReaderCore"], path: "ReaderApp",
                 exclude: ["ReaderApp.swift", "ReaderScreen.swift", "ReaderWebView.swift", "Resources", "Info.plist"],
-                sources: ["ReaderStore.swift", "ReaderPalette.swift", "ReaderLanguage.swift"]),
+                sources: ["ReaderStore.swift", "ReaderPalette.swift", "ReaderLanguage.swift", "ReaderSync.swift"]),
         .testTarget(name: "ReaderStoreChecksTests", dependencies: ["ReaderStoreChecks"], path: "Tests/ReaderStoreChecksTests")
     ]
 )
