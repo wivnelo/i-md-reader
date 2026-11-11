@@ -1,0 +1,32 @@
+{
+  "identifier": "4D0DA810-3EBB-4BC9-9625-BA31884EA513",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "0.99",
+      "familyShareable": false,
+      "internalID": "CF45DB5E-180D-428D-8567-18C91CD3C36D",
+      "localizations": [
+        {
+          "description": "PLACEHOLDER one-time purchase; scope undecided.",
+          "displayName": "PLACEHOLDER iMDReader Pro",
+          "locale": "en_US"
+        },
+        {
+          "description": "PLACEHOLDER 一次性买断，付费范围未定。",
+          "displayName": "PLACEHOLDER iMDReader 买断",
+          "locale": "zh_Hans"
+        }
+      ],
+      "productID": "com.placeholder.imdreader.pro",
+      "referenceName": "PLACEHOLDER iMDReader Pro — ID, price and scope undecided",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {},
+  "subscriptionGroups": [],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}
