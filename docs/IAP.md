@@ -5,6 +5,7 @@
 - 已验证（源码/纯逻辑范围）：唯一总开关为 `ReaderCore/Sources/ReaderCore/PurchaseAccess.swift` 的 `PurchaseConfig.current`，默认关闭；仅 DEBUG 允许 `-IMDPurchaseEnabled`。关闭时无入口、不加载商品、不监听交易、不锁功能。`gatedFeatures` 为空，现有功能均未接入限制。
 - 占位：`PurchaseConfig.placeholderProductID` 为 `com.placeholder.imdreader.pro`；Boss 未定，最终见 KB PR#20，创建后不可改不可重用。本地配置 `ReaderApp/StoreKit/iMDReader.storekit` 的名称/描述与测试价格均为 PLACEHOLDER；UI 只用 `Product.displayPrice`。
 - 接入方式（待 Boss 确认后）：在 `PremiumFeature` 定义确认的功能，将其加入 `gatedFeatures`，再在 iOS 功能入口调用 `PurchaseStore.shared.isAvailable(feature)`。当前五项仅候选，不展示解锁清单，不改变既有功能。
+- 本地化：购买界面新增 14 条 String Catalog key 的繁体中文、日语、韩语译文共 42 条，为 AI 起草、待母语审校。目录条目以 comment 标注；`state` 仍为 `translated`，以免检查脚本失败。
 
 ## 验证
 
