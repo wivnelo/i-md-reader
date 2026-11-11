@@ -14,15 +14,15 @@
 
 ## 新增语言或字符串
 
-1. 在目录补齐对应语言译文，保留 key 和占位符类型；不要翻译用户内容或语言自称。
+1. 在目录补齐对应语言译文，保留 key 和占位符类型；不要翻译用户内容。语言名一律使用各语言自称（Apple 惯例），在所有界面语言下都显示为：简体中文、繁體中文、English、日本語、한국어。校验脚本 `scripts/check-localizations.py` 将这五个 key 列为白名单，豁免字形启发式和 OpenCC 繁简探测（因此 zh-Hant 中保留「简体中文」的简体字是有意的，不算混入简体）。
 2. 新语言同步 knownRegions、ReaderLanguage 解析/语言表缓存、语言 Picker、reader.js、Widget text()、日期标签及 App Shortcuts phrases。
 3. 新 SwiftUI 文案直接使用中文 LocalizedStringKey；普通 String 显示入口使用 message()，并保证目录存在同名 key。新的动态消息优先使用完整模板，避免假定译文参数位置。
 4. 补语言解析、临时 bundle 消息、日期与 WebView 测试；检查普通/iOS 与 Mac Contents/Resources 两种资源布局。
-5. 执行 `python3 scripts/check-localizations.py`（校验目录 JSON、五语言完整性、占位符一致、严格 UTF-8、knownRegions、reader.js/ReaderLanguage 覆盖；可选安装 opencc-python-reimplemented 以提示繁体里残留的简体字），再在 Mac 执行根目录 swift test 和 ReaderCore 下的 swift test；使用 scripts/check-reader-webview.sh 及 scripts/check-mac-appearance.sh /path/to/iMDReader.app。
+5. 执行 `python3 scripts/check-localizations.py`（校验目录 JSON、五语言完整性、占位符一致、严格 UTF-8、knownRegions、reader.js/ReaderLanguage 覆盖；可选安装 opencc-python-reimplemented 以提示繁体里残留的简体字，语言自称白名单除外），再在 Mac 执行根目录 swift test 和 ReaderCore 下的 swift test；使用 scripts/check-reader-webview.sh 及 scripts/check-mac-appearance.sh /path/to/iMDReader.app。
 6. 在实际打包 App 中切换所有语言与 system，检查窄屏、长文案、设置菜单、无障碍及中英文既有交互。
 
 ## 已知限制与验证边界
 
-示例文档与正文不翻译；ByteCountFormatter 与 GitHub 限流时间使用系统 locale；正文 HTML lang 保持 zh-CN，避免改变汉字字形。日语、韩语、繁体译文由 AI 起草，未经母语审校；日期用系统本地化模板（yMMMdHHmmzzz），中英文保持旧格式。语言设置控件由分段改为菜单（六个选项在 Mac 弹层与 iPhone 窄屏放不下分段）。
+示例文档与正文不翻译；ByteCountFormatter 与 GitHub 限流时间使用系统 locale；正文 HTML lang 保持 zh-CN，避免改变汉字字形。日语、韩语、繁体译文由 AI 起草，未经母语审校；日期用系统本地化模板（yMMMdHHmmzzz），中英文保持旧格式。语言设置控件目前为菜单式 Picker。是否改回分段控件等产品或 Boss 定，本分支不自行决定；备选分支 `feat/l10n-ja-ko-zh-hant-segmented` 已恢复分段（已推送、未开 PR）。五种语言加「跟随系统」共六个选项放进分段控件，iPhone 竖屏宽度可能不够（【推断】，未在真机或模拟器验证）。
 
 本轮仅在 Linux 做静态检查：目录校验脚本、JavaScript 行为检查，以及用 Swift 6.1 对 ReaderLanguage/DocumentDates 做的独立编译与运行检查、其余 Swift 文件的语法解析；没有 Xcode，未在 Xcode、模拟器或真机编译 App 与 Widget、验证布局、语言或交互。固定回归门槛中的语言标签、外观排版、Mac 查找和移动设置仍需 Apple 平台回归。

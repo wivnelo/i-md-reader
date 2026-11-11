@@ -9,6 +9,9 @@ from collections import Counter
 from pathlib import Path
 
 LANGS = ["zh-Hans", "zh-Hant", "en", "ja", "ko"]
+# Language autonyms stay in their own script in every locale (Apple convention).
+# Exempt these keys from script-sanity and OpenCC simplified-character warnings.
+LANGUAGE_AUTONYMS = {"简体中文", "繁體中文", "English", "日本語", "한국어"}
 root = Path(sys.argv[1] if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent)
 errors, warnings = [], []
 err = errors.append
@@ -82,6 +85,9 @@ for key, entry in strings.items():
         if "\n" in key and value.count("\n") != key.count("\n"):
             err(f"{key!r}: {lang} newline count differs")
     # Heuristics (warnings): script sanity for native review.
+    # Language autonyms are intentionally untranslated; see docs/LOCALIZATION.md.
+    if key in LANGUAGE_AUTONYMS:
+        continue
     ja, ko, hant = values.get("ja", ""), values.get("ko", ""), values.get("zh-Hant", "")
     if ja and re.search(r"[\u4e00-\u9fff]", key) and not re.search(r"[\u3040-\u30ff]", ja) and len(ja) > 6:
         warn(f"{key!r}: ja has no kana: {ja!r}")
