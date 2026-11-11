@@ -1,12 +1,25 @@
 import CloudKit
+import Combine
 import Foundation
 import ReaderCore
 import os
 #if os(macOS)
 import AppKit
+import Security
 #else
 import UIKit
 #endif
+
+struct CloudKitBackend: Sendable {
+    var accountStatus: @Sendable () async throws -> CKAccountStatus
+    var database: @Sendable () -> CKDatabase
+
+    static func live(containerID: String) -> CloudKitBackend {
+        let container = CKContainer(identifier: containerID)
+        return CloudKitBackend(accountStatus: { try await container.accountStatus() },
+                               database: { container.privateCloudDatabase })
+    }
+}
 
 /// Mirrors ReaderStore's shared data into the user's private CloudKit database.
 /// Local data stays the source of truth for the UI; any CloudKit failure leaves the app working as before.
@@ -15,14 +28,16 @@ import UIKit
     enum Status { case off, signedOut, syncing, synced, retrying }
     @Published private(set) var status: Status = .off
     @Published private(set) var isEnabled: Bool
+    @Published private(set) var isAvailable = true
     private struct Persisted: Codable {
         var state: SyncState
         var systemFields: [String: Data] = [:]
         var engine: CKSyncEngine.State.Serialization?
     }
     private let store: ReaderStore
-    private let container: CKContainer
-    private let database: CKDatabase
+    private let makeBackend: () -> CloudKitBackend
+    private var backend: CloudKitBackend?
+    private var startGeneration: UInt64 = 0
     private let defaults: UserDefaults
     /// A save failed during the current exchange; the engine retries on its own schedule.
     private var failedThisRound = false
@@ -38,11 +53,11 @@ import UIKit
     private let log = Logger(subsystem: "iMDReader", category: "sync")
 
     init(store: ReaderStore, defaults: UserDefaults = .standard, directory: URL? = nil,
-         container: CKContainer = CKContainer(identifier: containerID)) {
+         verdict: @autoclosure () -> CloudKitGate.Verdict = ReaderSync.currentVerdict(),
+         makeBackend: @escaping () -> CloudKitBackend = { .live(containerID: ReaderSync.containerID) }) {
         self.store = store
-        self.container = container
+        self.makeBackend = makeBackend
         self.defaults = defaults
-        database = container.privateCloudDatabase
         isEnabled = defaults.object(forKey: "iCloudSyncEnabled") as? Bool ?? true
         let folder = directory ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Sync", isDirectory: true)
@@ -52,6 +67,15 @@ import UIKit
         else { device = UUID().uuidString; defaults.set(device, forKey: "syncDeviceID") }
         persisted = (try? JSONDecoder().decode(Persisted.self, from: Data(contentsOf: fileURL)))
             ?? Persisted(state: SyncState(stamp: .legacy(device: device)))
+        let availability = verdict()
+        guard availability == .allowed else {
+            isAvailable = false
+            isEnabled = false
+            status = .off
+            if availability == .disabledByArgument { log.info("CloudKit disabled by launch argument") }
+            else { log.info("CloudKit disabled: missing container entitlement") }
+            return
+        }
         if isEnabled { start() }
         observers.append(NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: defaults, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.scheduleCapture() }
@@ -85,33 +109,76 @@ import UIKit
         return Persisted(state: state)
     }
 
-    private func start() {
-        let fresh = persisted.engine == nil
-        if fresh { persisted = Self.legacy(store, device: device) }
-        status = .syncing
-        // CKSyncEngine learns about other devices' changes through silent CloudKit pushes; no user prompt is involved.
+    static func currentVerdict() -> CloudKitGate.Verdict {
+        let arguments = ProcessInfo.processInfo.arguments
+        // Check the override before doing any entitlement I/O.
+        if arguments.contains(CloudKitGate.disableArgument) { return .disabledByArgument }
+        let containers: [String]?
         #if os(macOS)
-        NSApplication.shared.registerForRemoteNotifications()
+        if let task = SecTaskCreateFromSelf(nil) {
+            containers = SecTaskCopyValueForEntitlement(task, CloudKitGate.entitlementKey as CFString, nil) as? [String]
+        } else { containers = nil }
         #else
-        UIApplication.shared.registerForRemoteNotifications()
+        if let url = Bundle.main.executableURL,
+           let executable = try? Data(contentsOf: url, options: .mappedIfSafe),
+           let plist = CloudKitGate.entitlementsPlist(inMachO: executable) {
+            containers = CloudKitGate.containers(inEntitlementsPlist: plist)
+        } else { containers = nil }
         #endif
-        startEngine(fresh: fresh)
+        return CloudKitGate.verdict(containerID: containerID, arguments: arguments, entitledContainers: containers)
+    }
+
+    private func start(syncImmediately: Bool = false) {
+        startGeneration &+= 1
+        let generation = startGeneration
+        status = .syncing
+        let backend = self.backend ?? makeBackend()
+        self.backend = backend
         Task { [weak self] in
-            guard let self, let account = try? await self.container.accountStatus(), self.engine != nil else { return }
+            let account: CKAccountStatus
+            do { account = try await backend.accountStatus() }
+            catch {
+                guard let self, self.startGeneration == generation, self.isEnabled else { return }
+                self.disableUnavailableAccount()
+                return
+            }
+            guard let self, self.startGeneration == generation, self.isEnabled else { return }
+            guard account != .restricted else {
+                self.disableUnavailableAccount()
+                return
+            }
+            let fresh = self.persisted.engine == nil
+            if fresh { self.persisted = Self.legacy(self.store, device: self.device) }
+            // An unsigned or restricted build never reaches push registration or engine creation.
+            #if os(macOS)
+            NSApplication.shared.registerForRemoteNotifications()
+            #else
+            UIApplication.shared.registerForRemoteNotifications()
+            #endif
             if account != .available { self.status = .signedOut }
+            self.startEngine(fresh: fresh)
+            if syncImmediately { await self.syncNow() }
         }
+    }
+
+    private func disableUnavailableAccount() {
+        isAvailable = false
+        isEnabled = false
+        status = .off
+        log.info("CloudKit disabled: account unavailable or restricted")
     }
 
     /// Turning sync off stops all CloudKit traffic but keeps local data, the iCloud copy and sync bookkeeping,
     /// so turning it back on continues where it left off.
     func setEnabled(_ enabled: Bool) {
+        guard !enabled || isAvailable else { return }
         guard enabled != isEnabled else { return }
         isEnabled = enabled
         defaults.set(enabled, forKey: "iCloudSyncEnabled")
         if enabled {
-            start()
-            Task { [weak self] in await self?.syncNow() }
+            start(syncImmediately: true)
         } else {
+            startGeneration &+= 1
             capturing?.cancel(); capturing = nil
             uploading?.cancel(); uploading = nil
             engine = nil
@@ -121,7 +188,8 @@ import UIKit
     }
 
     private func startEngine(fresh: Bool) {
-        let engine = CKSyncEngine(.init(database: database, stateSerialization: persisted.engine, delegate: self))
+        guard let backend else { return }
+        let engine = CKSyncEngine(.init(database: backend.database(), stateSerialization: persisted.engine, delegate: self))
         self.engine = engine
         guard fresh else { return }
         engine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: SyncRecords.zoneID))])
