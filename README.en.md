@@ -9,7 +9,7 @@
 ## Download
 
 - **Mac:** [Download the 0.3.0 release](https://github.com/wivnelo/i-md-reader/releases/tag/v0.3.0). Supports Apple Silicon and Intel; requires macOS 14 or later.
-- **iPhone / iPad:** 0.2.1 (51) has been submitted for App Store review and is not yet available; iCloud sync will follow in a later mobile release.
+- **iPhone / iPad:** [Get 0.3.0 on the App Store](https://apps.apple.com/app/id6827371085), iOS / iPadOS 17 or later; includes iCloud sync, the Continue Reading widget, Spotlight and Shortcuts.
 
 For Mac, download the `.dmg`, open it, and drag iMDReader to Applications. A ZIP is also available. The release is Developer ID signed, notarized by Apple, and checked with Gatekeeper. You can replace an existing installation without uninstalling or clearing your library. Quit iMDReader before replacing it, then open the copy in Applications. If the Dock still opens an older copy, remove that Dock item and pin iMDReader from Applications again.
 
