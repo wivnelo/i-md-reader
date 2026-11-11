@@ -89,10 +89,18 @@ func appearanceLabelsFollowLanguageAcrossBundleLayouts(macLayout: Bool) throws {
 @Test func interfaceLanguageResolvesExplicitSystemAndUnsupportedChoices() {
     #expect(ReaderLanguage.chinese.resolved(preferred: ["en-US"]) == "zh-Hans")
     #expect(ReaderLanguage.english.resolved(preferred: ["zh-CN"]) == "en")
-    #expect(ReaderLanguage.system.resolved(preferred: ["zh-Hant-TW", "en"]) == "zh-Hans")
+    #expect(ReaderLanguage.system.resolved(preferred: ["zh-Hant-TW", "en"]) == "zh-Hant")
     #expect(ReaderLanguage.system.resolved(preferred: ["en-GB", "zh-Hans"]) == "en")
     #expect(ReaderLanguage.system.resolved(preferred: ["fr-FR", "en-US"]) == "en")
-    #expect(ReaderLanguage.system.resolved(preferred: ["ja-JP"]) == "en")
+    #expect(ReaderLanguage.system.resolved(preferred: ["ja-JP"]) == "ja")
+    for (identifier, expected) in [("ko-KR", "ko"), ("zh-HK", "zh-Hant"), ("zh-MO", "zh-Hant"), ("zh-TW", "zh-Hant"), ("zh-SG", "zh-Hans"), ("zh-CN", "zh-Hans"), ("zh", "zh-Hans"), ("fr-FR", "en"), ("zh_Hant_TW", "zh-Hant")] {
+        #expect(ReaderLanguage.system.resolved(preferred: [identifier]) == expected)
+    }
+    #expect(ReaderLanguage.system.resolved(preferred: ["fr-FR", "ko-KR", "ja-JP"]) == "ko")
+    #expect(ReaderLanguage.system.resolved(preferred: []) == "en")
+    for choice in [ReaderLanguage.traditionalChinese, .japanese, .korean] {
+        #expect(choice.resolved(preferred: ["en"]) == choice.rawValue)
+    }
 }
 
 @Test @MainActor func insertionLinePlacesSourceBeforeOrAfterTargetInEitherDirection() throws {
@@ -972,4 +980,43 @@ func optionalHistoryFailureKeepsReadingAndCredential(status: Int) async throws {
     #expect(try vault.read() == token)
     #expect(store.document?.dates.committed == nil)
     #expect(store.error == nil)
+}
+
+
+@Test(arguments: [false, true])
+func messagesUseAllLanguageTablesAndKeepInterpolationsInPlace(macLayout: Bool) throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".bundle")
+    defer { try? FileManager.default.removeItem(at: root) }
+    let resources = macLayout ? root.appendingPathComponent("Contents/Resources") : root
+    try FileManager.default.createDirectory(at: resources, withIntermediateDirectories: true)
+    if macLayout {
+        let info = ["CFBundleIdentifier": "test.imdreader.multilingual", "CFBundlePackageType": "BNDL", "CFBundleDevelopmentRegion": "zh-Hans"]
+        try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0)
+            .write(to: root.appendingPathComponent("Contents/Info.plist"))
+    }
+    let translations: [(String, String, String, String, String)] = [
+        ("ja", "更新に失敗しました。", "%@ 以降に再試行してください。", "エラー %@ が発生しました。", "アクセスを保存できません："),
+        ("ko", "새로 고침에 실패했습니다.", "%@ 이후에 다시 시도하세요.", "오류 %@ 발생.", "접근 권한을 저장할 수 없습니다: "),
+        ("zh-Hant", "重新整理失敗。", "請於 %@ 後重試。", "請求失敗（%@）。", "無法保留資料夾授權：")
+    ]
+    for (code, refresh, retry, http, access) in translations {
+        let directory = resources.appendingPathComponent(code + ".lproj")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let table = ["刷新失败，已保留之前的内容。": refresh, "GitHub 访问额度暂不可用，请在 %@ 后重试。": retry,
+                     "GitHub 请求失败（%@）。": http, "无法保留文件夹授权：": access]
+        try PropertyListSerialization.data(fromPropertyList: table, format: .binary, options: 0)
+            .write(to: directory.appendingPathComponent("Localizable.strings"))
+    }
+    let bundle = try #require(Bundle(url: root))
+    for (code, refresh, retry, http, access) in translations {
+        let locale = Locale(identifier: code == "zh-Hant" ? "zh_TW" : code + "_XX")
+        #expect(ReaderLanguage.message("刷新失败，已保留之前的内容。\nProvider detail", locale: locale, bundle: bundle) == refresh + "\nProvider detail")
+        #expect(ReaderLanguage.message("GitHub 访问额度暂不可用，请在 15:30 后重试。", locale: locale, bundle: bundle) == retry.replacingOccurrences(of: "%@", with: "15:30"))
+        #expect(ReaderLanguage.message("GitHub 请求失败（503）。", locale: locale, bundle: bundle) == http.replacingOccurrences(of: "%@", with: "503"))
+        #expect(ReaderLanguage.message("无法保留文件夹授权：Provider detail", locale: locale, bundle: bundle) == access + "Provider detail")
+        #expect(ReaderLanguage.message("未知 key", locale: locale, bundle: bundle) == "未知 key")
+    }
+    for code in ["zh-Hans", "fr-FR"] {
+        #expect(ReaderLanguage.message("刷新失败，已保留之前的内容。", locale: Locale(identifier: code), bundle: bundle) == "刷新失败，已保留之前的内容。")
+    }
 }

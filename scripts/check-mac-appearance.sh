@@ -23,7 +23,8 @@ contents = qa / 'AppearanceQA.app/Contents'
 (contents / 'MacOS').mkdir(parents=True)
 (contents / 'Resources').mkdir()
 (contents / 'Info.plist').write_bytes(plistlib.dumps({'CFBundleIdentifier': 'local.imdreader.AppearanceQA', 'CFBundleExecutable': 'AppearanceQA', 'CFBundlePackageType': 'APPL', 'LSUIElement': True}))
-shutil.copytree(app / 'Contents/Resources/en.lproj', contents / 'Resources/en.lproj')
+for localization in (app / 'Contents/Resources').glob('*.lproj'):
+    shutil.copytree(localization, contents / 'Resources' / localization.name)
 PY
 swiftc -swift-version 6 "$repo/ReaderApp/ReaderLanguage.swift" "$repo/ReaderApp/ReaderPalette.swift" \
   "$qa/Segments.swift" "$qa/Theme.swift" "$qa/Title.swift" "$repo/Tests/AppearanceViewChecks/main.swift" \
