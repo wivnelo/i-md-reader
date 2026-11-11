@@ -61,6 +61,9 @@ struct ReaderScreen: View {
     @AppStorage("readerTheme") private var theme = "system"
     #if os(iOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    private var usesRegularChrome: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad || horizontalSizeClass == .regular
+    }
     #else
     @State private var findText = ""
     @State private var findFocusRequest = 0
@@ -121,7 +124,7 @@ struct ReaderScreen: View {
                             if let root = source.url {
                                 TreeDirectory(store: store, source: source, url: root, level: 0, selection: colors.selection, draggingFolder: $draggingFolder, onOpenDocument: showReadingColumn)
                             } else {
-                                Text(store.isAwaitingAuthorization(source) ? "在这台设备上授权后即可阅读。" : "文件夹暂时无法访问，请稍后重试。")
+                                Text(store.isAwaitingAuthorization(source) ? LocalizedStringKey("在这台设备上授权后即可阅读。") : LocalizedStringKey("文件夹暂时无法访问，请稍后重试。"))
                                     .font(.caption).foregroundStyle(.secondary).padding(14)
                             }
                         } header: {
@@ -229,7 +232,7 @@ struct ReaderScreen: View {
         #endif
             .toolbar {
                 #if os(iOS)
-                if UIDevice.current.userInterfaceIdiom != .pad {
+                if !usesRegularChrome {
                     ToolbarItem(placement: leadingToolbar) { readerBrand }
                 }
                 #endif
@@ -325,7 +328,7 @@ struct ReaderScreen: View {
         #endif
             .toolbar {
                 #if os(iOS)
-                if UIDevice.current.userInterfaceIdiom == .pad {
+                if usesRegularChrome {
                     ToolbarItem(placement: .topBarLeading) { readerBrand }
                 }
                 #endif
@@ -336,7 +339,8 @@ struct ReaderScreen: View {
                                      placeholder: ReaderLanguage.message("文内查找", locale: language.locale),
                                      submit: { findRequest += 1 })
                             .padding(.leading, 8)
-                            .frame(width: 140, height: 24)
+                            .frame(minWidth: 140, idealWidth: 140, maxWidth: 220)
+                            .frame(height: 24)
                         Button { findFocusRequest += 1; findRequest += 1 } label: { Label("查找下一个", systemImage: "magnifyingglass") }
                         #else
                         Button { findRequest += 1 } label: { Label("文内查找", systemImage: "magnifyingglass") }
@@ -654,16 +658,15 @@ struct ReaderScreen: View {
             }
             VStack(alignment: .leading, spacing: 12) {
                 Text("语言").font(.subheadline)
-                #if os(macOS)
-                MacAppearanceSegments(title: "语言", options: [("跟随系统", "system"), ("简体中文", "zh-Hans"), ("English", "en")], selection: $languageValue, locale: language.locale, tint: readerTint)
-                    .frame(height: 24)
-                #else
                 Picker("语言", selection: $languageValue) {
                     Text("跟随系统").tag("system")
-                    Text("简体中文").tag("zh-Hans")
-                    Text("English").tag("en")
-                }.pickerStyle(.segmented)
-                #endif
+                    Text(verbatim: "简体中文").tag("zh-Hans")
+                    Text(verbatim: "English").tag("en")
+                    Text(verbatim: "繁體中文").tag("zh-Hant")
+                    Text(verbatim: "日本語").tag("ja")
+                    Text(verbatim: "한국어").tag("ko")
+                }.pickerStyle(.menu).labelsHidden()
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         #if os(macOS)
@@ -812,6 +815,7 @@ private struct SourceHeader: View {
             #if !os(macOS)
             Button(role: .destructive) { store.remove(source) } label: {
                 Text("移除来源").font(.subheadline).foregroundStyle(.white)
+                    .lineLimit(2).minimumScaleFactor(0.8)
                     .frame(width: actionWidth).frame(maxHeight: .infinity)
                     .background(Color.red)
             }.buttonStyle(.plain)
@@ -851,7 +855,7 @@ private struct SourceHeader: View {
         .modifier(SourceDrop(store: store, item: source.id.uuidString + "|", dragging: $draggingFolder, insertion: $insertion))
         .contextMenu {
             Button { store.togglePin(source) } label: {
-                Label(store.isPinned(source) ? "取消置顶" : "置顶来源", systemImage: store.isPinned(source) ? "pin.slash" : "pin")
+                Label(store.isPinned(source) ? LocalizedStringKey("取消置顶") : LocalizedStringKey("置顶来源"), systemImage: store.isPinned(source) ? "pin.slash" : "pin")
             }
             #if os(macOS)
             Button("移除来源", systemImage: "minus.circle", role: .destructive) { store.remove(source) }
@@ -1020,7 +1024,7 @@ private struct OfflineCacheSheet: View {
                     }
                         .disabled(store.isClearingCache || store.isLoading)
                 } footer: {
-                    Text("自动缓存读过的 GitHub 文章、已列举目录和加载过的图片。断网或限流时使用已有缓存，不下载整个仓库。清空后保留当前页面、来源和授权，未缓存内容仍需联网。")
+                    Text("自动缓存读过的 GitHub 文章、已列举目录和加载过的图片。断网或限流时使用已有缓存，不下载整个仓库。清空后保留当前页面、来源和授权，未缓存内容仍需联网。").fixedSize(horizontal: false, vertical: true)
                 }
             }
             .modifier(ReaderSheetFormStyle())
@@ -1049,7 +1053,7 @@ private struct GitHubAccessSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    Label(store.hasGitHubCredential ? "已保存授权" : "尚未保存授权", systemImage: "key")
+                    Label(store.hasGitHubCredential ? LocalizedStringKey("已保存授权") : LocalizedStringKey("尚未保存授权"), systemImage: "key")
                     SecureField("细粒度访问令牌", text: $token, prompt: Text("细粒度访问令牌"))
                         .modifier(ReaderSheetInputStyle())
         #if os(iOS)
@@ -1059,18 +1063,18 @@ private struct GitHubAccessSheet: View {
                     Button("保存授权") { update(token) }
                         .disabled(token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 } footer: {
-                    Text("令牌仅存入此设备的 Keychain，不显示已保存的令牌。保存不代表已验证仓库权限，添加来源时会检查。")
+                    Text("令牌仅存入此设备的 Keychain，不显示已保存的令牌。保存不代表已验证仓库权限，添加来源时会检查。").fixedSize(horizontal: false, vertical: true)
                 }
                 Section {
                     Link("前往 GitHub 创建令牌", destination: URL(string: "https://github.com/settings/personal-access-tokens/new")!)
                 } footer: {
-                    Text("在 GitHub 创建 fine-grained token，选择需要阅读的仓库，将 Contents 设为 Read-only，并设置有效期。不要授予写入权限。")
+                    Text("在 GitHub 创建 fine-grained token，选择需要阅读的仓库，将 Contents 设为 Read-only，并设置有效期。不要授予写入权限。").fixedSize(horizontal: false, vertical: true)
                 }
                 if store.hasGitHubCredential {
                     Section {
                         Button("清除授权", role: .destructive) { update(nil) }
                     } footer: {
-                        Text("清除本机令牌和 GitHub 阅读内容、目录及内存缓存，保留来源链接。本地文件不受影响；撤销令牌本身需到 GitHub 操作。")
+                        Text("清除本机令牌和 GitHub 阅读内容、目录及内存缓存，保留来源链接。本地文件不受影响；撤销令牌本身需到 GitHub 操作。").fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 if let failure { Text(ReaderLanguage.message(failure, locale: locale)).foregroundStyle(.red) }
@@ -1121,9 +1125,9 @@ private struct SyncSheet: View {
             Form {
                 Section {
                     Toggle("在设备间同步", isOn: Binding(get: { sync.isEnabled }, set: { sync.setEnabled($0) }))
-                    LabeledContent("状态") { Text(status) }
+                    LabeledContent("状态") { Text(status).fixedSize(horizontal: false, vertical: true) }
                 } footer: {
-                    Text("将来源、置顶与排序和阅读位置同步到你的 iCloud，在同一 Apple 账户的 Mac、iPhone、iPad 间使用。不上传文档正文，不同步 GitHub 令牌、离线缓存和外观设置。iCloud 云盘以外的本地文件夹只保留在本机；其他设备上的 iCloud 云盘文件夹需在该设备授权一次。")
+                    Text("将来源、置顶与排序和阅读位置同步到你的 iCloud，在同一 Apple 账户的 Mac、iPhone、iPad 间使用。不上传文档正文，不同步 GitHub 令牌、离线缓存和外观设置。iCloud 云盘以外的本地文件夹只保留在本机；其他设备上的 iCloud 云盘文件夹需在该设备授权一次。").fixedSize(horizontal: false, vertical: true)
                 }
             }
             .modifier(ReaderSheetFormStyle())
