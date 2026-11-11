@@ -183,10 +183,15 @@ struct PurchaseEntryModifier: ViewModifier {
     }
 
     private func languageTitle(_ language: ReaderLanguage) -> String {
-        switch language {
-        case .system: "跟随系统"
-        case .chinese: "简体中文"
-        case .english: "English"
+        // Switch on rawValue so this compiles both on this branch
+        // (system/zh-Hans/en) and on integration (also zh-Hant/ja/ko).
+        switch language.rawValue {
+        case "zh-Hans": "简体中文"
+        case "en": "English"
+        case "zh-Hant": "繁體中文"
+        case "ja": "日本語"
+        case "ko": "한국어"
+        default: "跟随系统"
         }
     }
 }
