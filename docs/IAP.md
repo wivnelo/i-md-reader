@@ -18,7 +18,7 @@ ReaderCore 的 `PurchaseAccess` 是不依赖 StoreKit/UIKit 的纯逻辑；输�
 
 开关开启且锁定时，所有 PremiumFeature 均不可用；解锁后保留 `gatedFeatures` 钩子的既有判断，默认空集合，无额外功能限制。开关关闭时全部钩子放行。
 
-到期后按 KB PR #22 提交 `40fde35` 第 11.3 节执行：阅读、打开本地文件或文件夹、GitHub 来源、阅读页、目录、文内查找、来源内容、最近文件及外观设置全部锁住，不允许只读打开已有文件。Spotlight、快捷指令、小组件和深链进入都落到购买页，并把待打开的文档/来源暂存；买断或恢复购买成功后立即回到原状态（含原先打开的文档或来源）。不删除任何用户数据。Mac 不受影响。
+到期后按 KB main 合并提交 `3bc39f7`（PR #22） 第 11.3 节执行：阅读、打开本地文件或文件夹、GitHub 来源、阅读页、目录、文内查找、来源内容、最近文件及外观设置全部锁住，不允许只读打开已有文件。Spotlight、快捷指令、小组件和深链进入都落到购买页，并把待打开的文档/来源暂存；买断或恢复购买成功后立即回到原状态（含原先打开的文档或来源）。不删除任何用户数据。Mac 不受影响。
 
 锁定层保留：购买页、恢复购买、隐私政策、联系方式与版本、语言切换、数据管理（清缓存、移除来源、清 GitHub 授权、关 iCloud 同步）。完成按钮可关闭购买页以访问这些设置，但不能绕过底层锁定。未采纳「只读打开已有文件」。
 
@@ -53,7 +53,7 @@ sandbox、TestFlight（始终沙盒）、Xcode/StoreKit 本地测试（`.xcode`�
 
 ## 家庭共享与 3.1.1
 
-买断开启家庭共享，已验证、未撤销的共享交易永久解锁。试用关闭家庭共享：试用是按 Apple ID 领取的个人一次性权益；Family Sharing 开启后不能关闭，创建时必须核对。
+买断开启家庭共享（`.storekit` 中 `lifetime` 的 `familyShareable = true`）：已验证、未撤销的买断交易，不论 `ownershipType` 为购买者还是 `.familyShared`，均永久解锁，不要求先领取试用。共享撤销按 `revocationDate` 处理。试用关闭家庭共享（`trial14d` 的 `familyShareable = false`）：每人各自试用；家庭共享来的试用交易不授予试用（`isFamilyShared` 不计起点）。Boss 于 2026-11-11 12:14（Asia/Manila）确认这两项设置。Family Sharing 开启后不能关闭，ASC 创建时必须核对。KB main `3bc39f7` 第十二节第 4 项与 3.4 仍写试用为「建议不开、未单独转达确认」，以本次 Boss 确认为准。
 
 按 Guideline 3.1.1：试用名称写明 14 天；领取前明确告知时长及到期后无法打开文档、无法继续使用全部功能，必须买断；购买前显示永久解锁价格。UI 价格只来自 `Product.displayPrice`，不写死美元金额。领取试用只需试用商品已加载；买断按钮在永久解锁价格未加载时禁用。最后 3 天 App 内再次提示；到期页提供购买、恢复及设置/支持入口。[Apple 审核指南](https://developer.apple.com/app-store/review/guidelines/#in-app-purchase)。
 
@@ -105,7 +105,7 @@ sandbox、TestFlight（始终沙盒）、Xcode/StoreKit 本地测试（`.xcode`�
 
 本轮不在真机或模拟器启动 App。视觉、五语言长文布局、iPhone 单栏旋转/iPad 双栏、明暗、现有品牌/工具栏/设置可达性以及 Apple SDK 类型检查均待 Xcode 验证，不能记为通过。运行方法与实际结果见 [STATUS](STATUS.md) 及 [StoreKit/README](../ReaderApp/StoreKit/README.md)。
 
-## 与 KB PR #22（提交 40fde35）的对齐
+## 与 KB main（合并提交 `3bc39f7`，PR #22）的对齐
 
 已对照该提交第十一节、4.3 与 9.1 实现。本仓库实现范围：4.3 老用户规则、11.3 到期入口、试用+买断状态机与测试。11.1 DSA 交易者申报只写入文档，由 Boss 在 ASC 完成。11.2 隐私政策在 PR #2 单独提交，不经本分支、不合 main。
 
