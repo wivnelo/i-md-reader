@@ -6306,6 +6306,1760 @@
           }
         }
       }
+    },
+    "正在载入价格…": {
+      "comment": "Purchase flow progress or recoverable failure; does not imply cancellation of an Apple transaction.",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在载入价格…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading price…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在載入價格…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "価格を読み込み中…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가격 불러오는 중…"
+          }
+        }
+      }
+    },
+    "正在与 App Store 通信…": {
+      "comment": "Purchase flow progress or recoverable failure; does not imply cancellation of an Apple transaction.",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在与 App Store 通信…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contacting the App Store…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在與 App Store 通訊…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store と通信中…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store와 통신 중…"
+          }
+        }
+      }
+    },
+    "正在恢复购买…": {
+      "comment": "Purchase flow progress or recoverable failure; does not imply cancellation of an Apple transaction.",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在恢复购买…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restoring purchases…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在回復購買…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入を復元中…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입 항목 복원 중…"
+          }
+        }
+      }
+    },
+    "正在验证购买…": {
+      "comment": "Purchase flow progress or recoverable failure; does not imply cancellation of an Apple transaction.",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在验证购买…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifying purchase…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在驗證購買…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入を確認中…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입 확인 중…"
+          }
+        }
+      }
+    },
+    "无法连接 App Store，请稍后重试。": {
+      "comment": "Purchase flow progress or recoverable failure; does not imply cancellation of an Apple transaction.",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法连接 App Store，请稍后重试。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to connect to the App Store. Please try again later."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法連接 App Store，請稍後重試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store に接続できません。しばらくしてから再試行してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store에 연결할 수 없습니다. 나중에 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "商品信息加载超时，请重试。": {
+      "comment": "Purchase flow progress or recoverable failure; does not imply cancellation of an Apple transaction.",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "商品信息加载超时，请重试。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading product information timed out. Please try again."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "商品資訊載入逾時，請重試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "商品情報の読み込みがタイムアウトしました。再試行してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "상품 정보를 불러오는 시간이 초과되었습니다. 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "暂时无法开始试用，仍可购买永久解锁。": {
+      "comment": "Purchase flow progress or recoverable failure; does not imply cancellation of an Apple transaction.",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时无法开始试用，仍可购买永久解锁。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The trial is temporarily unavailable. You can still purchase lifetime access."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫時無法開始試用，仍可購買永久解鎖。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在、試用を開始できません。永久アクセスの購入は引き続き可能です。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재 체험을 시작할 수 없습니다. 영구 이용권은 구입할 수 있습니다."
+          }
+        }
+      }
+    },
+    "价格载入后才能开始试用或购买。": {
+      "comment": "Purchase flow progress or recoverable failure; does not imply cancellation of an Apple transaction.",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "价格载入后才能开始试用或购买。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The price must load before you can start a trial or purchase."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "價格載入後才能開始試用或購買。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "価格が読み込まれると、試用または購入を開始できます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가격을 불러온 후 체험을 시작하거나 구입할 수 있습니다."
+          }
+        }
+      }
+    },
+    "仍在等待 App Store，请完成或取消系统购买窗口。": {
+      "comment": "Purchase flow progress or recoverable failure; does not imply cancellation of an Apple transaction.",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仍在等待 App Store，请完成或取消系统购买窗口。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Still waiting for the App Store. Complete or cancel the system purchase dialog."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仍在等待 App Store，請完成或取消系統購買視窗。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store の応答を待っています。システムの購入画面で操作を完了するか、キャンセルしてください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store 응답을 기다리는 중입니다. 시스템 구입 창에서 완료하거나 취소해 주세요."
+          }
+        }
+      }
+    },
+    "仍在等待 App Store 恢复购买。你可以重试等待，或稍后重新打开此页面。": {
+      "comment": "Purchase flow progress or recoverable failure; does not imply cancellation of an Apple transaction.",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仍在等待 App Store 恢复购买。你可以重试等待，或稍后重新打开此页面。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Still waiting for the App Store to restore purchases. Try Restore Purchases again to keep waiting, or reopen this page later."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仍在等待 App Store 回復購買。你可以重試等待，或稍後重新開啟此頁面。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store での購入の復元を待っています。「購入を復元」をもう一度選んで待つか、後でこの画面を開いてください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store에서 구입 항목을 복원하기를 기다리는 중입니다. 구입 항목 복원을 다시 눌러 기다리거나 나중에 이 페이지를 다시 열어 주세요."
+          }
+        }
+      }
+    },
+    "关闭购买页，返回资料管理": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭购买页，返回资料管理"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close purchase page and return to library management"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關閉購買頁，返回資料管理"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入画面を閉じてライブラリ管理に戻る"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구매 화면을 닫고 자료 관리로 돌아가기"
+          }
+        }
+      }
+    },
+    "本地文件、文件夹与 GitHub 阅读": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本地文件、文件夹与 GitHub 阅读"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read local files, folders and GitHub"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "閱讀本機檔案、資料夾與 GitHub"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ローカルファイル・フォルダ・GitHub を読む"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로컬 파일, 폴더 및 GitHub 읽기"
+          }
+        }
+      }
+    },
+    "离线阅读与 iCloud 阅读位置同步": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "离线阅读与 iCloud 阅读位置同步"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read offline and sync your place with iCloud"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "離線閱讀與 iCloud 閱讀位置同步"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オフライン閲覧と iCloud での読書位置同期"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오프라인 읽기 및 iCloud 읽기 위치 동기화"
+          }
+        }
+      }
+    },
+    "iPhone 与 iPad 通用，买断支持家庭共享": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone 与 iPad 通用，买断支持家庭共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Works on iPhone and iPad; lifetime unlock supports Family Sharing"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone 與 iPad 通用，買斷支援家人共享"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone・iPad 共通。買い切りはファミリー共有に対応"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone 및 iPad 공용. 영구 구매는 가족 공유 지원"
+          }
+        }
+      }
+    },
+    "试用不会自动扣费。14 天后需购买永久解锁，才能继续打开文档；你的文件与资料库会保留。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "试用不会自动扣费。14 天后需购买永久解锁，才能继续打开文档；你的文件与资料库会保留。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The trial never charges automatically. After 14 days, a lifetime unlock is required to keep opening documents. Your files and library are kept."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "試用不會自動扣款。14 天後需購買永久解鎖，才能繼續開啟文件；你的檔案與資料庫會保留。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トライアルで自動課金はされません。14 日後も文書を開くには永久アンロックの購入が必要です。ファイルとライブラリは保持されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "체험은 자동 결제되지 않습니다. 14일 후에도 문서를 열려면 영구 이용권을 구매해야 합니다. 파일과 자료는 보관됩니다."
+          }
+        }
+      }
+    },
+    "已永久解锁": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已永久解锁"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permanently unlocked"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已永久解鎖"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久アンロック済み"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "영구 이용 가능"
+          }
+        }
+      }
+    },
+    "14 天试用已结束": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14 天试用已结束"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your 14-day trial has ended"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14 天試用已結束"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14 日間のトライアルが終了しました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14일 체험이 종료되었습니다"
+          }
+        }
+      }
+    },
+    "暂时无法载入": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时无法载入"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temporarily unavailable"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫時無法載入"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在読み込めません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "지금은 불러올 수 없습니다"
+          }
+        }
+      }
+    },
+    "专注阅读，轻松开始": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "专注阅读，轻松开始"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A simple start to focused reading"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "專注閱讀，輕鬆開始"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "気軽に始めて、読書に集中"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가볍게 시작하고 읽기에 집중하세요"
+          }
+        }
+      }
+    },
+    "安心阅读，随时继续。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安心阅读，随时继续。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your reading, always ready."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安心閱讀，隨時繼續。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "いつでも、読書の続きから。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "언제든 이어서 읽으세요."
+          }
+        }
+      }
+    },
+    "继续你的阅读。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续你的阅读。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep your reading going."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "繼續你的閱讀。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読書を続けましょう。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계속 읽어보세요."
+          }
+        }
+      }
+    },
+    "让阅读，继续下去。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "让阅读，继续下去。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Let the reading continue."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "讓閱讀，繼續下去。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読書の楽しみを、これからも。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "읽는 즐거움을 이어가세요."
+          }
+        }
+      }
+    },
+    "稍后再试，也没关系。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "稍后再试，也没关系。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can try again later."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "稍後再試，也沒關係。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あとでもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "나중에 다시 시도해도 괜찮아요."
+          }
+        }
+      }
+    },
+    "先读 14 天，再决定。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先读 14 天，再决定。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read for 14 days. Then decide."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先讀 14 天，再決定。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14 日間読んでから、決める。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14일간 읽어보고 결정하세요."
+          }
+        }
+      }
+    },
+    "全部功能已解锁，无需再次购买。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部功能已解锁，无需再次购买。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every feature is unlocked. No need to buy again."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部功能已解鎖，無需再次購買。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全機能が利用できます。再購入は不要です。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모든 기능을 이용할 수 있습니다. 다시 구매할 필요가 없습니다."
+          }
+        }
+      }
+    },
+    "一次购买，永久解锁全部功能。无需订阅，也没有自动续费。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一次购买，永久解锁全部功能。无需订阅，也没有自动续费。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One purchase unlocks every feature forever. No subscription or automatic renewal."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一次購買，永久解鎖全部功能。無需訂閱，也沒有自動續訂。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一度の購入で全機能を永久に利用できます。サブスクリプションも自動更新もありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한 번 구매하면 모든 기능을 영구적으로 이용할 수 있습니다. 구독이나 자동 갱신이 없습니다."
+          }
+        }
+      }
+    },
+    "你的全部功能仍可使用。试用结束前或之后，都可以购买永久解锁。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的全部功能仍可使用。试用结束前或之后，都可以购买永久解锁。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every feature is still available. Buy a lifetime unlock before or after your trial ends."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的全部功能仍可使用。試用結束前或之後，都可以購買永久解鎖。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在は全機能を利用できます。トライアル終了の前後いつでも永久アンロックを購入できます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "지금은 모든 기능을 이용할 수 있습니다. 체험 종료 전후 언제든 영구 이용권을 구매할 수 있습니다."
+          }
+        }
+      }
+    },
+    "暂时无法获取商品信息。请重试；如果持续出现，可以联系使用支持。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时无法获取商品信息。请重试；如果持续出现，可以联系使用支持。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Product information is unavailable. Try again, or contact support if the problem continues."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫時無法取得商品資訊。請重試；如果持續出現，可以聯絡使用支援。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "商品情報を取得できません。再試行してください。問題が続く場合はサポートにお問い合わせください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "상품 정보를 가져올 수 없습니다. 다시 시도하거나 문제가 계속되면 지원팀에 문의해 주세요."
+          }
+        }
+      }
+    },
+    "免费体验全部功能。到期后，一次购买即可永久使用。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "免费体验全部功能。到期后，一次购买即可永久使用。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try every feature free. When your trial ends, one purchase unlocks lifetime access."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "免費體驗全部功能。到期後，一次購買即可永久使用。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全機能を無料でお試しください。期間終了後は一度の購入で永久に利用できます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모든 기능을 무료로 체험하세요. 체험 종료 후 한 번 구매하면 영구적으로 이용할 수 있습니다."
+          }
+        }
+      }
+    },
+    "永久解锁": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久解锁"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lifetime unlock"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久解鎖"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久アンロック"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "영구 이용권"
+          }
+        }
+      }
+    },
+    "一次购买 · 无需订阅": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一次购买 · 无需订阅"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One purchase · No subscription"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一次購買 · 無需訂閱"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一度の購入 · サブスク不要"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한 번 구매 · 구독 없음"
+          }
+        }
+      }
+    },
+    "暂不可用": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂不可用"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unavailable"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫不可用"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "利用できません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이용 불가"
+          }
+        }
+      }
+    },
+    "试用到期后暂时无法打开文档。原文件和资料库都已保留，解锁后可继续阅读。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "试用到期后暂时无法打开文档。原文件和资料库都已保留，解锁后可继续阅读。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your trial has ended, so documents cannot be opened yet. Your files and library are kept. Unlock to continue reading."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "試用到期後暫時無法開啟文件。原檔案和資料庫都已保留，解鎖後可繼續閱讀。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トライアル終了のため文書を開けません。ファイルとライブラリは保持されています。アンロックすると読書を再開できます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "체험이 종료되어 문서를 열 수 없습니다. 파일과 자료는 보관되어 있으며, 구매 후 계속 읽을 수 있습니다."
+          }
+        }
+      }
+    },
+    "开始 14 天免费试用": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始 14 天免费试用"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start 14-day free trial"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始 14 天免費試用"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14 日間無料で試す"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14일 무료 체험 시작"
+          }
+        }
+      }
+    },
+    "重新载入": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新载入"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reload"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新載入"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再読み込み"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다시 불러오기"
+          }
+        }
+      }
+    },
+    "管理资料": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理资料"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manage library"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理資料"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ライブラリを管理"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자료 관리"
+          }
+        }
+      }
+    },
+    "永久解锁 · %@": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久解锁 · %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lifetime unlock · %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久解鎖 · %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久アンロック · %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "영구 이용권 · %@"
+          }
+        }
+      }
+    },
+    "直接购买 · %@": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直接购买 · %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buy now · %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直接購買 · %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今すぐ購入 · %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "바로 구매 · %@"
+          }
+        }
+      }
+    },
+    "付款由 Apple 处理": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "付款由 Apple 处理"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Payments are handled by Apple"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "付款由 Apple 處理"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "お支払いは Apple が処理します"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "결제는 Apple에서 처리합니다"
+          }
+        }
+      }
+    },
+    "等待批准": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待批准"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Awaiting approval"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待核准"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "承認待ち"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "승인 대기 중"
+          }
+        }
+      }
+    },
+    "正在为你恢复。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在为你恢复。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restoring your purchases."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在為你恢復。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入を復元しています。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구매를 복원하고 있습니다."
+          }
+        }
+      }
+    },
+    "交给 App Store。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交给 App Store。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue in the App Store."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交給 App Store。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store で手続きを。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store에서 진행하세요."
+          }
+        }
+      }
+    },
+    "批准后，即可继续阅读。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "批准后，即可继续阅读。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read on once approved."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "核准後，即可繼續閱讀。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "承認されたら、読書の続きを。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "승인되면 계속 읽을 수 있어요."
+          }
+        }
+      }
+    },
+    "随时开始阅读。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "随时开始阅读。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start reading anytime."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隨時開始閱讀。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "いつでも読書を始められます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "언제든 읽기를 시작하세요."
+          }
+        }
+      }
+    },
+    "正在与 App Store 核对购买记录。请完成系统要求的验证。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在与 App Store 核对购买记录。请完成系统要求的验证。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking your purchases with the App Store. Please complete any system verification."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在與 App Store 核對購買記錄。請完成系統要求的驗證。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store で購入履歴を確認しています。システムの認証を完了してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store에서 구매 내역을 확인하고 있습니다. 시스템에서 요청하는 인증을 완료해 주세요."
+          }
+        }
+      }
+    },
+    "请在系统购买窗口中确认或取消。完成后会自动更新解锁状态。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请在系统购买窗口中确认或取消。完成后会自动更新解锁状态。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirm or cancel in the system purchase sheet. Access will update automatically when it finishes."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請在系統購買視窗中確認或取消。完成後會自動更新解鎖狀態。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システムの購入画面で確定またはキャンセルしてください。完了後、利用状況は自動で更新されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시스템 구매 창에서 확인하거나 취소해 주세요. 완료되면 이용 상태가 자동으로 업데이트됩니다."
+          }
+        }
+      }
+    },
+    "这次购买正在等待批准。收到结果后会自动更新，无需重复购买。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这次购买正在等待批准。收到结果后会自动更新，无需重复购买。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This purchase is awaiting approval. Access will update automatically; there is no need to buy again."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這次購買正在等待核准。收到結果後會自動更新，無需重複購買。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この購入は承認待ちです。結果が届くと自動で更新されるため、再購入は不要です。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구매 승인을 기다리고 있습니다. 결과가 도착하면 자동으로 업데이트되므로 다시 구매할 필요가 없습니다."
+          }
+        }
+      }
+    },
+    "试用目前暂不可用。你可以稍后重试，或直接购买永久使用。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "试用目前暂不可用。你可以稍后重试，或直接购买永久使用。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The trial is currently unavailable. Try again later, or buy lifetime access now."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "試用目前暫不可用。你可以稍後重試，或直接購買永久使用。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在トライアルを利用できません。あとで再試行するか、永久アンロックを購入できます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "지금은 체험을 시작할 수 없습니다. 나중에 다시 시도하거나 영구 이용권을 바로 구매할 수 있습니다."
+          }
+        }
+      }
+    },
+    "我们正在载入你所在地区的购买价格。": {
+      "comment": "付费墙已确认设计；AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我们正在载入你所在地区的购买价格。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading the purchase price for your region."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我們正在載入你所在地區的購買價格。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "お住まいの地域の価格を読み込んでいます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재 지역의 구매 가격을 불러오고 있습니다."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

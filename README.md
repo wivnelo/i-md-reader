@@ -40,4 +40,4 @@ Mac 推荐下载 `.dmg`，打开后将 iMDReader 拖入“应用程序”；也�
 
 - [使用支持](https://wivnelo.github.io/i-md-reader/support.html) · [隐私政策](https://wivnelo.github.io/i-md-reader/privacy.html) · [提交问题](https://github.com/wivnelo/i-md-reader/issues)
 
-开发回归、已知问题与验证边界见 [开发状态](docs/STATUS.md)。
+正式下载仍为 0.3.0。iPhone/iPad 的 14 天试用与一次性买断正在开发和测试中，尚未正式发布；Mac 保持免费。已按确认设计实现原生付费墙，本地购买流程和短屏 iPhone／iPad 付费页检查已完成，并补充整 App 导航与锁定回归；已按确认范围改善浅色锁定页四处文字的对比度；最新修复已作为 0.4.0（55）进入 TestFlight 内部测试；真机商品加载仍失败，后台付费 App 协议尚未生效；用户要求的旧锁定入口页已移除并通过所列受影响回归，尚未上传。整套验收与真机交易尚未完成。开发进展与验收边界见 [开发状态](docs/STATUS.md)，收费实现见 [IAP](docs/IAP.md)。

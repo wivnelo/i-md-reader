@@ -1,73 +1,7 @@
 #if os(iOS)
+import Combine
 import ReaderCore
 import SwiftUI
-
-struct PurchaseSheet: View {
-    @ObservedObject private var store = PurchaseStore.shared
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    if store.access == .unlockedLifetime {
-                        Text("已解锁")
-                    } else {
-                        if store.access == .lockedExpired {
-                            Text("14 天试用已到期，请购买永久解锁以继续使用。")
-                        } else {
-                            Text("免费试用全部功能 14 天。到期后无法打开文档或继续使用全部功能，需购买永久解锁。")
-                        }
-                        if let days = store.access.remainingDays {
-                            Text("试用剩余 \(Int64(days)) 天")
-                        }
-                        LabeledContent("价格") {
-                            if let product = store.product { Text(verbatim: product.displayPrice) }
-                            else if store.isBusy { Text("正在载入…") }
-                            else { Text(verbatim: "—") }
-                        }
-                        if store.access == .lockedNotStarted {
-                            Button("开始 14 天试用") { Task { await store.purchase(trial: true) } }
-                                .disabled(!PremiumAccess.canStartTrial(hasTrialProduct: store.trialProduct != nil, hasLifetimeProduct: store.product != nil, isBusy: store.isBusy))
-                        }
-                        Button("购买永久解锁") { Task { await store.purchase() } }
-                            .disabled(store.product == nil || store.isBusy)
-                    }
-                    Button("恢复购买") { Task { await store.restore() } }.disabled(store.isBusy)
-                    if store.product == nil || store.trialProduct == nil {
-                        Button("重试") { Task { await store.loadProduct() } }.disabled(store.isBusy)
-                    }
-                    if let message = store.message {
-                        switch message {
-                        case .productUnavailable: Text("暂时无法获取商品信息，请稍后重试。")
-                        case .pending: Text("购买正在等待批准。")
-                        case .unverified: Text("无法验证这次购买，请稍后重试。")
-                        case .purchaseFailed: Text("购买未完成，请稍后重试。")
-                        case .restored: Text("已恢复购买。")
-                        case .nothingToRestore: Text("没有可恢复的购买。")
-                        case .restoreFailed: Text("恢复购买失败，请稍后重试。")
-                        case .cancelled: Text("操作已取消。")
-                        }
-                    }
-                } footer: {
-                    Text("一次购买，永久使用，iPhone 和 iPad 通用。付款由 Apple 处理，iMDReader 不接收支付信息。")
-                }
-                Section { PurchaseLinks() }
-            }
-            .navigationTitle("试用与购买")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button { dismiss() } label: { Image(systemName: "xmark.circle.fill") } } }
-        }
-        .task { if store.product == nil || store.trialProduct == nil { await store.loadProduct() } }
-    }
-}
-
-private struct PurchaseLinks: View {
-    var body: some View {
-        Link("隐私政策", destination: URL(string: "https://wivnelo.github.io/i-md-reader/privacy.html")!)
-        Link("使用支持", destination: URL(string: "https://wivnelo.github.io/i-md-reader/support.html")!)
-    }
-}
 
 /// Used in the existing settings menu; observing here keeps its remaining days current.
 struct PurchaseMenuEntry: View {
@@ -96,6 +30,7 @@ struct PurchaseEntryModifier: ViewModifier {
     var onUnlocked: () -> Void = {}
     @ObservedObject private var store = PurchaseStore.shared
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage("readerLanguage") private var languageValue = ReaderLanguage.system.rawValue
     @State private var managingSources = false
     private let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
@@ -105,41 +40,10 @@ struct PurchaseEntryModifier: ViewModifier {
             content
                 .overlay {
                     if !store.isUnlocked {
-                        ScrollView {
-                            VStack(spacing: 20) {
-                                if store.access == .lockedExpired {
-                                    Text("14 天试用已到期，请购买永久解锁以继续使用。")
-                                } else {
-                                    Text("免费试用全部功能 14 天。到期后无法打开文档或继续使用全部功能，需购买永久解锁。")
-                                }
-                                Button("试用与购买") { isPresented = true }
-                                Menu("应用设置") {
-                                    Button("GitHub 授权", action: openGitHub)
-                                    Button("iCloud 同步", action: openSync)
-                                    Button("离线缓存", action: openCache)
-                                    if storeSources != nil {
-                                        Button("管理来源") { managingSources = true }
-                                    }
-                                }
-                                Picker("语言", selection: $languageValue) {
-                                    ForEach(ReaderLanguage.allCases) { item in
-                                        Text(languageTitle(item)).tag(item.rawValue)
-                                    }
-                                }
-                                .labelsHidden()
-                                .pickerStyle(.menu)
-                                .accessibilityLabel("语言")
-                                if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String,
-                                   let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String {
-                                    Text("版本 \(version)（\(build)）")
-                                }
-                                PurchaseLinks()
-                            }
-                            .padding()
-                            .frame(maxWidth: .infinity)
+                        PurchaseSheet(onManageSources: { managingSources = true }) {
+                            lockedSettingsMenu
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(.background)
                     }
                 }
                 .safeAreaInset(edge: .bottom) {
@@ -149,14 +53,12 @@ struct PurchaseEntryModifier: ViewModifier {
                         }.padding(8).frame(maxWidth: .infinity).background(.regularMaterial)
                     }
                 }
-                .task {
-                    await store.start()
-                    presentIfLocked()
-                }
-                .onChange(of: store.hasRefreshed) { _, _ in presentIfLocked() }
-                .onChange(of: store.access) { _, access in
-                    presentIfLocked()
-                    if access.isUnlocked { onUnlocked() }
+                .task { await store.start() }
+                .onChange(of: store.access) { previous, access in
+                    if access.isUnlocked {
+                        if !previous.isUnlocked { isPresented = false }
+                        onUnlocked()
+                    }
                 }
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active { Task { await store.refreshEntitlements() } }
@@ -169,7 +71,10 @@ struct PurchaseEntryModifier: ViewModifier {
                     }
                 }
                 .onReceive(timer) { _ in store.updateClock() }
-                .sheet(isPresented: $isPresented) { PurchaseSheet() }
+                .sheet(isPresented: Binding(
+                    get: { isPresented && store.isUnlocked },
+                    set: { isPresented = $0 }
+                )) { PurchaseSheet() }
                 .sheet(isPresented: $managingSources) {
                     if let storeSources {
                         LockedSourceManager(store: storeSources)
@@ -178,8 +83,31 @@ struct PurchaseEntryModifier: ViewModifier {
         } else { content }
     }
 
-    private func presentIfLocked() {
-        if store.hasRefreshed && !store.isUnlocked { isPresented = true }
+    private var lockedSettingsMenu: some View {
+        Menu {
+            Button("GitHub 授权", action: openGitHub)
+            Button("iCloud 同步", action: openSync)
+            Button("离线缓存", action: openCache)
+            if storeSources != nil {
+                Button("管理来源") { managingSources = true }
+            }
+            Picker("语言", selection: $languageValue) {
+                ForEach(ReaderLanguage.allCases) { item in
+                    Text(languageTitle(item)).tag(item.rawValue)
+                }
+            }
+            if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String,
+               let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String {
+                Text("版本 \(version)（\(build)）")
+            }
+        } label: {
+            Image(systemName: "ellipsis")
+                .font(.body.weight(.semibold))
+                .frame(width: 44, height: 44)
+                .background(ReaderPalette.mist.colors(dark: colorScheme == .dark).selection.opacity(0.5), in: Circle())
+        }
+        .accessibilityLabel("应用设置")
+        .accessibilityIdentifier("paywall.settings")
     }
 
     private func languageTitle(_ language: ReaderLanguage) -> String {
