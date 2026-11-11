@@ -2729,42 +2729,6 @@
         }
       }
     },
-    "解锁 iMDReader": {
-      "comment": "AI 起草、待母语审校",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unlock iMDReader"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "解锁 iMDReader"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "解鎖 iMDReader"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iMDReader のロックを解除"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iMDReader 잠금 해제"
-          }
-        }
-      }
-    },
     "价格": {
       "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
@@ -3222,7 +3186,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "一度の購入で、iPhone と iPad でずっと使えます。お支払いは Apple が処理し、iMDReader がお支払い情報を受け取ることはありません。"
+            "value": "一度の購入で、 iPhone と iPad でずっと使えます。お支払いは Apple が処理し、 iMDReader がお支払い情報を受け取ることはありません。"
           }
         },
         "ko": {
@@ -5979,6 +5943,366 @@
           "stringUnit": {
             "state": "translated",
             "value": "읽기 모양 닫기"
+          }
+        }
+      }
+    },
+    "试用与购买": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "试用与购买"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trial and Purchase"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "試用與購買"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トライアルと購入"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "체험 및 구입"
+          }
+        }
+      }
+    },
+    "开始 14 天试用": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始 14 天试用"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start 14-day Trial"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始 14 天試用"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14日間トライアルを開始"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14일 체험 시작"
+          }
+        }
+      }
+    },
+    "购买永久解锁": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "购买永久解锁"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buy Lifetime Unlock"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購買永久解鎖"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久アンロックを購入"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "평생 잠금 해제 구입"
+          }
+        }
+      }
+    },
+    "试用剩余 %lld 天": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "试用剩余 %lld 天"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld days left in trial"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "試用剩餘 %lld 天"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トライアル残り %lld 日"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "체험 기간 %lld일 남음"
+          }
+        }
+      }
+    },
+    "免费试用全部功能 14 天。到期后无法打开文档或继续使用全部功能，需购买永久解锁。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "免费试用全部功能 14 天。到期后无法打开文档或继续使用全部功能，需购买永久解锁。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try every feature free for 14 days. After the trial, you cannot open documents or continue using any features without a Lifetime Unlock purchase."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "免費試用全部功能 14 天。到期後無法開啟文件或繼續使用全部功能，需購買永久解鎖。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全機能を14日間無料でお試しいただけます。期間終了後は、永久アンロックを購入するまで書類を開いたり、すべての機能を使い続けたりすることはできません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모든 기능을 14일간 무료로 체험하세요. 체험 종료 후에는 평생 잠금 해제를 구입해야 문서를 열거나 모든 기능을 계속 사용할 수 있습니다."
+          }
+        }
+      }
+    },
+    "14 天试用已到期，请购买永久解锁以继续使用。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14 天试用已到期，请购买永久解锁以继续使用。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your 14-day trial has ended. Buy Lifetime Unlock to continue."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14 天試用已到期，請購買永久解鎖以繼續使用。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14日間のトライアルが終了しました。引き続き利用するには永久アンロックをご購入ください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14일 체험이 종료되었습니다. 계속 사용하려면 평생 잠금 해제를 구입하세요."
+          }
+        }
+      }
+    },
+    "操作已取消。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作已取消。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Operation cancelled."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作已取消。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作をキャンセルしました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "작업이 취소되었습니다."
+          }
+        }
+      }
+    },
+    "使用支持": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用支持"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Support"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用支援"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サポート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "지원"
+          }
+        }
+      }
+    },
+    "管理来源": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理来源"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manage Sources"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理來源"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ソースを管理"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "소스 관리"
+          }
+        }
+      }
+    },
+    "版本 %@（%@）": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "版本 %@（%@）"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@ (%@)"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "版本 %@（%@）"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バージョン %@（%@）"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "버전 %@(%@)"
           }
         }
       }
