@@ -15,6 +15,24 @@
             "state": "translated",
             "value": "资料来源"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "來源"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ソース"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "소스"
+          }
         }
       }
     },
@@ -31,6 +49,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "文件夹暂时无法访问，请稍后重试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此資料夾暫時無法存取，請稍後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このフォルダには一時的にアクセスできません。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 폴더에 일시적으로 접근할 수 없습니다. 나중에 다시 시도하세요."
           }
         }
       }
@@ -49,6 +85,24 @@
             "state": "translated",
             "value": "仅阅读，不修改源文件"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "僅供閱讀，不修改原始檔案"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み取り専用・元のファイルは変更しません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "읽기 전용 · 원본 파일을 변경하지 않습니다"
+          }
         }
       }
     },
@@ -58,6 +112,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Library"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "资料库"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "資料庫"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ライブラリ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "라이브러리"
           }
         }
       }
@@ -76,6 +154,24 @@
             "state": "translated",
             "value": "本地文件夹"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本機資料夾"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ローカルフォルダ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로컬 폴더"
+          }
         }
       }
     },
@@ -92,6 +188,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "公开 GitHub 链接"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "公開 GitHub 連結"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "公開 GitHub リンク"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "공개 GitHub 링크"
           }
         }
       }
@@ -110,6 +224,24 @@
             "state": "translated",
             "value": "添加来源"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入來源"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ソースを追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "소스 추가"
+          }
         }
       }
     },
@@ -126,6 +258,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "留一点空间，开始阅读"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "留一點空間，開始閱讀"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ひと息ついて、読書を始めましょう"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "여유를 갖고 읽기를 시작하세요"
           }
         }
       }
@@ -144,6 +294,24 @@
             "state": "translated",
             "value": "从左侧选择文章，或添加文件夹与公开 GitHub 链接。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從側邊欄選取文章，或加入資料夾與公開 GitHub 連結。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サイドバーで記事を選択するか、フォルダや公開 GitHub リンクを追加してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사이드바에서 글을 선택하거나 폴더 또는 공개 GitHub 링크를 추가하세요."
+          }
         }
       }
     },
@@ -160,6 +328,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "阅读"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "閱讀"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読む"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "읽기"
           }
         }
       }
@@ -178,6 +364,24 @@
             "state": "translated",
             "value": "正在打开文档…"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在開啟文件⋯"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書類を開いています…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "문서를 여는 중…"
+          }
         }
       }
     },
@@ -194,6 +398,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "这篇文章没有标题"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這篇文章沒有標題"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この記事には見出しがありません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 글에는 제목이 없습니다"
           }
         }
       }
@@ -212,6 +434,24 @@
             "state": "translated",
             "value": "文章目录"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文章目錄"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目次"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "목차"
+          }
         }
       }
     },
@@ -228,6 +468,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "阅读外观"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "閱讀外觀"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表示設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "읽기 모양"
           }
         }
       }
@@ -246,6 +504,24 @@
             "state": "translated",
             "value": "沉浸阅读"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沉浸閱讀"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "集中モード"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "집중 읽기"
+          }
         }
       }
     },
@@ -262,6 +538,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "无法完成操作"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法完成操作"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作を完了できません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "작업을 완료할 수 없습니다"
           }
         }
       }
@@ -280,6 +574,24 @@
             "state": "translated",
             "value": "好"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "好"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "확인"
+          }
         }
       }
     },
@@ -296,6 +608,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "正文字号"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "內文字級"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字サイズ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "본문 크기"
           }
         }
       }
@@ -314,6 +644,24 @@
             "state": "translated",
             "value": "%lld 点"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 點"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld ポイント"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld포인트"
+          }
         }
       }
     },
@@ -330,6 +678,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "明暗"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "明暗"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外観"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "화면 모드"
           }
         }
       }
@@ -348,6 +714,24 @@
             "state": "translated",
             "value": "跟随系统"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跟隨系統"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システム"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시스템 설정"
+          }
         }
       }
     },
@@ -364,6 +748,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "浅色"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "淺色"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ライト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "라이트"
           }
         }
       }
@@ -382,6 +784,24 @@
             "state": "translated",
             "value": "深色"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深色"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ダーク"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다크"
+          }
         }
       }
     },
@@ -398,6 +818,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "配色"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配色"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カラー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "색상 테마"
           }
         }
       }
@@ -416,6 +854,24 @@
             "state": "translated",
             "value": "雾蓝"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "霧藍"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ミストブルー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "미스트 블루"
+          }
         }
       }
     },
@@ -432,6 +888,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "远山"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "遠山"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "山並み"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "먼 산"
           }
         }
       }
@@ -450,6 +924,24 @@
             "state": "translated",
             "value": "青苔"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "青苔"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "モス"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이끼"
+          }
         }
       }
     },
@@ -466,6 +958,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "暖砂"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暖砂"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ウォームサンド"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "웜 샌드"
           }
         }
       }
@@ -484,6 +994,24 @@
             "state": "translated",
             "value": "上移"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上移"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上に移動"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "위로 이동"
+          }
         }
       }
     },
@@ -500,6 +1028,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "下移"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下移"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下に移動"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아래로 이동"
           }
         }
       }
@@ -518,6 +1064,24 @@
             "state": "translated",
             "value": "移除来源"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除來源"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ソースを削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "소스 제거"
+          }
         }
       }
     },
@@ -534,6 +1098,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "重试"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重試"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再試行"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다시 시도"
           }
         }
       }
@@ -552,6 +1134,24 @@
             "state": "translated",
             "value": "已展开"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已展開"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "展開中"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "펼쳐짐"
+          }
         }
       }
     },
@@ -568,6 +1168,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "已收起"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已收合"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "折りたたみ中"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "접힘"
           }
         }
       }
@@ -586,6 +1204,24 @@
             "state": "translated",
             "value": "长按并上下拖动可调整来源顺序"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "長按並上下拖移可調整來源順序"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "長押しして上下にドラッグすると、ソースの順序を変更できます"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "길게 누른 다음 위아래로 드래그하여 소스 순서를 변경하세요"
+          }
         }
       }
     },
@@ -602,6 +1238,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "刷新来源：%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新整理來源：%@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ソースを更新：%@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "소스 새로 고침: %@"
           }
         }
       }
@@ -620,6 +1274,24 @@
             "state": "translated",
             "value": "%@，文件夹来源"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@，資料夾來源"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@、フォルダソース"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, 폴더 소스"
+          }
         }
       }
     },
@@ -636,6 +1308,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@，GitHub 来源"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@，GitHub 來源"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@、GitHub ソース"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, GitHub 소스"
           }
         }
       }
@@ -654,6 +1344,24 @@
             "state": "translated",
             "value": "重新读取目录和当前文档，不修改源文件"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新讀取目錄與目前文件，不修改原始檔案"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォルダと現在の書類を再読み込みします。元のファイルは変更しません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "폴더와 현재 문서를 다시 불러옵니다. 원본 파일은 변경하지 않습니다"
+          }
         }
       }
     },
@@ -670,6 +1378,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "拉取最新目录和当前文档，不上传任何修改"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取得最新目錄與目前文件，不上傳任何變更"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最新のフォルダと現在の書類を取得します。変更はアップロードしません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최신 폴더와 현재 문서를 가져옵니다. 변경 사항은 업로드하지 않습니다"
           }
         }
       }
@@ -688,6 +1414,24 @@
             "state": "translated",
             "value": "没有 Markdown 文档"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒有 Markdown 文件"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown 書類がありません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown 문서가 없습니다"
+          }
         }
       }
     },
@@ -697,6 +1441,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "GitHub link"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 链接"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 連結"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub リンク"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 링크"
           }
         }
       }
@@ -715,6 +1483,24 @@
             "state": "translated",
             "value": "支持公开仓库、目录或 Markdown 文件。私有仓库暂未开放。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支援公開儲存庫、目錄或 Markdown 檔案。暫不支援私有儲存庫。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "公開リポジトリ、フォルダ、Markdown ファイルに対応しています。非公開リポジトリにはまだ対応していません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "공개 저장소, 폴더 또는 Markdown 파일을 지원합니다. 비공개 저장소는 아직 지원하지 않습니다."
+          }
         }
       }
     },
@@ -731,6 +1517,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "指定分支或标签（可选）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "指定分支或標籤（選填）"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ブランチまたはタグ（任意）"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "브랜치 또는 태그(선택 사항)"
           }
         }
       }
@@ -749,6 +1553,24 @@
             "state": "translated",
             "value": "例如 main 或 feature/notes"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "例如 main 或 feature/notes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "例：main、feature/notes"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "예: main 또는 feature/notes"
+          }
         }
       }
     },
@@ -765,6 +1587,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "链接存在歧义时填写；留空则自动解析。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連結有歧義時填寫；留空則自動解析。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リンクが曖昧な場合に指定してください。空欄の場合は自動で判別します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "링크가 명확하지 않을 때 입력하세요. 비워 두면 자동으로 해석합니다."
           }
         }
       }
@@ -783,6 +1623,24 @@
             "state": "translated",
             "value": "正在读取来源…"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在讀取來源⋯"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ソースを読み込んでいます…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "소스를 불러오는 중…"
+          }
         }
       }
     },
@@ -799,6 +1657,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "添加 GitHub 来源"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入 GitHub 來源"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub ソースを追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 소스 추가"
           }
         }
       }
@@ -817,6 +1693,24 @@
             "state": "translated",
             "value": "取消"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャンセル"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "취소"
+          }
         }
       }
     },
@@ -833,6 +1727,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "添加"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "추가"
           }
         }
       }
@@ -851,6 +1763,24 @@
             "state": "translated",
             "value": "阅读示例"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "閱讀範例"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サンプル"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "읽기 예제"
+          }
         }
       }
     },
@@ -868,6 +1798,24 @@
             "state": "translated",
             "value": "语言"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語言"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "言語"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "언어"
+          }
         }
       }
     },
@@ -881,6 +1829,24 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "简体中文"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "简体中文"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "简体中文"
+          }
+        },
+        "ko": {
           "stringUnit": {
             "state": "translated",
             "value": "简体中文"
@@ -902,6 +1868,24 @@
             "state": "translated",
             "value": "English"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
+          }
         }
       }
     },
@@ -918,6 +1902,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "阅读视图已停止，请从目录重新打开文档。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "閱讀畫面已停止，請從目錄重新開啟文件。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "閲覧画面が停止しました。サイドバーから書類を開き直してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "읽기 화면이 중지되었습니다. 사이드바에서 문서를 다시 여세요."
           }
         }
       }
@@ -936,6 +1938,24 @@
             "state": "translated",
             "value": "此链接不是 Markdown 文档。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此連結不是 Markdown 文件。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このリンクは Markdown 書類ではありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 링크는 Markdown 문서가 아닙니다."
+          }
         }
       }
     },
@@ -952,6 +1972,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "本地文件夹授权已失效，已移除 App 中的来源；原始文件未删除。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本機資料夾的存取授權已失效，已從 App 移除來源；原始檔案並未刪除。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ローカルフォルダへのアクセス許可が無効になりました。アプリからソースを削除しましたが、元のファイルは削除していません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로컬 폴더의 접근 권한이 만료되었습니다. 앱에서 소스를 제거했으며 원본 파일은 삭제하지 않았습니다."
           }
         }
       }
@@ -970,6 +2008,24 @@
             "state": "translated",
             "value": "文件夹暂时无法访问，已保留来源，请稍后重试。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此資料夾暫時無法存取，來源已保留，請稍後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このフォルダには一時的にアクセスできません。ソースは保持されています。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 폴더에 일시적으로 접근할 수 없습니다. 소스는 유지됩니다. 나중에 다시 시도하세요."
+          }
         }
       }
     },
@@ -986,6 +2042,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "刷新失败，已保留之前的内容。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新整理失敗，已保留先前的內容。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新できませんでした。以前の内容は保持されています。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새로 고침에 실패했습니다. 이전 내용은 유지됩니다."
           }
         }
       }
@@ -1004,6 +2078,24 @@
             "state": "translated",
             "value": "无法保留文件夹授权："
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法保留資料夾的存取授權："
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォルダへのアクセス許可を保存できません："
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "폴더 접근 권한을 저장할 수 없습니다: "
+          }
         }
       }
     },
@@ -1020,6 +2112,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "当前文章仍可阅读。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前文章仍可閱讀。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在の記事は引き続き読めます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재 글은 계속 읽을 수 있습니다."
           }
         }
       }
@@ -1038,6 +2148,24 @@
             "state": "translated",
             "value": "文档刷新失败，仍显示上次打开的内容。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文件重新整理失敗，仍顯示上次開啟的內容。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書類を更新できませんでした。前回開いた内容を表示しています。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "문서를 새로 고치지 못했습니다. 마지막으로 열었던 내용을 표시합니다."
+          }
         }
       }
     },
@@ -1054,6 +2182,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "这个 GitHub 来源已经添加。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 GitHub 來源已加入。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この GitHub ソースは追加済みです。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이미 추가된 GitHub 소스입니다."
           }
         }
       }
@@ -1072,6 +2218,24 @@
             "state": "translated",
             "value": "当前文章和目录已保留。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前文章與目錄已保留。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在の記事とフォルダ一覧は保持されています。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재 글과 폴더 목록은 유지됩니다."
+          }
         }
       }
     },
@@ -1088,6 +2252,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "链接超出已授权文件夹，请单独添加该文件夹。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連結超出已授權的資料夾範圍，請另行加入該資料夾。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このリンクはアクセス許可されたフォルダの範囲外です。そのフォルダを別途追加してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 링크는 접근 권한이 있는 폴더의 범위를 벗어납니다. 해당 폴더를 별도로 추가하세요."
           }
         }
       }
@@ -1106,6 +2288,24 @@
             "state": "translated",
             "value": "此版本只打开 Markdown 文档和本地图片。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此版本僅能開啟 Markdown 文件與本機圖片。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このバージョンでは Markdown 書類とローカル画像のみ開けます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 버전에서는 Markdown 문서와 로컬 이미지만 열 수 있습니다."
+          }
         }
       }
     },
@@ -1122,6 +2322,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "文档超过原型的 10 MB 保护上限。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文件超過原型版本的 10 MB 大小限制。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書類がプロトタイプの上限サイズ（10 MB）を超えています。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "문서가 프로토타입의 크기 제한인 10 MB를 초과합니다."
           }
         }
       }
@@ -1140,6 +2358,24 @@
             "state": "translated",
             "value": "无法识别文档编码，请使用 UTF-8 或 UTF-16。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法辨識文件編碼，請使用 UTF-8 或 UTF-16。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書類の文字コードを認識できません。UTF-8 または UTF-16 を使用してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "문서 인코딩을 인식할 수 없습니다. UTF-8 또는 UTF-16을 사용하세요."
+          }
         }
       }
     },
@@ -1156,6 +2392,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "请输入 github.com 的 HTTPS 仓库、目录或 Markdown 文件链接。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入 github.com 的 HTTPS 儲存庫、目錄或 Markdown 檔案連結。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "github.com のリポジトリ、フォルダ、Markdown ファイルへの HTTPS リンクを入力してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "github.com의 저장소, 폴더 또는 Markdown 파일에 대한 HTTPS 링크를 입력하세요."
           }
         }
       }
@@ -1174,6 +2428,24 @@
             "state": "translated",
             "value": "仓库路径无效或包含不支持的路径段。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "儲存庫路徑無效或包含不支援的路徑區段。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リポジトリのパスが無効か、未対応のパス要素が含まれています。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장소 경로가 유효하지 않거나 지원하지 않는 경로 요소가 포함되어 있습니다."
+          }
         }
       }
     },
@@ -1190,6 +2462,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "链接的分支与路径有歧义，请明确指定分支或标签。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連結的分支與路徑有歧義，請明確指定分支或標籤。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リンクのブランチとパスが曖昧です。ブランチまたはタグを指定してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "링크의 브랜치와 경로가 명확하지 않습니다. 브랜치 또는 태그를 지정하세요."
           }
         }
       }
@@ -1208,6 +2498,24 @@
             "state": "translated",
             "value": "未找到链接对应的分支、标签或提交。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找不到連結對應的分支、標籤或提交。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リンク先のブランチ、タグ、コミットが見つかりません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "링크에 해당하는 브랜치, 태그 또는 커밋을 찾을 수 없습니다."
+          }
         }
       }
     },
@@ -1224,6 +2532,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "目录达到 GitHub Contents API 的 1,000 项上限，暂不能保证完整展示。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目錄已達 GitHub Contents API 的 1,000 個項目上限，暫時無法保證完整顯示。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォルダが GitHub Contents API の上限（1,000 項目）に達しました。すべての項目を表示できない場合があります。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "폴더가 GitHub Contents API의 항목 제한인 1,000개에 도달했습니다. 전체 목록이 표시되지 않을 수 있습니다."
           }
         }
       }
@@ -1242,6 +2568,24 @@
             "state": "translated",
             "value": "此仓库需要有效的只读授权；当前仅接入公开读取。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此儲存庫需要有效的唯讀授權；目前僅支援公開讀取。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このリポジトリには有効な読み取り専用のアクセス許可が必要です。現在は公開リポジトリの読み取りのみに対応しています。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 저장소에는 유효한 읽기 전용 접근 권한이 필요합니다. 현재는 공개 저장소 읽기만 지원합니다."
+          }
         }
       }
     },
@@ -1258,6 +2602,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "未找到仓库或文件，也可能没有访问权限。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找不到儲存庫或檔案，也可能沒有存取權限。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リポジトリまたはファイルが見つからないか、アクセス権がありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장소 또는 파일을 찾을 수 없거나 접근 권한이 없습니다."
           }
         }
       }
@@ -1276,6 +2638,24 @@
             "state": "translated",
             "value": "GitHub 请求过于频繁，请至少等待一分钟后再试。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 請求過於頻繁，請至少等候一分鐘後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub へのリクエストが多すぎます。1 分以上待ってからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 요청이 너무 많습니다. 1분 이상 기다린 후 다시 시도하세요."
+          }
         }
       }
     },
@@ -1292,6 +2672,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "远程内容超过原型的大小保护上限。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "遠端內容超過原型版本的大小限制。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リモートコンテンツがプロトタイプの上限サイズを超えています。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "원격 콘텐츠가 프로토타입의 크기 제한을 초과합니다."
           }
         }
       }
@@ -1310,6 +2708,492 @@
             "state": "translated",
             "value": "GitHub 返回了无法识别的内容。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 傳回無法辨識的內容。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub から認識できない応答が返されました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub에서 인식할 수 없는 응답을 반환했습니다."
+          }
+        }
+      }
+    },
+    "价格": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Price"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "价格"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "價格"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "価格"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가격"
+          }
+        }
+      }
+    },
+    "购买": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buy"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "购买"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購買"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입"
+          }
+        }
+      }
+    },
+    "恢复购买": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restore Purchases"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复购买"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢復購買"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入を復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입 항목 복원"
+          }
+        }
+      }
+    },
+    "已解锁": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlocked"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已解锁"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已解鎖"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ロック解除済み"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "잠금 해제됨"
+          }
+        }
+      }
+    },
+    "正在载入…": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在载入…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在載入⋯"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み込み中…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "불러오는 중…"
+          }
+        }
+      }
+    },
+    "暂时无法获取商品信息，请稍后重试。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Product information is unavailable right now. Try again later."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时无法获取商品信息，请稍后重试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫時無法取得商品資訊，請稍後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在、商品情報を取得できません。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재 상품 정보를 가져올 수 없습니다. 나중에 다시 시도하세요."
+          }
+        }
+      }
+    },
+    "购买正在等待批准。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your purchase is waiting for approval."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "购买正在等待批准。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購買正在等待核准。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入は承認待ちです。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입 승인 대기 중입니다."
+          }
+        }
+      }
+    },
+    "无法验证这次购买，请稍后重试。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We couldn’t verify this purchase. Try again later."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法验证这次购买，请稍后重试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法驗證此次購買，請稍後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この購入を確認できませんでした。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 구입 항목을 확인할 수 없습니다. 나중에 다시 시도하세요."
+          }
+        }
+      }
+    },
+    "购买未完成，请稍后重试。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The purchase didn’t complete. Try again later."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "购买未完成，请稍后重试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購買未完成，請稍後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入を完了できませんでした。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입을 완료하지 못했습니다. 나중에 다시 시도하세요."
+          }
+        }
+      }
+    },
+    "已恢复购买。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Purchases restored."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已恢复购买。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已恢復購買。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入を復元しました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입 항목을 복원했습니다."
+          }
+        }
+      }
+    },
+    "没有可恢复的购买。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "There are no purchases to restore."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有可恢复的购买。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒有可恢復的購買。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "復元できる購入はありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복원할 구입 항목이 없습니다."
+          }
+        }
+      }
+    },
+    "恢复购买失败，请稍后重试。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restoring purchases failed. Try again later."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复购买失败，请稍后重试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢復購買失敗，請稍後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入を復元できませんでした。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입 항목을 복원하지 못했습니다. 나중에 다시 시도하세요."
+          }
+        }
+      }
+    },
+    "一次购买，永久使用，iPhone 和 iPad 通用。付款由 Apple 处理，iMDReader 不接收支付信息。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buy once, use forever on iPhone and iPad. Apple processes payment; iMDReader never receives your payment details."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一次购买，永久使用，iPhone 和 iPad 通用。付款由 Apple 处理，iMDReader 不接收支付信息。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一次購買，永久使用，iPhone 和 iPad 通用。付款由 Apple 處理，iMDReader 不會接收您的付款資訊。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一度の購入で、 iPhone と iPad でずっと使えます。お支払いは Apple が処理し、 iMDReader がお支払い情報を受け取ることはありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한 번 구입하면 iPhone과 iPad에서 영구적으로 사용할 수 있습니다. 결제는 Apple이 처리하며, iMDReader는 결제 정보를 받지 않습니다."
+          }
         }
       }
     },
@@ -1326,6 +3210,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "GitHub 访问额度暂不可用，请在 %@ 后重试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 存取額度暫時用盡，請在 %@ 後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub のレート制限に達しました。%@ 以降にもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 요청 한도에 도달했습니다. %@ 이후에 다시 시도하세요."
           }
         }
       }
@@ -1344,6 +3246,24 @@
             "state": "translated",
             "value": "GitHub 请求失败（%@）。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 請求失敗（%@）。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub リクエストに失敗しました（%@）。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 요청에 실패했습니다(%@)."
+          }
         }
       }
     },
@@ -1360,6 +3280,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "复制"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "複製"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コピー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복사"
           }
         }
       }
@@ -1378,6 +3316,24 @@
             "state": "translated",
             "value": "已复制"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已複製"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コピーしました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복사됨"
+          }
         }
       }
     },
@@ -1394,6 +3350,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "任务状态"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "任務狀態"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タスクの状態"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "작업 상태"
           }
         }
       }
@@ -1412,6 +3386,24 @@
             "state": "translated",
             "value": "表格"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表格"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "표"
+          }
         }
       }
     },
@@ -1428,6 +3420,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "[图片暂未加载]"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[圖片尚未載入]"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[画像が読み込まれていません]"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[이미지가 로드되지 않음]"
           }
         }
       }
@@ -1446,6 +3456,24 @@
             "state": "translated",
             "value": "[图片未加载：仅支持本地相对图片]"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[圖片未載入：僅支援本機相對路徑圖片]"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[画像未読み込み：ローカルの相対パス画像のみ対応]"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[이미지가 로드되지 않음: 로컬 상대 경로 이미지만 지원]"
+          }
         }
       }
     },
@@ -1463,6 +3491,24 @@
             "state": "translated",
             "value": "收起全部子目录"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收合所有子目錄"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サブフォルダをすべて折りたたむ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모든 하위 폴더 접기"
+          }
         }
       }
     },
@@ -1478,6 +3524,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开 Markdown 文件"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開啟 Markdown 檔案"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown ファイルを開く"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown 파일 열기"
           }
         }
       }
@@ -1495,6 +3559,24 @@
             "state": "translated",
             "value": "最近文件"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近使用的檔案"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近使ったファイル"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최근 파일"
+          }
         }
       }
     },
@@ -1510,6 +3592,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "重新打开"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新開啟"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開き直す"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다시 열기"
           }
         }
       }
@@ -1527,6 +3627,24 @@
             "state": "translated",
             "value": "移除记录"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除記錄"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "履歴から削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기록 제거"
+          }
         }
       }
     },
@@ -1542,6 +3660,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "单文件不包含同级图片和文档的访问权限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "單一檔案不包含同層圖片與文件的存取權限"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このファイルだけでは、同じフォルダの画像や書類にはアクセスできません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "단일 파일로는 같은 폴더의 이미지와 문서에 접근할 수 없습니다"
           }
         }
       }
@@ -1559,6 +3695,24 @@
             "state": "translated",
             "value": "添加所在文件夹"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入所在資料夾"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存先フォルダを追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "상위 폴더 추가"
+          }
         }
       }
     },
@@ -1574,6 +3728,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "单个文件"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "單一檔案"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "単一ファイル"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "단일 파일"
           }
         }
       }
@@ -1591,6 +3763,24 @@
             "state": "translated",
             "value": "请先添加所在文件夹，再打开相对图片或文档链接。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請先加入所在資料夾，再開啟相對路徑的圖片或文件連結。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "相対パスの画像や書類のリンクを開くには、先に保存先のフォルダを追加してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "상대 경로의 이미지나 문서 링크를 열려면 먼저 상위 폴더를 추가하세요."
+          }
         }
       }
     },
@@ -1606,6 +3796,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "请选择 Markdown 文件（.md 或 .markdown）。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請選取 Markdown 檔案（.md 或 .markdown）。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown ファイル（.md または .markdown）を選択してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown 파일(.md 또는 .markdown)을 선택하세요."
           }
         }
       }
@@ -1623,6 +3831,24 @@
             "state": "translated",
             "value": "文件暂时无法访问，记录已保留，请稍后重试。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此檔案暫時無法存取，記錄已保留，請稍後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このファイルには一時的にアクセスできません。履歴は保持されています。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 파일에 일시적으로 접근할 수 없습니다. 기록은 유지됩니다. 나중에 다시 시도하세요."
+          }
         }
       }
     },
@@ -1638,6 +3864,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "清空"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "消去"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "지우기"
           }
         }
       }
@@ -1655,6 +3899,24 @@
             "state": "translated",
             "value": "清空最近文件"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除最近使用的檔案"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近使ったファイルを消去"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최근 파일 지우기"
+          }
         }
       }
     },
@@ -1671,6 +3933,24 @@
             "state": "translated",
             "value": "文内查找"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文內搜尋"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ページ内検索"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "문서 내 검색"
+          }
         }
       }
     },
@@ -1680,6 +3960,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pin source"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "置顶来源"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "釘選來源"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ソースをピン留め"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "소스 고정"
           }
         }
       }
@@ -1691,6 +3995,30 @@
             "state": "translated",
             "value": "Unpin"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消置顶"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消釘選"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ピン留めを解除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "고정 해제"
+          }
         }
       }
     },
@@ -1700,6 +4028,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pinned"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已置顶"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已釘選"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ピン留め済み"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "고정됨"
           }
         }
       }
@@ -1711,6 +4063,30 @@
             "state": "translated",
             "value": "Pinned. Unpin to reorder."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已置顶，取消置顶后可拖动"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已釘選，取消釘選後即可拖移"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ピン留め済みです。解除すると並べ替えられます"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "고정되어 있습니다. 고정을 해제하면 순서를 변경할 수 있습니다"
+          }
         }
       }
     },
@@ -1720,6 +4096,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pinned"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "置顶"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "釘選"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ピン留め"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "고정"
           }
         }
       }
@@ -1731,6 +4131,30 @@
             "state": "translated",
             "value": "GitHub access"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 授权"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 授權"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub アクセス許可"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 접근 권한"
+          }
         }
       }
     },
@@ -1740,6 +4164,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Credential saved"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已保存授权"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已儲存授權"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アクセス許可を保存済み"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "접근 권한 저장됨"
           }
         }
       }
@@ -1751,6 +4199,30 @@
             "state": "translated",
             "value": "No credential saved"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚未保存授权"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚未儲存授權"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アクセス許可が未保存"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장된 접근 권한 없음"
+          }
         }
       }
     },
@@ -1760,6 +4232,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fine-grained access token"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "细粒度访问令牌"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "細緻的存取權杖"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "きめ細かなアクセストークン"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "세분화된 접근 토큰"
           }
         }
       }
@@ -1771,6 +4267,30 @@
             "state": "translated",
             "value": "Save credential"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存授权"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "儲存授權"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アクセス許可を保存"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "접근 권한 저장"
+          }
         }
       }
     },
@@ -1780,6 +4300,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Create a read-only token"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创建只读令牌"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建立唯讀權杖"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み取り専用トークンを作成"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "읽기 전용 토큰 생성"
           }
         }
       }
@@ -1791,6 +4335,30 @@
             "state": "translated",
             "value": "Create a token on GitHub"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前往 GitHub 创建令牌"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前往 GitHub 建立權杖"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub でトークンを作成"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub에서 토큰 생성"
+          }
         }
       }
     },
@@ -1800,6 +4368,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Clear credential"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除授权"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除授權"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アクセス許可を削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "접근 권한 삭제"
           }
         }
       }
@@ -1811,6 +4403,30 @@
             "state": "translated",
             "value": "Done"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完了"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료"
+          }
         }
       }
     },
@@ -1820,6 +4436,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Secure credentials are unavailable. Unlock your device and try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法访问安全凭据，请解锁设备后重试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法存取安全憑證，請解鎖裝置後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安全な認証情報にアクセスできません。デバイスのロックを解除してからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보안 자격 증명에 접근할 수 없습니다. 기기 잠금을 해제한 후 다시 시도하세요."
           }
         }
       }
@@ -1831,6 +4471,30 @@
             "state": "translated",
             "value": "Enter a fine-grained GitHub personal access token."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请输入细粒度 GitHub 访问令牌。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入細緻的 GitHub 存取權杖。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "きめ細かな GitHub アクセストークンを入力してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "세분화된 GitHub 접근 토큰을 입력하세요."
+          }
         }
       }
     },
@@ -1840,6 +4504,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cannot read this repository. Check your GitHub credential and repository read permissions."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法读取此仓库，请检查 GitHub 授权是否有效及所选仓库的读取权限。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法讀取此儲存庫，請確認 GitHub 授權是否有效，以及是否具有所選儲存庫的讀取權限。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このリポジトリを読み取れません。GitHub アクセス許可が有効か、選択したリポジトリの読み取り権限があるか確認してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 저장소를 읽을 수 없습니다. GitHub 접근 권한이 유효한지, 선택한 저장소의 읽기 권한이 있는지 확인하세요."
           }
         }
       }
@@ -1851,6 +4539,30 @@
             "state": "translated",
             "value": "Supports repositories, folders, and Markdown files. Save a read-only token in GitHub access before opening private repositories."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支持仓库、目录或 Markdown 文件。私有仓库需先在“GitHub 授权”中保存只读令牌。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支援儲存庫、目錄或 Markdown 檔案。私有儲存庫需先在「GitHub 授權」中儲存唯讀權杖。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リポジトリ、フォルダ、Markdown ファイルに対応しています。非公開リポジトリを開くには、先に「GitHub アクセス許可」で読み取り専用トークンを保存してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장소, 폴더 또는 Markdown 파일을 지원합니다. 비공개 저장소를 열려면 먼저 “GitHub 접근 권한”에서 읽기 전용 토큰을 저장하세요."
+          }
         }
       }
     },
@@ -1860,6 +4572,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Choose a document in the sidebar, or add a folder or GitHub link."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从左侧选择文章，或添加文件夹与 GitHub 链接。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從側邊欄選取文章，或加入資料夾與 GitHub 連結。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サイドバーで記事を選択するか、フォルダや GitHub リンクを追加してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사이드바에서 글을 선택하거나 폴더 또는 GitHub 링크를 추가하세요."
           }
         }
       }
@@ -1871,6 +4607,30 @@
             "state": "translated",
             "value": "The token is stored only in this device’s Keychain and is never shown again. Saving does not verify repository access; adding a source checks access."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "令牌仅存入此设备的 Keychain，不显示已保存的令牌。保存不代表已验证仓库权限，添加来源时会检查。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "權杖僅儲存在此裝置的 Keychain，不會顯示已儲存的權杖。儲存不代表已驗證儲存庫權限，加入來源時才會檢查。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トークンはこのデバイスの Keychain にのみ保存され、保存後は表示されません。保存時にはリポジトリへのアクセス権を検証しません。ソースの追加時に確認します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "토큰은 이 기기의 Keychain에만 저장되며 저장된 토큰은 표시하지 않습니다. 저장 시에는 저장소 접근 권한을 확인하지 않습니다. 소스를 추가할 때 확인합니다."
+          }
         }
       }
     },
@@ -1880,6 +4640,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Create a fine-grained token on GitHub, select repositories to read, set Contents to Read-only, and choose an expiry. Do not grant write permissions."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 GitHub 创建 fine-grained token，选择需要阅读的仓库，将 Contents 设为 Read-only，并设置有效期。不要授予写入权限。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 GitHub 建立 fine-grained token，選取要閱讀的儲存庫，將 Contents 設為 Read-only，並設定有效期限。請勿授予寫入權限。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub で fine-grained token を作成し、読みたいリポジトリを選択して、Contents を Read-only に設定し、有効期限を指定してください。書き込み権限は付与しないでください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub에서 fine-grained token을 생성하고 읽을 저장소를 선택한 다음 Contents를 Read-only로 설정하고 만료일을 지정하세요. 쓰기 권한은 부여하지 마세요."
           }
         }
       }
@@ -1891,6 +4675,30 @@
             "state": "translated",
             "value": "Removes the local token, GitHub reading content, directory listings, and memory cache. Source links and local files are kept. Revoke the token itself on GitHub."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除本机令牌和 GitHub 阅读内容、目录及内存缓存，保留来源链接。本地文件不受影响；撤销令牌本身需到 GitHub 操作。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除此裝置的權杖與 GitHub 閱讀內容、目錄及記憶體快取，保留來源連結。本機檔案不受影響；如要撤銷權杖，需前往 GitHub 操作。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデバイスのトークンと GitHub の閲覧コンテンツ、フォルダ一覧、メモリキャッシュを削除します。ソースのリンクとローカルファイルは保持されます。トークン自体を取り消すには GitHub で操作してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 기기의 토큰과 GitHub 읽기 콘텐츠, 폴더 목록, 메모리 캐시를 삭제합니다. 소스 링크와 로컬 파일은 유지됩니다. 토큰 자체를 폐기하려면 GitHub에서 처리하세요."
+          }
         }
       }
     },
@@ -1900,6 +4708,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your GitHub credential is no longer valid. Save a new token."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 授权已失效，请重新保存令牌。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 授權已失效，請重新儲存權杖。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub アクセス許可が無効になりました。トークンを保存し直してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 접근 권한이 만료되었습니다. 토큰을 다시 저장하세요."
           }
         }
       }
@@ -1911,6 +4743,30 @@
             "state": "translated",
             "value": "Offline cache"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "离线缓存"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "離線快取"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オフラインキャッシュ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오프라인 캐시"
+          }
         }
       }
     },
@@ -1920,6 +4776,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cached copy"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缓存阅读"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "快取閱讀"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャッシュから閲覧"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "캐시로 읽기"
           }
         }
       }
@@ -1931,6 +4811,30 @@
             "state": "translated",
             "value": "Storage used"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已用空间"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已用空間"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用済み容量"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용 공간"
+          }
         }
       }
     },
@@ -1940,6 +4844,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Storage limit"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "容量上限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "容量上限"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "容量の上限"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "용량 제한"
           }
         }
       }
@@ -1951,6 +4879,30 @@
             "state": "translated",
             "value": "Clear offline cache"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空离线缓存"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除離線快取"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オフラインキャッシュを消去"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오프라인 캐시 지우기"
+          }
         }
       }
     },
@@ -1960,6 +4912,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "The cache could not be fully cleared. Try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缓存未能完全清理，请重试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "快取未能完全清除，請再試一次。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャッシュを完全に消去できませんでした。もう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "캐시를 완전히 지우지 못했습니다. 다시 시도하세요."
           }
         }
       }
@@ -1971,6 +4947,30 @@
             "state": "translated",
             "value": "The network is unavailable and this content is not cached. Open it online before reading offline."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网络不可用，且此内容尚未缓存。请联网打开一次后再离线阅读。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前無法連線，且此內容尚未快取。請先連線開啟一次，再離線閱讀。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ネットワークに接続できず、このコンテンツはキャッシュされていません。一度オンラインで開いてから、オフラインでお読みください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "네트워크에 연결할 수 없으며 이 콘텐츠는 캐시되지 않았습니다. 온라인에서 한 번 연 후 오프라인으로 읽으세요."
+          }
         }
       }
     },
@@ -1980,6 +4980,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Automatically saves GitHub articles you read, directory listings you open, and images you load. Uses saved copies when offline or rate limited; does not download entire repositories. Clearing keeps the current page, sources, and credential. Uncached content needs a connection."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动缓存读过的 GitHub 文章、已列举目录和加载过的图片。断网或限流时使用已有缓存，不下载整个仓库。清空后保留当前页面、来源和授权，未缓存内容仍需联网。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動快取讀過的 GitHub 文章、已瀏覽的目錄與載入過的圖片。離線或請求受限時使用現有快取，不會下載整個儲存庫。清除後會保留目前頁面、來源與授權，尚未快取的內容仍需連線。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "閲覧した GitHub 記事、開いたフォルダ一覧、読み込んだ画像を自動でキャッシュします。オフライン時やレート制限時は既存のキャッシュを使用し、リポジトリ全体はダウンロードしません。消去後も現在のページ、ソース、アクセス許可は保持されます。未キャッシュのコンテンツには接続が必要です。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "읽은 GitHub 글, 열어 본 폴더 목록, 불러온 이미지를 자동으로 캐시합니다. 오프라인이거나 요청이 제한되면 기존 캐시를 사용하며 저장소 전체를 다운로드하지 않습니다. 캐시를 지워도 현재 페이지, 소스, 접근 권한은 유지됩니다. 캐시되지 않은 콘텐츠는 네트워크 연결이 필요합니다."
           }
         }
       }
@@ -1991,6 +5015,30 @@
             "state": "translated",
             "value": "Private cached content is encrypted and isolated by token; clearing authorization deletes it. Local original files are not copied. The cache stays on this device and does not sync across devices."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "私有缓存按令牌隔离并加密；清除授权会删除对应缓存。本地原文件不复制到缓存。缓存仅保留在本机，不是跨设备同步。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "私有內容的快取依權杖隔離並加密；清除授權時會刪除對應快取。本機原始檔案不會複製到快取。快取僅保留在此裝置，不會跨裝置同步。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "非公開コンテンツのキャッシュはトークンごとに分離して暗号化され、アクセス許可を削除すると対応するキャッシュも削除されます。ローカルの元ファイルはキャッシュにコピーしません。キャッシュはこのデバイスにのみ保存され、デバイス間では同期されません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비공개 콘텐츠 캐시는 토큰별로 분리하여 암호화하며 접근 권한을 삭제하면 해당 캐시도 삭제됩니다. 로컬 원본 파일은 캐시에 복사하지 않습니다. 캐시는 이 기기에만 저장되며 기기 간에 동기화되지 않습니다."
+          }
         }
       }
     },
@@ -2000,6 +5048,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "App settings"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用设置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App 設定"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アプリ設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 설정"
           }
         }
       }
@@ -2018,6 +5090,24 @@
             "state": "translated",
             "value": "添加本地文件夹"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入本機資料夾"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ローカルフォルダを追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로컬 폴더 추가"
+          }
         }
       }
     },
@@ -2033,6 +5123,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "发现新版本"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有可用的更新"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アップデートがあります"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "업데이트 사용 가능"
           }
         }
       }
@@ -2050,6 +5158,24 @@
             "state": "translated",
             "value": "下载更新"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下載更新"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アップデートをダウンロード"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "업데이트 다운로드"
+          }
         }
       }
     },
@@ -2066,6 +5192,24 @@
             "state": "translated",
             "value": "稍后"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "稍後"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あとで"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "나중에"
+          }
         }
       }
     },
@@ -2081,6 +5225,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "新版本可供下载，下载后请手动安装。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有新版本可供下載，下載後請手動安裝。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新しいバージョンをダウンロードできます。ダウンロード後、手動でインストールしてください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새 버전을 다운로드할 수 있습니다. 다운로드한 후 직접 설치하세요."
           }
         }
       }
@@ -2099,6 +5261,24 @@
             "state": "translated",
             "value": "隐私政策"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隱私權政策"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プライバシーポリシー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "개인정보 처리방침"
+          }
         }
       }
     },
@@ -2115,6 +5295,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "授权"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "授權"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アクセスを許可"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "접근 허용"
           }
         }
       }
@@ -2133,6 +5331,24 @@
             "state": "translated",
             "value": "在这台设备上授权后即可阅读。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此裝置授權後即可閱讀。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデバイスでアクセスを許可すると読めるようになります。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 기기에서 접근을 허용하면 읽을 수 있습니다."
+          }
         }
       }
     },
@@ -2149,6 +5365,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "所选文件夹不是同一个 iCloud 云盘位置，未完成授权。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所選資料夾不是相同的 iCloud 雲碟位置，未完成授權。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選択したフォルダは同じ iCloud Drive の場所ではないため、アクセスは許可されませんでした。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "선택한 폴더가 동일한 iCloud Drive 위치가 아니므로 접근 권한이 부여되지 않았습니다."
           }
         }
       }
@@ -2167,6 +5401,24 @@
             "state": "translated",
             "value": "iCloud 同步"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 同步"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 同期"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 동기화"
+          }
         }
       }
     },
@@ -2183,6 +5435,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "在设备间同步"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在裝置間同步"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デバイス間で同期"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기기 간 동기화"
           }
         }
       }
@@ -2201,6 +5471,24 @@
             "state": "translated",
             "value": "状态"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "狀態"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状態"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "상태"
+          }
         }
       }
     },
@@ -2217,6 +5505,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "已关闭"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已關閉"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オフ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "끔"
           }
         }
       }
@@ -2235,6 +5541,24 @@
             "state": "translated",
             "value": "iCloud 未登录"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 尚未登入"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud に未サインイン"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud에 로그인하지 않음"
+          }
         }
       }
     },
@@ -2251,6 +5575,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在同步…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在同步⋯"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同期中…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "동기화 중…"
           }
         }
       }
@@ -2269,6 +5611,24 @@
             "state": "translated",
             "value": "已同步"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已同步"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同期済み"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "동기화됨"
+          }
         }
       }
     },
@@ -2285,6 +5645,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "暂时无法同步，稍后自动重试"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫時無法同步，稍後將自動重試"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在同期できません。あとで自動的に再試行します"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "지금은 동기화할 수 없습니다. 나중에 자동으로 다시 시도합니다"
           }
         }
       }
@@ -2303,6 +5681,24 @@
             "state": "translated",
             "value": "将来源、置顶与排序和阅读位置同步到你的 iCloud，在同一 Apple 账户的 Mac、iPhone、iPad 间使用。不上传文档正文，不同步 GitHub 令牌、离线缓存和外观设置。iCloud 云盘以外的本地文件夹只保留在本机；其他设备上的 iCloud 云盘文件夹需在该设备授权一次。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將來源、釘選與排序及閱讀位置同步至你的 iCloud，可在使用相同 Apple 帳號的 Mac、iPhone、iPad 間使用。不會上傳文件內文，也不會同步 GitHub 權杖、離線快取與外觀設定。iCloud 雲碟以外的本機資料夾只保留在此裝置；來自其他裝置的 iCloud 雲碟資料夾，需在各裝置上授權一次。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ソース、ピン留めと並び順、読書位置を iCloud 経由で同期し、同じ Apple Account にサインインした Mac、iPhone、iPad で使えます。書類の本文はアップロードせず、GitHub トークン、オフラインキャッシュ、表示設定は同期しません。iCloud Drive 以外のローカルフォルダはこのデバイスにのみ保持されます。他のデバイスの iCloud Drive フォルダは、各デバイスで一度アクセスを許可する必要があります。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "소스, 고정 및 정렬 순서, 읽기 위치를 iCloud를 통해 동기화하여 동일한 Apple 계정으로 로그인한 Mac, iPhone, iPad에서 사용할 수 있습니다. 문서 본문은 업로드하지 않으며 GitHub 토큰, 오프라인 캐시, 화면 설정은 동기화하지 않습니다. iCloud Drive 외부의 로컬 폴더는 이 기기에만 유지됩니다. 다른 기기의 iCloud Drive 폴더는 각 기기에서 한 번씩 접근을 허용해야 합니다."
+          }
         }
       }
     },
@@ -2319,6 +5715,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "继续阅读"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "繼續閱讀"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "続きを読む"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이어서 읽기"
           }
         }
       }
@@ -2337,6 +5751,24 @@
             "state": "translated",
             "value": "打开上次阅读的文档，回到上次的位置。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開啟上次閱讀的文件，回到上次的位置。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前回読んだ書類を、前回の位置で開きます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "마지막으로 읽은 문서를 이전 위치에서 엽니다."
+          }
         }
       }
     },
@@ -2353,6 +5785,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开文档"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開啟文件"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書類を開く"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "문서 열기"
           }
         }
       }
@@ -2371,6 +5821,24 @@
             "state": "translated",
             "value": "打开最近阅读过的一篇文档。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開啟最近閱讀過的一篇文件。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近読んだ書類を開きます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최근에 읽은 문서를 엽니다."
+          }
         }
       }
     },
@@ -2387,6 +5855,454 @@
           "stringUnit": {
             "state": "translated",
             "value": "文档"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文件"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書類"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "문서"
+          }
+        }
+      }
+    },
+    "查找下一个": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Find Next"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查找下一个"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尋找下一個"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次を検索"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다음 찾기"
+          }
+        }
+      }
+    },
+    "关闭阅读外观": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close Reading Appearance"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭阅读外观"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關閉閱讀外觀"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表示設定を閉じる"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "읽기 모양 닫기"
+          }
+        }
+      }
+    },
+    "试用与购买": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "试用与购买"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trial and Purchase"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "試用與購買"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トライアルと購入"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "체험 및 구입"
+          }
+        }
+      }
+    },
+    "开始 14 天试用": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始 14 天试用"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start 14-day Trial"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始 14 天試用"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14日間トライアルを開始"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14일 체험 시작"
+          }
+        }
+      }
+    },
+    "购买永久解锁": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "购买永久解锁"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buy Lifetime Unlock"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購買永久解鎖"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久アンロックを購入"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "평생 잠금 해제 구입"
+          }
+        }
+      }
+    },
+    "试用剩余 %lld 天": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "试用剩余 %lld 天"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld days left in trial"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "試用剩餘 %lld 天"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トライアル残り %lld 日"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "체험 기간 %lld일 남음"
+          }
+        }
+      }
+    },
+    "免费试用全部功能 14 天。到期后无法打开文档或继续使用全部功能，需购买永久解锁。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "免费试用全部功能 14 天。到期后无法打开文档或继续使用全部功能，需购买永久解锁。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try every feature free for 14 days. After the trial, you cannot open documents or continue using any features without a Lifetime Unlock purchase."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "免費試用全部功能 14 天。到期後無法開啟文件或繼續使用全部功能，需購買永久解鎖。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全機能を14日間無料でお試しいただけます。期間終了後は、永久アンロックを購入するまで書類を開いたり、すべての機能を使い続けたりすることはできません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모든 기능을 14일간 무료로 체험하세요. 체험 종료 후에는 평생 잠금 해제를 구입해야 문서를 열거나 모든 기능을 계속 사용할 수 있습니다."
+          }
+        }
+      }
+    },
+    "14 天试用已到期，请购买永久解锁以继续使用。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14 天试用已到期，请购买永久解锁以继续使用。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your 14-day trial has ended. Buy Lifetime Unlock to continue."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14 天試用已到期，請購買永久解鎖以繼續使用。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14日間のトライアルが終了しました。引き続き利用するには永久アンロックをご購入ください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14일 체험이 종료되었습니다. 계속 사용하려면 평생 잠금 해제를 구입하세요."
+          }
+        }
+      }
+    },
+    "操作已取消。": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作已取消。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Operation cancelled."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作已取消。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作をキャンセルしました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "작업이 취소되었습니다."
+          }
+        }
+      }
+    },
+    "使用支持": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用支持"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Support"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用支援"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サポート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "지원"
+          }
+        }
+      }
+    },
+    "管理来源": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理来源"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manage Sources"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理來源"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ソースを管理"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "소스 관리"
+          }
+        }
+      }
+    },
+    "版本 %@（%@）": {
+      "comment": "AI 起草、待母语审校",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "版本 %@（%@）"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@ (%@)"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "版本 %@（%@）"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バージョン %@（%@）"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "버전 %@(%@)"
           }
         }
       }

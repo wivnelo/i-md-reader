@@ -29,7 +29,7 @@ import WebKit
         let script = try! String(contentsOf: resources.appendingPathComponent("reader.js"), encoding: .utf8)
         config.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true, in: .defaultClient))
         for width: CGFloat in [320, 390, 768, 1100] {
-            for language in ["en", "zh-Hans"] {
+            for language in ["en", "zh-Hans", "zh-Hant", "ja", "ko"] {
                 for dark in [false, true] {
                     for committed in [false, true] {
                         for empty in [false, true] {
@@ -46,7 +46,7 @@ import WebKit
         web.setFrameSize(NSSize(width: item.width, height: 700))
         let css = try! String(contentsOf: resources.appendingPathComponent("reader.css"), encoding: .utf8)
         let notes = "<p><span class='resource-note' data-reader-message='folder-access'>图片需要所在文件夹的访问权限</span></p><p><span class='resource-note' data-reader-message='unsupported-image'>暂不支持此图片地址</span></p>"
-        let body = item.empty ? "" : "<h1>Reading Notes 阅读笔记</h1>\(notes)<section class='codeblock'><header><span>Swift</span><button class='copy' type='button'>复制</button></header><pre><code>let number = 42</code></pre></section><div id='reading-anchor'>Keep this reading position</div>" + String(repeating: "<p>Long document reading position fixture.</p>", count: 70)
+        let body = item.empty ? "" : "<h1>Reading Notes 阅读笔记</h1>\(notes)<section class='codeblock'><header><span>Swift</span><button class='copy' type='button'>复制</button></header><pre><code>let number = 42</code></pre></section><div class='table-scroll'><table><tr><td>Table fixture</td></tr></table></div><input type='checkbox' disabled><div id='reading-anchor'>Keep this reading position</div>" + String(repeating: "<p>Long document reading position fixture.</p>", count: 70)
         web.loadHTMLString("""
         <html data-ui-language="\(item.language)" data-theme="\(item.dark ? "dark" : "light")"><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'none'; connect-src 'none'"><style>\(css)</style></head><body style="font-size:17px"><article><div id="reader-file-dates" class="file-dates" hidden></div>\(body)</article></body></html>
         """, baseURL: nil)
@@ -88,15 +88,30 @@ import WebKit
                 fail("reading position changed by \(String(describing: delta))")
             }
             // Exercise the actual isolated reader script through DOM mutations.
-            for language in ["en", "zh-Hans", "en", item.language] {
+            for language in ["en", "zh-Hans", "zh-Hant", "ja", "ko", "unknown", item.language] {
                 _ = try await evaluate("document.documentElement.dataset.uiLanguage='\(language)';")
                 let notes = try await evaluate("Array.from(document.querySelectorAll('.resource-note')).map(x=>x.textContent)") as? [String]
-                let expected = language == "en" ? ["Images require access to their containing folder", "This image address is not supported yet"] : ["图片需要所在文件夹的访问权限", "暂不支持此图片地址"]
+                let messages = [
+                    "en": ["Images require access to their containing folder", "This image address is not supported yet"],
+                    "zh-Hans": ["图片需要所在文件夹的访问权限", "暂不支持此图片地址"],
+                    "zh-Hant": ["圖片需要所在資料夾的存取權限", "暫不支援此圖片位址"],
+                    "ja": ["画像を含むフォルダへのアクセスが必要です", "この画像のアドレスにはまだ対応していません"],
+                    "ko": ["이미지가 있는 폴더에 대한 접근 권한이 필요합니다", "아직 지원하지 않는 이미지 주소입니다"]
+                ]
+                let expected = messages[language] ?? messages["zh-Hans"]!
                 guard notes == expected else { fail("resource language \(language): \(String(describing: notes))") }
+                let controls = ["en": ["Copy", "Table", "Task status"], "zh-Hans": ["复制", "表格", "任务状态"],
+                                "zh-Hant": ["複製", "表格", "任務狀態"], "ja": ["コピー", "表", "タスクの状態"],
+                                "ko": ["복사", "표", "작업 상태"]]
+                let labels = try await evaluate("[document.querySelector('.copy').textContent, document.querySelector('.table-scroll').getAttribute('aria-label'), document.querySelector('input[type=checkbox]').getAttribute('aria-label')]") as? [String]
+                guard labels == (controls[language] ?? controls["zh-Hans"]!) else { fail("control labels \(language)") }
             }
             _ = try await evaluate("document.querySelector('.copy').click();")
             for _ in 0..<100 where copied.isEmpty { try await Task.sleep(for: .milliseconds(5)) }
             guard copied == "let number = 42" else { fail("isolated copy bridge") }
+            let copiedLabels = ["en": "Copied", "zh-Hans": "已复制", "zh-Hant": "已複製", "ja": "コピーしました", "ko": "복사됨"]
+            let copiedLabel = try await evaluate("document.querySelector('.copy').textContent") as? String
+            guard copiedLabel == copiedLabels[item.language] else { fail("localized copied state") }
             copied = ""
             // A block anchor brings the same block back to the top after a font change.
             anchor = nil
