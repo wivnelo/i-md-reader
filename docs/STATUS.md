@@ -12,9 +12,13 @@
 
 ## 折叠屏/可变尺寸适配审查 · 2026-11-11（开发中，未发版）
 
-- 审查结论：未设UIRequiresFullScreen，iPad四向、iPhone三向；NavigationSplitView随窗口尺寸与size class在单/双栏间切换，选中文档存于store，不随折叠/展开丢失；无UIScreen.main与固定机型尺寸。多窗口（UIApplicationSupportsMultipleScenes）按既有决定保持关闭，未改。
-- 本分支唯一改动：品牌位置原按iPad/iPhone idiom判断，改为idiom为iPad或水平size class为regular，使iPhone展开内屏（regular）与iPad布局一致；iPad与compact iPhone行为不变。注意：Plus/Max机型横屏（regular）同样会把品牌放到阅读区左侧，待Mac模拟器确认是否接受。
-- 未在任何真机或模拟器测试；iPhone Duo模拟器（Xcode 27.1）及iPad调整窗口验证待Mac执行。
+- 源码核对【已验证】：未设 UIRequiresFullScreen；iPad 四向、iPhone 三向；无 UIScreen.main；无按机型写死的尺寸。单/双栏另有固定断点：`adaptLayout` 在 `size.width < 900`、宽小于高、或 `horizontalSizeClass` 为 compact 时走单栏（regular 宽度下由此决定单栏还是双栏）。多窗口（UIApplicationSupportsMultipleScenes）按既有决定保持关闭，本分支未改。
+- 【推断/待 Mac 验证】NavigationSplitView 随窗口尺寸与 size class 在单/双栏间切换；选中文档存于 store，推断不随折叠/展开丢失，运行时未测。iPad 与 compact iPhone 的品牌位置推断与改动前一致，未运行验证。
+- 本分支唯一代码改动（现方案，品牌位置条件待 Boss 确认，代码先不动）：品牌位置原按 iPad/iPhone idiom 判断，改为 idiom 为 iPad 或水平 size class 为 regular。
+- 品牌位置两个备选方案，等 Boss 定：
+  - 现方案（本分支）：iPhone 水平 size class 为 regular 即用 iPad 顶栏。Plus/Max 横屏一般为 regular 宽度（【推断】，待模拟器确认），品牌会从侧栏顶栏移到阅读区顶栏左侧，改变已确认的 iPhone 工具栏，与 AGENTS.md 冲突，须 Boss 确认。
+  - 收窄方案（分支 `feat/adaptive-layout-narrow`，已推送、未开 PR）：仅当 iPhone 水平与垂直 size class 均为 regular（折叠屏展开内屏）时才用 iPad 布局。Plus/Max 横屏为 regular×compact，品牌位置与现网一致，不违反 AGENTS.md。该前提依据 Apple 公开说明：iPhone Duo 内屏为 regular×regular，外屏竖向 compact×regular、横向 compact×compact，见 [Prepare - iPhone Duo](https://developer.apple.com/iphone-duo/prepare/) 与 Tech Talk [Prepare your app for iPhone Duo](https://developer.apple.com/videos/play/tech-talks/111461/)。Boss 若选收窄方案，可将该分支快进进本 PR 分支。
+- 未在任何真机或模拟器测试。Apple 已公布 iPhone Duo，Xcode 27.1 提供 Duo 模拟器（出处同上）。Duo 模拟器及 iPad 调整窗口验证待 Mac 执行。
 
 ## iOS 审核被拒与改进 · 2026-11-04
 
