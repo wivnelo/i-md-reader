@@ -612,8 +612,8 @@ struct ReaderScreen: View {
                 Text("语言").font(.subheadline)
                 Picker("语言", selection: $languageValue) {
                     Text("跟随系统").tag("system")
-                    Text("简体中文").tag("zh-Hans")
-                    Text("English").tag("en")
+                    Text(verbatim: "简体中文").tag("zh-Hans")
+                    Text(verbatim: "English").tag("en")
                     Text(verbatim: "繁體中文").tag("zh-Hant")
                     Text(verbatim: "日本語").tag("ja")
                     Text(verbatim: "한국어").tag("ko")
