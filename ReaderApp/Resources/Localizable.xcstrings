@@ -2730,6 +2730,7 @@
       }
     },
     "解锁 iMDReader": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2743,10 +2744,29 @@
             "state": "translated",
             "value": "解锁 iMDReader"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解鎖 iMDReader"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iMDReader のロックを解除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iMDReader 잠금 해제"
+          }
         }
       }
     },
     "价格": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2760,10 +2780,29 @@
             "state": "translated",
             "value": "价格"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "價格"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "価格"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가격"
+          }
         }
       }
     },
     "购买": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2777,10 +2816,29 @@
             "state": "translated",
             "value": "购买"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購買"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입"
+          }
         }
       }
     },
     "恢复购买": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2794,10 +2852,29 @@
             "state": "translated",
             "value": "恢复购买"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢復購買"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入を復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입 항목 복원"
+          }
         }
       }
     },
     "已解锁": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2811,10 +2888,29 @@
             "state": "translated",
             "value": "已解锁"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已解鎖"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ロック解除済み"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "잠금 해제됨"
+          }
         }
       }
     },
     "正在载入…": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2828,10 +2924,29 @@
             "state": "translated",
             "value": "正在载入…"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在載入⋯"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み込み中…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "불러오는 중…"
+          }
         }
       }
     },
     "暂时无法获取商品信息，请稍后重试。": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2845,10 +2960,29 @@
             "state": "translated",
             "value": "暂时无法获取商品信息，请稍后重试。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫時無法取得商品資訊，請稍後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在、商品情報を取得できません。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재 상품 정보를 가져올 수 없습니다. 나중에 다시 시도하세요."
+          }
         }
       }
     },
     "购买正在等待批准。": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2862,10 +2996,29 @@
             "state": "translated",
             "value": "购买正在等待批准。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購買正在等待核准。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入は承認待ちです。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입 승인 대기 중입니다."
+          }
         }
       }
     },
     "无法验证这次购买，请稍后重试。": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2879,10 +3032,29 @@
             "state": "translated",
             "value": "无法验证这次购买，请稍后重试。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法驗證此次購買，請稍後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この購入を確認できませんでした。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 구입 항목을 확인할 수 없습니다. 나중에 다시 시도하세요."
+          }
         }
       }
     },
     "购买未完成，请稍后重试。": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2896,10 +3068,29 @@
             "state": "translated",
             "value": "购买未完成，请稍后重试。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購買未完成，請稍後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入を完了できませんでした。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입을 완료하지 못했습니다. 나중에 다시 시도하세요."
+          }
         }
       }
     },
     "已恢复购买。": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2913,10 +3104,29 @@
             "state": "translated",
             "value": "已恢复购买。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已恢復購買。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入を復元しました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입 항목을 복원했습니다."
+          }
         }
       }
     },
     "没有可恢复的购买。": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2930,10 +3140,29 @@
             "state": "translated",
             "value": "没有可恢复的购买。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒有可恢復的購買。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "復元できる購入はありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복원할 구입 항목이 없습니다."
+          }
         }
       }
     },
     "恢复购买失败，请稍后重试。": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2947,10 +3176,29 @@
             "state": "translated",
             "value": "恢复购买失败，请稍后重试。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢復購買失敗，請稍後再試。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入を復元できませんでした。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구입 항목을 복원하지 못했습니다. 나중에 다시 시도하세요."
+          }
         }
       }
     },
     "一次购买，永久使用，iPhone 和 iPad 通用。付款由 Apple 处理，iMDReader 不接收支付信息。": {
+      "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2963,6 +3211,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "一次购买，永久使用，iPhone 和 iPad 通用。付款由 Apple 处理，iMDReader 不接收支付信息。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一次購買，永久使用，iPhone 和 iPad 通用。付款由 Apple 處理，iMDReader 不會接收您的付款資訊。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一度の購入で、iPhone と iPad でずっと使えます。お支払いは Apple が処理し、iMDReader がお支払い情報を受け取ることはありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한 번 구입하면 iPhone과 iPad에서 영구적으로 사용할 수 있습니다. 결제는 Apple이 처리하며, iMDReader는 결제 정보를 받지 않습니다."
           }
         }
       }
