@@ -141,6 +141,11 @@ public enum PremiumAccess: Sendable {
         return !config.gatedFeatures.contains(feature) || isUnlocked
     }
     public static func showsPurchaseEntry(config: PurchaseConfig) -> Bool { config.isEnabled }
+
+    /// Guideline 3.1.1 / KB 9.1: the localized lifetime price must be on screen before a trial can start.
+    public static func canStartTrial(hasTrialProduct: Bool, hasLifetimeProduct: Bool, isBusy: Bool) -> Bool {
+        hasTrialProduct && hasLifetimeProduct && !isBusy
+    }
 }
 
 /// Defers Spotlight, App Intent, widget and deep-link opens until the iOS purchase lock lifts.

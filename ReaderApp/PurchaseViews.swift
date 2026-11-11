@@ -28,12 +28,15 @@ struct PurchaseSheet: View {
                         }
                         if store.access == .lockedNotStarted {
                             Button("开始 14 天试用") { Task { await store.purchase(trial: true) } }
-                                .disabled(store.trialProduct == nil || store.isBusy)
+                                .disabled(!PremiumAccess.canStartTrial(hasTrialProduct: store.trialProduct != nil, hasLifetimeProduct: store.product != nil, isBusy: store.isBusy))
                         }
                         Button("购买永久解锁") { Task { await store.purchase() } }
                             .disabled(store.product == nil || store.isBusy)
                     }
                     Button("恢复购买") { Task { await store.restore() } }.disabled(store.isBusy)
+                    if store.product == nil || store.trialProduct == nil {
+                        Button("重试") { Task { await store.loadProduct() } }.disabled(store.isBusy)
+                    }
                     if let message = store.message {
                         switch message {
                         case .productUnavailable: Text("暂时无法获取商品信息，请稍后重试。")

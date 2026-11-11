@@ -171,6 +171,7 @@ final class PurchaseStore: ObservableObject {
 
     func purchase(trial: Bool = false) async {
         guard config.isEnabled, !isBusy else { return }
+        if trial, product == nil || trialProduct == nil { message = .productUnavailable; return }
         guard let selected = trial ? trialProduct : product else { message = .productUnavailable; return }
         isBusy = true
         message = nil

@@ -55,7 +55,7 @@ sandbox、TestFlight（始终沙盒）、Xcode/StoreKit 本地测试（`.xcode`�
 
 买断开启家庭共享（`.storekit` 中 `lifetime` 的 `familyShareable = true`）：已验证、未撤销的买断交易，不论 `ownershipType` 为购买者还是 `.familyShared`，均永久解锁，不要求先领取试用。共享撤销按 `revocationDate` 处理。试用关闭家庭共享（`trial14d` 的 `familyShareable = false`）：每人各自试用；家庭共享来的试用交易不授予试用（`isFamilyShared` 不计起点）。Boss 于 2026-11-11 12:14（Asia/Manila）确认这两项设置。Family Sharing 开启后不能关闭，ASC 创建时必须核对。KB main `3bc39f7` 第十二节第 4 项与 3.4 仍写试用为「建议不开、未单独转达确认」，以本次 Boss 确认为准。
 
-按 Guideline 3.1.1：试用名称写明 14 天；领取前明确告知时长及到期后无法打开文档、无法继续使用全部功能，必须买断；购买前显示永久解锁价格。UI 价格只来自 `Product.displayPrice`，不写死美元金额。领取试用只需试用商品已加载；买断按钮在永久解锁价格未加载时禁用。最后 3 天 App 内再次提示；到期页提供购买、恢复及设置/支持入口。[Apple 审核指南](https://developer.apple.com/app-store/review/guidelines/#in-app-purchase)。
+按 Guideline 3.1.1：试用名称写明 14 天；领取前明确告知时长及到期后无法打开文档、无法继续使用全部功能，必须买断；购买前显示永久解锁价格。UI 价格只来自 `Product.displayPrice`，不写死美元金额。领取试用与购买永久解锁都要求已加载并展示本地化买断价格（`Product.displayPrice`）；试用商品未加载或价格未展示时禁用「开始 14 天试用」，并提供重试。买断按钮在永久解锁价格未加载时禁用。这是 Guideline 3.1.1 与 KB 9.1 的领取前价格告知要求。最后 3 天 App 内再次提示；到期页提供购买、恢复及设置/支持入口。[Apple 审核指南](https://developer.apple.com/app-store/review/guidelines/#in-app-purchase)。
 
 ## ASC 创建清单（仅清单，本轮不创建）
 
@@ -111,7 +111,7 @@ sandbox、TestFlight（始终沙盒）、Xcode/StoreKit 本地测试（`.xcode`�
 
 ## 本轮实际测试与复现
 
-Swift 6.1.2 的无依赖临时包直接复制实际两个购买源码/测试文件，Debug 与 Release 各 9 项全部通过；没有启动 App。iOS 三文件语法解析、五语言修改范围/占位符/translated、商品字段/长度、UTF-8 与 diff 检查通过。完整 ReaderCore 的 `swift test` 已尝试，但 Linux 缺少既有 OfflineCache 所需 CryptoKit，未能完成；没有修改该模块来迁就测试。
+Swift 6.1.2 的无依赖临时包直接复制实际两个购买源码/测试文件，Debug 与 Release 各 10 项全部通过；没有启动 App。iOS 三文件语法解析、五语言修改范围/占位符/translated、商品字段/长度、UTF-8 与 diff 检查通过。完整 ReaderCore 的 `swift test` 已尝试，但 Linux 缺少既有 OfflineCache 所需 CryptoKit，未能完成；没有修改该模块来迁就测试。
 
 Apple 开发环境可运行 `swift test --package-path ReaderCore --filter purchase`。本轮在 Linux 使用以下隔离方式（确保 Swift 6 在 PATH；当前环境另需将 `/workspace/swift-toolchain/lib` 加入 LD_LIBRARY_PATH，并将模块/SwiftPM 缓存路径指向可写的 `/tmp`）：
 

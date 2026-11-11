@@ -152,3 +152,11 @@ private func resolve(_ records: [EntitlementRecord]? = nil, cache: PurchaseAcces
     let encoded = try JSONEncoder().encode(value)
     #expect(try JSONDecoder().decode(PurchaseAccessCache.self, from: encoded) == value)
 }
+
+@Test func purchaseCanStartTrialRequiresLifetimePrice() {
+    #expect(PremiumAccess.canStartTrial(hasTrialProduct: true, hasLifetimeProduct: true, isBusy: false))
+    #expect(!PremiumAccess.canStartTrial(hasTrialProduct: true, hasLifetimeProduct: false, isBusy: false))
+    #expect(!PremiumAccess.canStartTrial(hasTrialProduct: false, hasLifetimeProduct: true, isBusy: false))
+    #expect(!PremiumAccess.canStartTrial(hasTrialProduct: true, hasLifetimeProduct: true, isBusy: true))
+    #expect(!PremiumAccess.canStartTrial(hasTrialProduct: false, hasLifetimeProduct: false, isBusy: false))
+}

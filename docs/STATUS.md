@@ -6,7 +6,7 @@
 
 - 已完成：两个已定非消耗型 ID；ReaderCore 五态纯逻辑与可注入缓存协议；生产 originalAppVersion 数字 build≤53 的老用户已定 B（sandbox/xcode 排除；取不到 AppTransaction 按新用户，不另存标记）；Keychain 独立本机缓存与最大已见时间；iOS 主动领取/买断/恢复、家庭共享买断与撤销、按 11.3 的锁定层（语言、版本、数据管理保留；Spotlight/快捷指令/小组件/深链落到购买页，解锁后恢复原文档/来源）、自动说明页、最后三天提示；五语言购买文案与本地 StoreKit 配置。方案、ASC 五语言清单及重装实测步骤见 [IAP](IAP.md)。
 - 开关：iOS Release 默认启用；iOS DEBUG 仅 `-IMDPurchaseEnabled` 启用；非 iOS 永远关闭。**发版前必须先在 ASC 配好 lifetime 和 trial14d，否则 Release 会锁功能且无法试用/购买。**
-- 验证通过：Swift 6.1.2，直接复制实际 PurchaseAccess.swift 与 PurchaseAccessTests.swift 到 `/tmp/imd-purchase-checks` 的无依赖临时包，Debug/Release 各 9 项 swift-testing 全通过（非 App host）。覆盖五态、恰好14天、撤销、共享、离线/无缓存、老用户数字/环境排除、水印回拨、交易保留/缓存清空及内存协议往返。三个 iOS App 源文件以 arm64-apple-ios17.0 语法解析通过，不能等同 Apple SDK 类型检查；购买文案五语言、translated/comment/占位符、商品限长/价格/家庭共享、严格 UTF-8 和 diff 空白检查通过。
+- 验证通过：Swift 6.1.2，直接复制实际 PurchaseAccess.swift 与 PurchaseAccessTests.swift 到 `/tmp/imd-purchase-checks` 的无依赖临时包，Debug/Release 各 10 项 swift-testing 全通过（非 App host）。覆盖五态、恰好14天、撤销、共享、离线/无缓存、老用户数字/环境排除、水印回拨、交易保留/缓存清空及内存协议往返。三个 iOS App 源文件以 arm64-apple-ios17.0 语法解析通过，不能等同 Apple SDK 类型检查；购买文案五语言、translated/comment/占位符、商品限长/价格/家庭共享、严格 UTF-8 和 diff 空白检查通过。
 - 完整 ReaderCore 测试未通过运行门槛：已尝试 `swift test --package-path ReaderCore --scratch-path /tmp/imd-reader-core-build --skip-update`，依赖可用后编译被现有 `OfflineCache.swift` 的 `no such module 'CryptoKit'` 阻塞（Linux）；未为此改业务代码或依赖。购买纯逻辑已隔离运行，不冒充全套通过。复现命令见 IAP。
 - 固定回归门槛影响与限制：本轮影响 iOS 设置购买入口、阅读/资料库锁定与新增语言标签；品牌代码、导航、加号三项、置顶、配色、Mac 查找不变。所有语言实际画面、短屏/明暗、锁定后设置可达性、iPhone 单栏旋转与 iPad 双栏交互均未测；未启动真机/模拟器，不以语法或逻辑测试替代视觉/交互验收。
 - 待办：Apple SDK 编译；Xcode 本地购买/取消/待批准/恢复/撤销与五语言布局回归；Boss 提供可装开发包或 TestFlight 的真机及沙盒账号（或授权已有账号），按 IAP 执行同账号领取→记录 originalPurchaseDate→删除但保留购买记录→重装不再领取→恢复的上线前必测。未增加 StoreKitTest App host，纯逻辑覆盖不能替代真实重装收据验证。
