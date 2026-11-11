@@ -600,6 +600,10 @@ struct ReaderScreen: View {
             }
             VStack(alignment: .leading, spacing: 12) {
                 Text("语言").font(.subheadline)
+                #if os(macOS)
+                MacAppearanceSegments(title: "语言", options: [("跟随系统", "system"), ("简体中文", "zh-Hans"), ("English", "en"), ("繁體中文", "zh-Hant"), ("日本語", "ja"), ("한국어", "ko")], selection: $languageValue, locale: language.locale, tint: readerTint)
+                    .frame(height: 24)
+                #else
                 Picker("语言", selection: $languageValue) {
                     Text("跟随系统").tag("system")
                     Text(verbatim: "简体中文").tag("zh-Hans")
@@ -607,8 +611,8 @@ struct ReaderScreen: View {
                     Text(verbatim: "繁體中文").tag("zh-Hant")
                     Text(verbatim: "日本語").tag("ja")
                     Text(verbatim: "한국어").tag("ko")
-                }.pickerStyle(.menu).labelsHidden()
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                }.pickerStyle(.segmented)
+                #endif
             }
         }
         #if os(macOS)

@@ -7,7 +7,7 @@
 验证：scripts/check-localizations.py（JSON、五语言完整、占位符一致、严格 UTF-8、区域与 reader.js/ReaderLanguage 覆盖；已装 OpenCC 做繁简探测）0 error；reader.js 用 Node 做五语言行为检查；ReaderLanguage 与 DocumentDates 在 Linux 用 Swift 6.1 独立编译并运行检查，其余 Swift 文件仅语法解析。**没有 Xcode，App 与 Widget 未编译，Swift 测试未在 Apple 平台运行，模拟器/真机的布局、语言切换、Siri 短语和 Widget 均未测。** 日、韩、繁体译文由 AI 起草，未经母语审校。固定回归门槛中语言、外观排版、Mac 查找与移动设置须在 Apple 平台回归后才能写成通过。机制与步骤见 [LOCALIZATION](LOCALIZATION.md)。
 
 - 语言名一律使用各语言自称（简体中文、繁體中文、English、日本語、한국어；Apple 惯例），校验脚本已将这五个 key 列入白名单。OpenCC 扫描 zh-Hant：除白名单中的「简体中文」外，未发现混入简体字。
-- 语言选择器保持菜单，是否改回分段等产品或 Boss 定，本分支不自行决定；备选分支 `feat/l10n-ja-ko-zh-hant-segmented` 已恢复分段（已推送、未开 PR）。五种语言加「跟随系统」共六个选项放进分段控件，iPhone 竖屏宽度可能不够（【推断】，未在真机或模拟器验证）。
+- 本分支（`feat/l10n-ja-ko-zh-hant-segmented`）将语言选择器恢复为分段控件（Mac 为 MacAppearanceSegments，iOS 为 `.segmented`），未开 PR；若产品或 Boss 选用，可快进进 `feat/l10n-ja-ko-zh-hant`。PR 分支仍为菜单。五种语言加「跟随系统」共六个选项放进分段控件，iPhone 竖屏宽度可能不够（【推断】，未在真机或模拟器验证）。
 - 三语言 App Store 商店元数据草稿按原要求不进本 PR，存放在仓库外；是否入库由产品定。
 
 ## iOS 0.3.0（53）正式发布 · 2026-11-11

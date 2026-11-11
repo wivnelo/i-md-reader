@@ -37,7 +37,7 @@ struct Probe: View {
         return VStack(alignment: .leading) {
             MacAppearanceSegments(title: "明暗", options: [("跟随系统","system"),("浅色","light"),("深色","dark")], selection: $model.theme, locale: locale, tint: tint)
             MacAppearanceSegments(title: "配色", options: ReaderPalette.allCases.map { ($0.name,$0.rawValue) }, selection: $model.palette, locale: locale, tint: tint)
-            MacAppearanceSegments(title: "语言", options: [("跟随系统","system"),("简体中文","zh-Hans"),("English","en")], selection: $model.language, locale: locale, tint: tint)
+            MacAppearanceSegments(title: "语言", options: [("跟随系统","system"),("简体中文","zh-Hans"),("English","en"),("繁體中文","zh-Hant"),("日本語","ja"),("한국어","ko")], selection: $model.language, locale: locale, tint: tint)
         }.frame(width: 400, height: 100)
     }
 }
@@ -69,7 +69,7 @@ struct Probe: View {
                     let en = (ReaderLanguage(rawValue: language) ?? .system).resolved(preferred: preferred) == "en"
                     let expected = [en ? ["System", "Light", "Dark"] : ["跟随系统", "浅色", "深色"],
                                     en ? ["Mist Blue", "Distant Hills", "Moss", "Warm Sand"] : ["雾蓝", "远山", "青苔", "暖砂"],
-                                    en ? ["System", "简体中文", "English"] : ["跟随系统", "简体中文", "English"]]
+                                    en ? ["System", "简体中文", "English", "繁體中文", "日本語", "한국어"] : ["跟随系统", "简体中文", "English", "繁體中文", "日本語", "한국어"]]
                     let actual = rows.map { row in (0..<row.segmentCount).map { row.label(forSegment: $0) ?? "" } }
                     precondition(Set(actual) == Set(expected), "Rendered localized labels mismatch: \(actual)")
                     let lefts = rows.map { $0.convert($0.bounds, to: nil).minX }

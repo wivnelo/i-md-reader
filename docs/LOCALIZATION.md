@@ -23,6 +23,6 @@
 
 ## 已知限制与验证边界
 
-示例文档与正文不翻译；ByteCountFormatter 与 GitHub 限流时间使用系统 locale；正文 HTML lang 保持 zh-CN，避免改变汉字字形。日语、韩语、繁体译文由 AI 起草，未经母语审校；日期用系统本地化模板（yMMMdHHmmzzz），中英文保持旧格式。语言设置控件目前为菜单式 Picker。是否改回分段控件等产品或 Boss 定，本分支不自行决定；备选分支 `feat/l10n-ja-ko-zh-hant-segmented` 已恢复分段（已推送、未开 PR）。五种语言加「跟随系统」共六个选项放进分段控件，iPhone 竖屏宽度可能不够（【推断】，未在真机或模拟器验证）。
+示例文档与正文不翻译；ByteCountFormatter 与 GitHub 限流时间使用系统 locale；正文 HTML lang 保持 zh-CN，避免改变汉字字形。日语、韩语、繁体译文由 AI 起草，未经母语审校；日期用系统本地化模板（yMMMdHHmmzzz），中英文保持旧格式。本分支将语言设置控件恢复为分段（Mac 自定义分段、iOS `.segmented`），未开 PR。PR 分支 `feat/l10n-ja-ko-zh-hant` 仍为菜单，是否采用分段等产品或 Boss 定。五种语言加「跟随系统」共六个选项放进分段控件，iPhone 竖屏宽度可能不够（【推断】，未在真机或模拟器验证）。
 
 本轮仅在 Linux 做静态检查：目录校验脚本、JavaScript 行为检查，以及用 Swift 6.1 对 ReaderLanguage/DocumentDates 做的独立编译与运行检查、其余 Swift 文件的语法解析；没有 Xcode，未在 Xcode、模拟器或真机编译 App 与 Widget、验证布局、语言或交互。固定回归门槛中的语言标签、外观排版、Mac 查找和移动设置仍需 Apple 平台回归。
