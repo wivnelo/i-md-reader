@@ -70,6 +70,11 @@ struct PurchaseSheet<HeaderActions: View>: View {
             .frame(maxWidth: .infinity)
         }
         .accessibilityIdentifier("paywall.content")
+        // Opaque paper behind the status bar: scrolled content stops at the top safe-area edge
+        // instead of fading through the transparent status bar (SE footer audit: Contrast).
+        .safeAreaInset(edge: .top, spacing: 0) {
+            Color.clear.frame(height: 0).background(colors.paper)
+        }
         .foregroundStyle(colors.ink)
         .tint(colors.accent)
         .background(colors.paper)
