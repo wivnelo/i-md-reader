@@ -41,7 +41,9 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 
 **实际完成：** 商品加载和购买/恢复状态分开；加载不阻塞恢复，价格只按加载状态显示。空商品、缺试用商品、网络失败与 15 秒加载超时分开反馈；按钮禁用原因、购买/恢复/验证进度及等待提示五语言齐全。权益完整读取也限 15 秒，失败不擦除缓存；已验证事件先应用，快照滞后及旧快照覆盖撤销两类竞态有控制器测试。取消不再当错误展示。恢复等待 60 秒后明确提示仍在等待并可重试等待同一请求，迟到结果继续回写；不会重复调用 Apple 认证。购买窗口长时间等待只提示，不谎称交易已取消或解锁重复购买。诊断仅记录阶段、错误域/代码及缺失商品 ID。
 
-**规则与范围：** 14×24 小时、主动领取、到期锁定、老用户 build≤53 生产判断、买断家庭共享、试用不共享、Mac 不收费均未改；品牌/名称/工具栏、语言菜单、置顶、外观和导航代码未改。付费墙视觉已获用户明确确认并实施（见下）；语言选择器及 regular 宽度 iPhone 品牌迁移仍是独立待决策项，不能把付费墙确认扩展成这些改动的验收。
+**规则与范围：** 14×24 小时、主动领取、到期锁定、老用户 build≤53 生产判断、买断家庭共享、试用不共享、Mac 不收费均未改；品牌/名称/工具栏、语言菜单、置顶、外观和导航代码未改。付费墙视觉已获用户明确确认并实施（见下）；语言选择器与 regular 宽度 iPhone 品牌位置已由 Boss 于 2026-11-12 另行决定（见五语言本地化与折叠屏小节），不能把付费墙确认扩展成这些改动的验收。
+
+**使用条款链接 · 2026-11-12（本地开发，待 Mac 验证）：** Boss 选方案 A：付费墙页脚在“隐私政策”与“使用支持”之间新增“使用条款”，链接 Apple 标准 EULA（https://www.apple.com/legal/internet-services/itunes/dev/stdeula/），标识 `paywall.terms`；沿用现有 ViewThatFits，英文放不下一行时回退为既有竖排四行，未改页脚布局。新增 catalog key 五语言齐全，check-localizations.py 0 error（4 项既有警告）；日、韩、繁体由 AI 起草，未经母语审校。FullAppUITests 与 PaywallUITests 已有页脚路径补充 terms 存在且高度 ≥44 的断言，尚未在模拟器/真机运行；中英文页脚视觉待 Mac 检查。锁定层设置菜单无隐私/支持入口，解锁后设置的“使用支持”与 ReaderScreen 设置的“隐私政策”不属付费墙页脚，均未加使用条款。
 
 **当前验证：** Apple 平台 ReaderCore Debug/Release 各 75 项集合通过（各 1 项真实网络测试跳过）；根包既有状态 51 项集合通过（1 项真实网络跳过）；新增真实购买控制器注入测试 8 项通过，使用内存缓存，不访问真实购买账户。包含超时/不响应取消、迟到结果、重试、恢复单请求、恢复时商品仍加载、空/错商品、无记录/失败/取消、权益缓存保护、快照滞后和撤销竞态。Xcode 27.2 下 iOS Simulator Release（App/Widget）与 Mac Release 构建通过，正式 App 均未签名/安装/启动。本地化 230 个 key 五语言齐全，0 error、4 条既有启发式 warning；新增日韩繁译文未母语审校。
 
@@ -103,7 +105,7 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 验证：scripts/check-localizations.py（JSON、五语言完整、占位符一致、严格 UTF-8、区域与 reader.js/ReaderLanguage 覆盖；已装 OpenCC 做繁简探测）0 error；reader.js 用 Node 做五语言行为检查；ReaderLanguage 与 DocumentDates 在 Linux 用 Swift 6.1 独立编译并运行检查，其余 Swift 文件仅语法解析。**没有 Xcode，App 与 Widget 未编译，Swift 测试未在 Apple 平台运行，模拟器/真机的布局、语言切换、Siri 短语和 Widget 均未测。** 日、韩、繁体译文由 AI 起草，未经母语审校。固定回归门槛中语言、外观排版、Mac 查找与移动设置须在 Apple 平台回归后才能写成通过。机制与步骤见 [LOCALIZATION](LOCALIZATION.md)。
 
 - 语言名一律使用各语言自称（简体中文、繁體中文、English、日本語、한국어；Apple 惯例），校验脚本已将这五个 key 列入白名单。OpenCC 扫描 zh-Hant：除白名单中的「简体中文」外，未发现混入简体字。
-- 语言选择器保持菜单，是否改回分段等产品或 Boss 定，本分支不自行决定；备选分支 `feat/l10n-ja-ko-zh-hant-segmented` 已恢复分段（已推送、未开 PR）。五种语言加「跟随系统」共六个选项放进分段控件，iPhone 竖屏宽度可能不够（【推断】，未在真机或模拟器验证）。
+- 语言选择器保持菜单。**Boss 于 2026-11-12 决定保留下拉菜单，不改分段控件**，本次无代码改动；备选分支 `feat/l10n-ja-ko-zh-hant-segmented` 已恢复分段（已推送、未开 PR）。五种语言加「跟随系统」共六个选项放进分段控件，iPhone 竖屏宽度可能不够（【推断】，未在真机或模拟器验证）。
 - 三语言 App Store 商店元数据草稿按原要求不进本 PR，存放在仓库外；是否入库由产品定。
 
 ## iOS 0.3.0（53）正式发布 · 2026-11-11
@@ -114,8 +116,8 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 
 - 源码核对【已验证】：未设 UIRequiresFullScreen；iPad 四向、iPhone 三向；无 UIScreen.main；无按机型写死的尺寸。单/双栏另有固定断点：`adaptLayout` 在 `size.width < 900`、宽小于高、或 `horizontalSizeClass` 为 compact 时走单栏（regular 宽度下由此决定单栏还是双栏）。多窗口（UIApplicationSupportsMultipleScenes）按既有决定保持关闭，本分支未改。
 - 【推断/待 Mac 验证】NavigationSplitView 随窗口尺寸与 size class 在单/双栏间切换；选中文档存于 store，推断不随折叠/展开丢失，运行时未测。iPad 与 compact iPhone 的品牌位置推断与改动前一致，未运行验证。
-- 本分支唯一代码改动（现方案，品牌位置条件待 Boss 确认，代码先不动）：品牌位置原按 iPad/iPhone idiom 判断，改为 idiom 为 iPad 或水平 size class 为 regular。
-- 品牌位置两个备选方案，等 Boss 定：
+- **2026-11-12 Boss 决定采用收窄方案（方案 A）**：`release/0.4.x` 的 `usesRegularChrome` 已改为 idiom 为 iPad，或 iPhone 水平与垂直 size class 均为 regular；Plus/Max 横屏（regular×compact）保持已确认的 iPhone 工具栏。Duo、Plus/Max 横屏与 iPad 仍待 Mac/模拟器验证，尚未运行。
+- 品牌位置两个备选方案（历史记录，已按上条决定）：
   - 现方案（本分支）：iPhone 水平 size class 为 regular 即用 iPad 顶栏。Plus/Max 横屏一般为 regular 宽度（【推断】，待模拟器确认），品牌会从侧栏顶栏移到阅读区顶栏左侧，改变已确认的 iPhone 工具栏，与 AGENTS.md 冲突，须 Boss 确认。
   - 收窄方案（分支 `feat/adaptive-layout-narrow`，已推送、未开 PR）：仅当 iPhone 水平与垂直 size class 均为 regular（折叠屏展开内屏）时才用 iPad 布局。Plus/Max 横屏为 regular×compact，品牌位置与现网一致，不违反 AGENTS.md。该前提依据 Apple 公开说明：iPhone Duo 内屏为 regular×regular，外屏竖向 compact×regular、横向 compact×compact，见 [Prepare - iPhone Duo](https://developer.apple.com/iphone-duo/prepare/) 与 Tech Talk [Prepare your app for iPhone Duo](https://developer.apple.com/videos/play/tech-talks/111461/)。Boss 若选收窄方案，可将该分支快进进本 PR 分支。
 - 未在任何真机或模拟器测试。Apple 已公布 iPhone Duo，Xcode 27.1 提供 Duo 模拟器（出处同上）。Duo 模拟器及 iPad 调整窗口验证待 Mac 执行。
