@@ -28,11 +28,19 @@ final class FullAppUITests: XCTestCase {
         // Clearing StoreKit transactions does not clear the App's persistent Keychain grant.
         // Use the actual restore flow, so the fixture needs no production bypass.
         if !app.scrollViews["paywall.content"].waitForExistence(timeout: 3) {
+            // An unexpired trial is cached in the simulator Keychain, which survives uninstall.
+            // Its entry reads "N days left in trial" (in settings, or a bottom banner at <= 3 days).
+            let inTrial = NSPredicate(format: "label MATCHES %@", "[0-9]+ days left in trial")
             if app.buttons["Trial and Purchase"].exists {
                 app.buttons["Trial and Purchase"].tap()
+            } else if app.buttons.matching(inTrial).firstMatch.exists {
+                app.buttons.matching(inTrial).firstMatch.tap()
             } else {
                 app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "App settings")).firstMatch.tap()
-                app.buttons["Unlocked"].tap()
+                let entry = app.buttons.matching(NSCompoundPredicate(orPredicateWithSubpredicates: [
+                    NSPredicate(format: "label == %@", "Unlocked"), inTrial])).firstMatch
+                XCTAssertTrue(entry.waitForExistence(timeout: 5))
+                entry.tap()
             }
         }
         XCTAssertTrue(app.scrollViews["paywall.content"].waitForExistence(timeout: 10))
