@@ -61,8 +61,13 @@ struct ReaderScreen: View {
     @AppStorage("readerTheme") private var theme = "system"
     #if os(iOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     private var usesRegularChrome: Bool {
-        UIDevice.current.userInterfaceIdiom == .pad || horizontalSizeClass == .regular
+        // iPad keeps its chrome. On iPhone, only regular×regular (expanded foldable
+        // inner display) uses that placement; Plus/Max landscape is regular×compact
+        // and stays on the existing iPhone toolbar.
+        UIDevice.current.userInterfaceIdiom == .pad
+            || (horizontalSizeClass == .regular && verticalSizeClass == .regular)
     }
     #else
     @State private var findText = ""
