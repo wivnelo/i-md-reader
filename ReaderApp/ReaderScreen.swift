@@ -1336,7 +1336,7 @@ private struct MacFindField: NSViewRepresentable {
             super.select(withFrame: rect.insetBy(dx: 6, dy: 0), in: view, editor: editor, delegate: delegate, start: start, length: length)
         }
     }
-    final class Coordinator: NSObject, NSTextFieldDelegate {
+    @MainActor final class Coordinator: NSObject, NSTextFieldDelegate {
         var parent: MacFindField
         var lastFocusRequest: Int
         init(_ parent: MacFindField) {
