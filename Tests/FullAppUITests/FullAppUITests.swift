@@ -135,7 +135,7 @@ final class FullAppUITests: XCTestCase {
         let topFindings = try audit("fullapp-expired-paywall-top", app: app)
         reveal(app.buttons["paywall.restore"], app: app)
         XCTAssertGreaterThanOrEqual(app.buttons["paywall.restore"].frame.height, 44)
-        let terms = app.buttons["paywall.terms"]
+        let terms = app.links["paywall.terms"]
         reveal(terms, app: app)
         XCTAssertTrue(terms.exists)
         XCTAssertGreaterThanOrEqual(terms.frame.height, 44)
@@ -175,18 +175,23 @@ final class FullAppUITests: XCTestCase {
         XCTAssertTrue(sample.waitForExistence(timeout: 10))
         XCTAssertTrue(sample.isHittable)
         let portraitSize = app.frame.size
-        let isPhone = portraitSize.width < 600
         XCUIDevice.shared.orientation = .landscapeLeft
         XCTAssertTrue(app.wait(for: \.frame.size, toEqual: CGSize(width: portraitSize.height, height: portraitSize.width), timeout: 10))
         defer { XCUIDevice.shared.orientation = .portrait }
+        // Judge the landscape layout by the UI: a hidden list means a regular-width detail-only split (e.g. Pro Max).
+        let listShownAfterRotation = sample.wait(for: \.isHittable, toEqual: true, timeout: 5)
+        if !listShownAfterRotation {
+            let sidebar = app.navigationBars.buttons.firstMatch
+            XCTAssertTrue(["Sidebar", "Show Sidebar", "Toggle Sidebar"].contains(sidebar.label), "Inspect landscape sidebar control: " + sidebar.label)
+            sidebar.tap()
+        }
         XCTAssertTrue(sample.wait(for: \.isHittable, toEqual: true, timeout: 10))
-        if isPhone { XCTAssertFalse(app.webViews.firstMatch.isHittable) }
+        // Only a compact stack (portrait compact and list still shown, e.g. SE) hides the article.
+        if listShownAfterRotation && portraitSize.width < 600 { XCTAssertFalse(app.webViews.firstMatch.isHittable) }
         record("unlocked-library-landscape", app: app)
         XCUIDevice.shared.orientation = .portrait
         XCTAssertTrue(app.wait(for: \.frame.size, toEqual: portraitSize, timeout: 10))
-        if isPhone {
-            XCTAssertTrue(sample.wait(for: \.isHittable, toEqual: true, timeout: 10))
-        } else if !sample.isHittable {
+        if !sample.wait(for: \.isHittable, toEqual: true, timeout: 5) {
             // iPad may collapse the sidebar on rotation; that behavior is not being redesigned.
             app.navigationBars.buttons.firstMatch.tap()
         }
@@ -242,7 +247,7 @@ final class FullAppUITests: XCTestCase {
             XCTAssertTrue(app.navigationBars["Manage Sources"].waitForExistence(timeout: 10))
             app.navigationBars["Manage Sources"].buttons.firstMatch.tap()
             reveal(app.buttons["paywall.restore"], app: app)
-            let terms = app.buttons["paywall.terms"]
+            let terms = app.links["paywall.terms"]
             reveal(terms, app: app)
             XCTAssertTrue(terms.exists)
             XCTAssertGreaterThanOrEqual(terms.frame.height, 44)

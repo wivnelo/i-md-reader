@@ -104,7 +104,7 @@ final class PaywallUITests: XCTestCase {
             XCTAssertTrue(app.buttons["paywall.trial"].isEnabled)
             if locale == "en" { normalButtonHeight = app.buttons["paywall.trial"].frame.height }
             reveal(app.buttons["paywall.restore"], in: app)
-            let terms = app.buttons["paywall.terms"]
+            let terms = app.links["paywall.terms"]
             reveal(terms, in: app)
             XCTAssertTrue(terms.exists)
             XCTAssertGreaterThanOrEqual(terms.frame.height, 44)
@@ -118,7 +118,7 @@ final class PaywallUITests: XCTestCase {
         XCTAssertGreaterThan(app.buttons["paywall.trial"].frame.height, normalButtonHeight)
         capture("iphone-en-large-actions")
         reveal(app.buttons["paywall.restore"], in: app)
-        let terms = app.buttons["paywall.terms"]
+        let terms = app.links["paywall.terms"]
         reveal(terms, in: app)
         XCTAssertTrue(terms.exists)
         XCTAssertGreaterThanOrEqual(terms.frame.height, 44)
