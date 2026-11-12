@@ -287,6 +287,10 @@ struct PurchaseSheet<HeaderActions: View>: View {
         Link(destination: URL(string: "https://wivnelo.github.io/i-md-reader/privacy.html")!) {
             Text("隐私政策").frame(minHeight: 44).contentShape(Rectangle())
         }
+        Link(destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!) {
+            Text("使用条款").frame(minHeight: 44).contentShape(Rectangle())
+        }
+        .accessibilityIdentifier("paywall.terms")
         Link(destination: URL(string: "https://wivnelo.github.io/i-md-reader/support.html")!) {
             Text("使用支持").frame(minHeight: 44).contentShape(Rectangle())
         }

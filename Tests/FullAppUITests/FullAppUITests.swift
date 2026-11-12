@@ -135,6 +135,10 @@ final class FullAppUITests: XCTestCase {
         let topFindings = try audit("fullapp-expired-paywall-top", app: app)
         reveal(app.buttons["paywall.restore"], app: app)
         XCTAssertGreaterThanOrEqual(app.buttons["paywall.restore"].frame.height, 44)
+        let terms = app.buttons["paywall.terms"]
+        reveal(terms, app: app)
+        XCTAssertTrue(terms.exists)
+        XCTAssertGreaterThanOrEqual(terms.frame.height, 44)
         reveal(app.staticTexts["paywall.payment"], app: app)
         record("fullapp-expired-paywall-footer", app: app)
         let footerFindings = try audit("fullapp-expired-paywall-footer", app: app)
@@ -238,6 +242,10 @@ final class FullAppUITests: XCTestCase {
             XCTAssertTrue(app.navigationBars["Manage Sources"].waitForExistence(timeout: 10))
             app.navigationBars["Manage Sources"].buttons.firstMatch.tap()
             reveal(app.buttons["paywall.restore"], app: app)
+            let terms = app.buttons["paywall.terms"]
+            reveal(terms, app: app)
+            XCTAssertTrue(terms.exists)
+            XCTAssertGreaterThanOrEqual(terms.frame.height, 44)
             reveal(app.staticTexts["paywall.payment"], app: app)
             record("new-root-expired-" + theme + "-footer", app: app)
             app.buttons["paywall.settings"].tap()
