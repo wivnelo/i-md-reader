@@ -124,6 +124,8 @@ final class PaywallUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(terms.frame.height, 44)
         reveal(app.staticTexts["paywall.payment"], in: app)
         capture("iphone-en-large-footer")
+        // The header scrolls with the content; scroll back up to reach the close button.
+        reveal(app.buttons["paywall.close"], in: app)
         XCTAssertTrue(app.buttons["paywall.close"].isHittable)
     }
 
@@ -134,6 +136,7 @@ final class PaywallUITests: XCTestCase {
         reveal(app.buttons["paywall.trial"], in: app)
         capture("landscape-en-dark-actions")
         reveal(app.buttons["paywall.restore"], in: app)
+        reveal(app.buttons["paywall.close"], in: app)
         XCTAssertTrue(app.buttons["paywall.close"].isHittable)
     }
 

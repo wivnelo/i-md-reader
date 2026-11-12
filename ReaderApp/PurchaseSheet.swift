@@ -6,6 +6,10 @@ struct PurchaseSheet<HeaderActions: View>: View {
     @ObservedObject var store: PurchaseStore = .shared
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @ScaledMetric(relativeTo: .headline) private var priceSectionSpacing: CGFloat = 18
+    @ScaledMetric(relativeTo: .headline) private var priceRowSpacing: CGFloat = 20
+    @ScaledMetric(relativeTo: .headline) private var priceStackSpacing: CGFloat = 12
 
     private let headerActions: HeaderActions?
     private let onManageSources: (() -> Void)?
@@ -37,31 +41,10 @@ struct PurchaseSheet<HeaderActions: View>: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 10) {
-                Image("ReaderBrand")
-                    .resizable().frame(width: 28, height: 28)
-                    .accessibilityHidden(true)
-                Text(verbatim: "iMDReader").font(.headline).lineLimit(1).minimumScaleFactor(0.7)
-                    .accessibilityAddTraits(.isHeader)
-                Spacer(minLength: 12)
-                if let headerActions {
-                    headerActions
-                } else {
-                    Button { dismiss() } label: {
-                        Image(systemName: "xmark")
-                            .font(.body.weight(.semibold))
-                            .frame(width: 44, height: 44)
-                            .background(colors.selection.opacity(0.5), in: Circle())
-                    }
-                    .accessibilityLabel("关闭购买页，返回资料管理")
-                    .accessibilityIdentifier("paywall.close")
-                }
-            }
-            .padding(.horizontal, 24).padding(.top, 12).padding(.bottom, 8)
-            .frame(maxWidth: 650)
-
-            ScrollView {
+        ScrollView {
+            // The header scrolls with the content, so nothing stays pinned over clipped content.
+            VStack(spacing: 0) {
+                header
                 VStack(alignment: .leading, spacing: 24) {
                     introduction
                     VStack(alignment: .leading, spacing: 14) {
@@ -82,16 +65,50 @@ struct PurchaseSheet<HeaderActions: View>: View {
                 }
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 24).padding(.top, 32).padding(.bottom, 24)
-                .frame(maxWidth: 488)
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? 680 : 488)
             }
-            .accessibilityIdentifier("paywall.content")
+            .frame(maxWidth: .infinity)
         }
+        .accessibilityIdentifier("paywall.content")
         .foregroundStyle(colors.ink)
         .tint(colors.accent)
         .background(colors.paper)
         .presentationBackground(colors.paper)
         .task { if store.access != .unlockedLifetime && needsProducts { await store.loadProduct() } }
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                Image("ReaderBrand")
+                    .resizable().frame(width: 28, height: 28)
+                    .accessibilityHidden(true)
+                if !dynamicTypeSize.isAccessibilitySize {
+                    brandName.lineLimit(1).minimumScaleFactor(0.7)
+                }
+                Spacer(minLength: 12)
+                if let headerActions {
+                    headerActions
+                } else {
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark")
+                            .font(.body.weight(.semibold))
+                            .padding(8).frame(minWidth: 44, minHeight: 44)
+                            .background { Circle().fill(colors.selection.opacity(0.5)).aspectRatio(1, contentMode: .fill) }
+                    }
+                    .accessibilityLabel("关闭购买页，返回资料管理")
+                    .accessibilityIdentifier("paywall.close")
+                }
+            }
+            // Accessibility sizes give the wordmark its own row instead of shrinking it.
+            if dynamicTypeSize.isAccessibilitySize { brandName }
+        }
+        .padding(.horizontal, 24).padding(.top, 12).padding(.bottom, 8)
+        .frame(maxWidth: 650)
+    }
+
+    private var brandName: some View {
+        Text(verbatim: "iMDReader").font(.headline).accessibilityAddTraits(.isHeader)
     }
 
     private var introduction: some View {
@@ -148,16 +165,18 @@ struct PurchaseSheet<HeaderActions: View>: View {
     }
 
     private var price: some View {
-        VStack(spacing: 18) {
+        let stacked = dynamicTypeSize.isAccessibilitySize
+        let layout = stacked
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: priceStackSpacing))
+            : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: priceRowSpacing))
+        return VStack(spacing: priceSectionSpacing) {
             Divider()
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .firstTextBaseline, spacing: 20) {
-                    priceDescription
-                    Spacer(minLength: 0)
-                    priceValue
-                }
-                VStack(alignment: .leading, spacing: 12) { priceDescription; priceValue }
+            layout {
+                priceDescription
+                if !stacked { Spacer(minLength: 0) }
+                priceValue
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .combine)
             Divider()
         }
@@ -166,7 +185,7 @@ struct PurchaseSheet<HeaderActions: View>: View {
     private var priceDescription: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text("永久解锁").font(.headline)
-            Text("一次购买 · 无需订阅").font(.caption).foregroundStyle(colors.secondary)
+            Text("一次购买 · 无需订阅").font(.footnote).foregroundStyle(colors.secondary)
         }
     }
 
@@ -267,32 +286,81 @@ struct PurchaseSheet<HeaderActions: View>: View {
     }
 
     private var footer: some View {
-        VStack(spacing: 8) {
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 16) { footerLinks }.fixedSize(horizontal: true, vertical: false)
-                VStack(spacing: 2) { footerLinks }
-            }
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(spacing: 0))
+            : AnyLayout(FooterFlowLayout(spacing: 16))
+        return VStack(spacing: 8) {
+            layout { footerLinks }
             Text("付款由 Apple 处理").foregroundStyle(colors.secondary)
+                .multilineTextAlignment(.center)
                 .accessibilityIdentifier("paywall.payment")
         }
         .font(.footnote).foregroundStyle(colors.accent).frame(maxWidth: .infinity)
     }
 
     @ViewBuilder private var footerLinks: some View {
-        Button { Task { await store.restore() } } label: {
-            Text("恢复购买").frame(minHeight: 44).contentShape(Rectangle())
-        }
+        Button { Task { await store.restore() } } label: { footerLabel("恢复购买") }
             .disabled(store.isWaitingForRestore || (store.isBusy && store.operation != .restoring))
             .accessibilityIdentifier("paywall.restore")
-        Link(destination: URL(string: "https://wivnelo.github.io/i-md-reader/privacy.html")!) {
-            Text("隐私政策").frame(minHeight: 44).contentShape(Rectangle())
-        }
-        Link(destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!) {
-            Text("使用条款").frame(minHeight: 44).contentShape(Rectangle())
-        }
+        Link(destination: URL(string: "https://wivnelo.github.io/i-md-reader/privacy.html")!) { footerLabel("隐私政策") }
+        Link(destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!) { footerLabel("使用条款") }
         .accessibilityIdentifier("paywall.terms")
-        Link(destination: URL(string: "https://wivnelo.github.io/i-md-reader/support.html")!) {
-            Text("使用支持").frame(minHeight: 44).contentShape(Rectangle())
+        Link(destination: URL(string: "https://wivnelo.github.io/i-md-reader/support.html")!) { footerLabel("使用支持") }
+    }
+
+    /// Accessibility sizes stack the links full width; each label wraps centered instead of overflowing.
+    private func footerLabel(_ title: LocalizedStringKey) -> some View {
+        Text(title).multilineTextAlignment(.center)
+            .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : nil, minHeight: 44)
+            .contentShape(Rectangle())
+    }
+}
+
+/// Centered, wrapping row layout for the paywall footer links at non-accessibility sizes.
+/// Links stay on one row when they fit and wrap onto further rows instead of overflowing.
+private struct FooterFlowLayout: Layout {
+    var spacing: CGFloat
+
+    private struct Row {
+        var items: [(index: Int, size: CGSize)] = []
+        var width: CGFloat = 0
+        var height: CGFloat = 0
+    }
+
+    private func rows(for subviews: Subviews, maxWidth: CGFloat) -> [Row] {
+        var rows: [Row] = []
+        var row = Row()
+        for (index, subview) in subviews.enumerated() {
+            var size = subview.sizeThatFits(.unspecified)
+            if size.width > maxWidth { size = subview.sizeThatFits(ProposedViewSize(width: maxWidth, height: nil)) }
+            if !row.items.isEmpty && row.width + spacing + size.width > maxWidth {
+                rows.append(row)
+                row = Row()
+            }
+            row.width += (row.items.isEmpty ? 0 : spacing) + size.width
+            row.height = max(row.height, size.height)
+            row.items.append((index, size))
+        }
+        if !row.items.isEmpty { rows.append(row) }
+        return rows
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let rows = rows(for: subviews, maxWidth: proposal.width ?? .infinity)
+        let width = proposal.width.flatMap { $0.isFinite ? $0 : nil } ?? rows.map(\.width).max() ?? 0
+        return CGSize(width: width, height: rows.reduce(0) { $0 + $1.height })
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var y = bounds.minY
+        for row in rows(for: subviews, maxWidth: bounds.width) {
+            var x = bounds.minX + (bounds.width - row.width) / 2
+            for item in row.items {
+                subviews[item.index].place(at: CGPoint(x: x, y: y + (row.height - item.size.height) / 2),
+                                           proposal: ProposedViewSize(item.size))
+                x += item.size.width + spacing
+            }
+            y += row.height
         }
     }
 }

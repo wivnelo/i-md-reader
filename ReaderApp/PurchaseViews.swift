@@ -103,8 +103,11 @@ struct PurchaseEntryModifier: ViewModifier {
         } label: {
             Image(systemName: "ellipsis")
                 .font(.body.weight(.semibold))
-                .frame(width: 44, height: 44)
-                .background(ReaderPalette.mist.colors(dark: colorScheme == .dark).selection.opacity(0.5), in: Circle())
+                .padding(8).frame(minWidth: 44, minHeight: 44)
+                .background {
+                    Circle().fill(ReaderPalette.mist.colors(dark: colorScheme == .dark).selection.opacity(0.5))
+                        .aspectRatio(1, contentMode: .fill)
+                }
         }
         .accessibilityLabel("应用设置")
         .accessibilityIdentifier("paywall.settings")

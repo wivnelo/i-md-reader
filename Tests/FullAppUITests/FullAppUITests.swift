@@ -18,7 +18,8 @@ final class FullAppUITests: XCTestCase {
         let scroll = app.scrollViews["paywall.content"]
         for _ in 0..<10 {
             if element.exists && scroll.frame.contains(element.frame) { return }
-            scroll.swipeUp()
+            // The header (settings menu) scrolls with the content, so it can sit above the viewport.
+            if element.exists && element.frame.minY < scroll.frame.minY { scroll.swipeDown() } else { scroll.swipeUp() }
         }
         XCTAssertTrue(element.isHittable)
     }
@@ -67,6 +68,7 @@ final class FullAppUITests: XCTestCase {
         record("fullapp-locked", app: app)
         XCTAssertFalse(app.webViews.firstMatch.isHittable)
         XCTAssertTrue(app.buttons["App settings"].exists)
+        reveal(app.buttons["App settings"], app: app)
         app.buttons["App settings"].tap()
         record("fullapp-locked-settings", app: app)
         for title in ["GitHub access", "iCloud sync", "Offline cache", "Manage Sources"] {
@@ -78,6 +80,7 @@ final class FullAppUITests: XCTestCase {
         record("fullapp-locked-source-manager", app: app)
         app.navigationBars["Manage Sources"].buttons.firstMatch.tap()
         for title in ["GitHub access", "iCloud sync", "Offline cache"] {
+            reveal(app.buttons["App settings"], app: app)
             app.buttons["App settings"].tap()
             app.buttons[title].tap()
             XCTAssertTrue(app.navigationBars[title].waitForExistence(timeout: 10))
@@ -253,6 +256,7 @@ final class FullAppUITests: XCTestCase {
             XCTAssertGreaterThanOrEqual(terms.frame.height, 44)
             reveal(app.staticTexts["paywall.payment"], app: app)
             record("new-root-expired-" + theme + "-footer", app: app)
+            reveal(app.buttons["paywall.settings"], app: app)
             app.buttons["paywall.settings"].tap()
             record("new-root-settings-" + theme, app: app)
             if theme == "light" {
@@ -263,6 +267,7 @@ final class FullAppUITests: XCTestCase {
             tapMenuOption("简体中文", app: app)
             XCTAssertTrue(app.buttons["paywall.settings"].waitForExistence(timeout: 10))
             XCTAssertEqual(app.buttons["paywall.settings"].label, "应用设置")
+            reveal(app.buttons["paywall.settings"], app: app)
             app.buttons["paywall.settings"].tap()
             tapMenuOption("English", app: app)
             XCTAssertEqual(app.buttons["paywall.settings"].label, "App settings")
