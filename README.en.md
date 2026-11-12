@@ -8,8 +8,8 @@
 
 ## Download
 
-- **Mac:** [Download the 0.3.0 release](https://github.com/wivnelo/i-md-reader/releases/tag/v0.3.0). Supports Apple Silicon and Intel; requires macOS 14 or later.
-- **iPhone / iPad:** [Get 0.3.0 on the App Store](https://apps.apple.com/app/id6827371085), iOS / iPadOS 17 or later; includes iCloud sync, the Continue Reading widget, Spotlight and Shortcuts.
+- **Mac:** [Download the 0.3.0 release](https://github.com/wivnelo/i-md-reader/releases/tag/v0.3.0) (released 2026-11-04). Supports Apple Silicon and Intel; requires macOS 14 or later.
+- **iPhone / iPad:** [Get 0.3.0 on the App Store](https://apps.apple.com/app/id6827371085) (available since 2026-11-11), iOS / iPadOS 17 or later; includes iCloud sync, the Continue Reading widget, Spotlight and Shortcuts.
 
 For Mac, download the `.dmg`, open it, and drag iMDReader to Applications. A ZIP is also available. The release is Developer ID signed, notarized by Apple, and checked with Gatekeeper. You can replace an existing installation without uninstalling or clearing your library. Quit iMDReader before replacing it, then open the copy in Applications. If the Dock still opens an older copy, remove that Dock item and pin iMDReader from Applications again.
 
@@ -40,4 +40,4 @@ Access to a single file does not grant access to its parent folder. Add the fold
 
 - [Support](https://wivnelo.github.io/i-md-reader/support.html) · [Privacy policy](https://wivnelo.github.io/i-md-reader/privacy.html) · [Report an issue](https://github.com/wivnelo/i-md-reader/issues)
 
-The public release remains 0.3.0. A 14-day trial and one-time unlock for iPhone and iPad are in development and testing, and have not been publicly released. Mac remains free. The approved paywall has been implemented natively. Local purchase-flow and paywall checks on short-screen iPhone and iPad simulators are complete, with additional full-app navigation and purchase-gate regression checks. The approved contrast adjustment for four text controls on the light-mode locked screen is implemented. The latest fixes are available in TestFlight as 0.4.0 (55), but product loading still fails on a real device and the Paid Apps Agreement is not yet active. The old lock screen has been removed and the affected regression checks have passed locally; this change has not been uploaded. Overall acceptance and real-device transactions are not complete. See [development status](docs/STATUS.md) and [IAP implementation](docs/IAP.md).
+The public release remains 0.3.0. Version 0.4.0 plans a 14-day trial and a one-time purchase for iPhone and iPad; Mac remains free. It is in internal TestFlight testing only and has not been submitted for App Review or released. In-app products do not yet load on a real device, so the trial and purchase cannot be started; retesting is pending the Paid Apps Agreement and related account setup. The latest source fixes have not yet been uploaded as a new TestFlight build. See [development status](docs/STATUS.md) and [IAP implementation](docs/IAP.md).
