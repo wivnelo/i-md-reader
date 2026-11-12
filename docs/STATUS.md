@@ -218,7 +218,7 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 ### 当时复现的问题（当前修复见页首）
 
 1. **P2：日期请求401被吞掉，GitHub会话失效但界面仍显示已授权。** `ReaderApp/ReaderStore.swift:740–744` 使用 `try?` 读取提交日期。若正文已读取、随后日期请求返回401，底层会撤销会话并清缓存，但Store没有走正文错误分支的 `clearRejectedGitHubCredential`。合成传输复现：`hasGitHubCredential=true`、原文仍在、没有授权失效提示；再打开另一篇仍停留原文并报 `Swift.CancellationError`。建议在日期任务中区分凭据拒绝与普通可忽略错误，并保护新会话不被旧回调清理；图片加载的同类401路径一起检查。可通过移除/重设授权恢复，未见令牌泄漏或源文件损坏，不定为P0。临时新增回归的4个期望失败，日志为 `auth-probe.log`。
-2. **P2：English下图片限制提示仍为中文。** `ReaderCore/Sources/ReaderCore/MarkdownRenderer.swift:86–87` 输出“图片需要所在文件夹的访问权限”和“暂不支持此图片地址”，但 `ReaderApp/Resources/reader.js:5–7` 只匹配两个已过时文案，未标记待翻译节点。隐藏WebKit以English执行当前脚本后，两条提示仍中文。建议使用稳定消息标识连接渲染器和翻译逻辑，并覆盖单文件相对图片/不支持图片地址及语言往返。
+2. **P2：English下图片限制提示仍为中文。** 2026-10-29当时属实：渲染器输出中文提示，`reader.js` 只匹配过时文案，隐藏WebKit以English执行后仍为中文。当前main已改为稳定 `data-reader-message` 标识，`reader.js` 按此为zh-Hans、zh-Hant、en、ja、ko五种App语言翻译；新增Node测试 `Tests/ReaderScriptChecks/resource-messages.test.mjs`。Mac端Swift测试与真实WebKit核对仍待执行。
 3. **P3：空Markdown或仅front matter文档不显示变更时间。** `ReaderApp/ReaderWebView.swift:113` 无判空调用 `box.nextElementSibling.getBoundingClientRect()`；正文没有元素时抛JavaScript异常，日期容器保持hidden。相同探针添加普通标题后正常显示。影响日期展示，不是原生App崩溃；建议无正文时仍填入日期，仅跳过滚动补偿。证据与第2项同在 `web-edge-probe.log`。
 
 本轮未覆盖：完整Mac界面人工点击/键盘/视觉矩阵、iPhone/iPad真机旋转与分栏、Intel及最低系统实际运行、完整无障碍和大文档/多图性能。构建另有既有 `MacFindField.Coordinator.submitSearch` 主Actor隔离告警，未据此声称运行故障。上述范围和历史待验项保持未测，不以用户此前总体验收或本轮编译通过代替。

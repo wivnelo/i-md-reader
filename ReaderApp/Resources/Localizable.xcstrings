@@ -6091,42 +6091,6 @@
         }
       }
     },
-    "免费试用全部功能 14 天。到期后无法打开文档或继续使用全部功能，需购买永久解锁。": {
-      "comment": "AI 起草、待母语审校",
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "免费试用全部功能 14 天。到期后无法打开文档或继续使用全部功能，需购买永久解锁。"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Try every feature free for 14 days. After the trial, you cannot open documents or continue using any features without a Lifetime Unlock purchase."
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "免費試用全部功能 14 天。到期後無法開啟文件或繼續使用全部功能，需購買永久解鎖。"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "全機能を14日間無料でお試しいただけます。期間終了後は、永久アンロックを購入するまで書類を開いたり、すべての機能を使い続けたりすることはできません。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "모든 기능을 14일간 무료로 체험하세요. 체험 종료 후에는 평생 잠금 해제를 구입해야 문서를 열거나 모든 기능을 계속 사용할 수 있습니다."
-          }
-        }
-      }
-    },
     "14 天试用已到期，请购买永久解锁以继续使用。": {
       "comment": "AI 起草、待母语审校",
       "extractionState": "manual",
