@@ -8,7 +8,7 @@
 
 ## Download
 
-- **Mac:** [Download the 0.3.0 release](https://github.com/wivnelo/i-md-reader/releases/tag/v0.3.0) (released 2026-11-04). Supports Apple Silicon and Intel; requires macOS 14 or later.
+- **Mac:** [Download the 0.4.0 release](https://github.com/wivnelo/i-md-reader/releases/tag/v0.4.0) (released 2026-11-13). Supports Apple Silicon and Intel; requires macOS 14 or later.
 - **iPhone / iPad:** [Get 0.3.0 on the App Store](https://apps.apple.com/app/id6827371085) (available since 2026-11-11), iOS / iPadOS 17 or later; includes iCloud sync, the Continue Reading widget, Spotlight and Shortcuts.
 
 For Mac, download the `.dmg`, open it, and drag iMDReader to Applications. A ZIP is also available. The release is Developer ID signed, notarized by Apple, and checked with Gatekeeper. You can replace an existing installation without uninstalling or clearing your library. Quit iMDReader before replacing it, then open the copy in Applications. If the Dock still opens an older copy, remove that Dock item and pin iMDReader from Applications again.
@@ -40,4 +40,4 @@ Access to a single file does not grant access to its parent folder. Add the fold
 
 - [Support](https://wivnelo.github.io/i-md-reader/support.html) · [Privacy policy](https://wivnelo.github.io/i-md-reader/privacy.html) · [Report an issue](https://github.com/wivnelo/i-md-reader/issues)
 
-The public release remains 0.3.0. Version 0.4.0 stays free on every platform, with no trial, in-app purchase or paid content (the planned 14-day trial and one-time purchase were cancelled on 2026-11-13 and their code removed). It is in internal TestFlight testing only and has not been submitted for App Review or released. See [development status](docs/STATUS.md).
+Version 0.4.0 adds Japanese, Korean and Traditional Chinese (five interface languages in total) and improves iCloud sync and reading-position restore. It is completely free on every platform, with no in-app purchases and no data collection. Mac 0.4.0 was released on 2026-11-13; iPhone and iPad 0.4.0 are being prepared for App Review, and the App Store version remains 0.3.0 until then. See [development status](docs/STATUS.md).
