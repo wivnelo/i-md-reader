@@ -24,6 +24,29 @@ final class FullAppUITests: XCTestCase {
         XCTAssertTrue(element.isHittable)
     }
 
+    @MainActor private func makeSession() async throws -> SKTestSession {
+        let config = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "iMDReader", withExtension: "storekit"))
+        // On a newly created or erased simulator every call on the first session fails, however long it
+        // waits. Probe with a throwaway purchase; on failure launch the app once and start a new session.
+        for attempt in 1...3 {
+            let session = try SKTestSession(contentsOf: config)
+            session.resetToDefaultState()
+            session.clearTransactions()
+            session.disableDialogs = true
+            if (try? await session.buyProduct(identifier: "com.readerprototype.3z4gd8c2jp.ipadmarkdownreader.lifetime")) != nil {
+                session.clearTransactions()
+                return session
+            }
+            print("StoreKit test session not ready on attempt \(attempt)")
+            let app = XCUIApplication()
+            app.launchArguments = ["-IMDPurchaseEnabled", "-IMDDisableCloudKit"]
+            app.launch()
+            app.terminate()
+        }
+        XCTFail("StoreKit test session never became ready on this simulator")
+        throw CancellationError()
+    }
+
     @MainActor private func clearCachedTestPurchase(app: XCUIApplication) {
         // Clearing StoreKit transactions does not clear the App's persistent Keychain grant.
         // Use the actual restore flow, so the fixture needs no production bypass.
@@ -51,11 +74,7 @@ final class FullAppUITests: XCTestCase {
     }
 
     @MainActor func testFullAppPurchaseGateAndNavigation() async throws {
-        let config = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "iMDReader", withExtension: "storekit"))
-        let session = try SKTestSession(contentsOf: config)
-        session.resetToDefaultState()
-        session.clearTransactions()
-        session.disableDialogs = true
+        let session = try await makeSession()
         session.storefront = "USA"
         let app = XCUIApplication()
         app.launchArguments = ["-IMDPurchaseEnabled", "-IMDDisableCloudKit", "-readingSampleRemoved", "NO", "-readerLanguage", "en", "-AppleLanguages", "(en)"]
@@ -126,11 +145,7 @@ final class FullAppUITests: XCTestCase {
     }
 
     @MainActor func testAccessibilityAuditWithoutSpeech() async throws {
-        let config = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "iMDReader", withExtension: "storekit"))
-        let session = try SKTestSession(contentsOf: config)
-        session.resetToDefaultState()
-        session.clearTransactions()
-        session.disableDialogs = true
+        let session = try await makeSession()
         session.storefront = "USA"
         let app = XCUIApplication()
         app.launchArguments = ["-IMDPurchaseEnabled", "-IMDDisableCloudKit", "-readingSampleRemoved", "NO", "-readerLanguage", "en", "-AppleLanguages", "(en)"]
@@ -152,6 +167,8 @@ final class FullAppUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(terms.frame.height, 44)
         reveal(app.staticTexts["paywall.payment"], app: app)
         record("fullapp-expired-paywall-footer", app: app)
+        // The audit samples pixels; let the reveal scroll settle first or it misreads the note's contrast.
+        try await Task.sleep(for: .seconds(1))
         let footerFindings = try audit("fullapp-expired-paywall-footer", app: app)
         XCTAssertFalse(app.buttons["paywall.close"].exists)
         XCTAssertFalse(app.webViews.firstMatch.isHittable)
@@ -160,11 +177,7 @@ final class FullAppUITests: XCTestCase {
     }
 
     @MainActor func testUnlockedNavigationAndRotation() async throws {
-        let config = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "iMDReader", withExtension: "storekit"))
-        let session = try SKTestSession(contentsOf: config)
-        session.resetToDefaultState()
-        session.clearTransactions()
-        session.disableDialogs = true
+        let session = try await makeSession()
         let app = XCUIApplication()
         app.launchArguments = ["-IMDPurchaseEnabled", "-IMDDisableCloudKit", "-readingSampleRemoved", "NO", "-readerLanguage", "en", "-AppleLanguages", "(en)"]
         app.launch()
@@ -227,11 +240,7 @@ final class FullAppUITests: XCTestCase {
     }
 
     @MainActor func testExpiredRootPaywallSettingsAndLanguage() async throws {
-        let config = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "iMDReader", withExtension: "storekit"))
-        let session = try SKTestSession(contentsOf: config)
-        session.resetToDefaultState()
-        session.clearTransactions()
-        session.disableDialogs = true
+        let session = try await makeSession()
         session.storefront = "USA"
         let app = XCUIApplication()
         app.launchArguments = ["-IMDPurchaseEnabled", "-IMDDisableCloudKit", "-readingSampleRemoved", "NO", "-readerLanguage", "en", "-AppleLanguages", "(en)"]
