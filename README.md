@@ -34,10 +34,10 @@ Mac 推荐下载 `.dmg`，打开后将 iMDReader 拖入“应用程序”；也�
 - **GitHub 阅读：** 支持公开仓库、子目录和单篇文档；私有仓库可使用自己的细粒度只读令牌，令牌保存在设备 Keychain。
 - **离线阅读：** 已读取的 GitHub 内容在缓存可用时可离线查看；未缓存内容仍需网络，缓存不等于完整仓库备份。
 - **iCloud 同步：** 在同一 Apple 账户的设备间同步来源、置顶与排序和阅读位置，可在“•••”中关闭；不上传文档正文，iCloud 云盘以外的本地文件夹只留在本机。
-- **界面语言：** 简体中文和 English；文档内容和文件名保持原样。
+- **界面语言：** 简体中文、繁體中文、English、日本語和한국어（Mac 0.4.0 起；App Store 0.3.0 为简体中文和 English）；文档内容和文件名保持原样。
 
 ## 帮助与反馈
 
 - [使用支持](https://wivnelo.github.io/i-md-reader/support.html) · [隐私政策](https://wivnelo.github.io/i-md-reader/privacy.html) · [提交问题](https://github.com/wivnelo/i-md-reader/issues)
 
-0.4.0 新增日本語、한국어和繁體中文（共五种界面语言），并改进 iCloud 同步与阅读位置恢复；所有平台完全免费，不含内购，不收集数据。Mac 0.4.0 已于 2026-11-13 发布；iPhone/iPad 0.4.0 已提交 App Store 审核前准备，上架前 App Store 仍为 0.3.0。开发进展与验收边界见 [开发状态](docs/STATUS.md)。
+0.4.0 新增日本語、한국어和繁體中文（共五种界面语言），并改进 iCloud 同步与阅读位置恢复；所有平台完全免费，不含内购，不收集数据。Mac 0.4.0 已于 2026-11-13 发布；iPhone/iPad 0.4.0 已于同日提交 App Store 审核，上架前 App Store 仍为 0.3.0。开发进展与验收边界见 [开发状态](docs/STATUS.md)。

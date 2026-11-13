@@ -34,10 +34,10 @@ Access to a single file does not grant access to its parent folder. Add the fold
 - **Read from GitHub:** open public repositories, subfolders, or individual documents. For private repositories, use your own fine-grained read-only token, stored in the device Keychain.
 - **Read offline:** previously read GitHub content is available offline while cached. Uncached content still requires a network connection; the cache is not a complete repository backup.
 - **iCloud sync:** Syncs sources, pins and order, and reading positions across devices on the same Apple Account; turn it off under “•••”. Document text is never uploaded, and local folders outside iCloud Drive stay on the device.
-- **Interface languages:** Simplified Chinese and English; document text and filenames are left unchanged.
+- **Interface languages:** Simplified Chinese, Traditional Chinese, English, Japanese and Korean (Mac 0.4.0 and later; App Store 0.3.0 has Simplified Chinese and English); document text and filenames are left unchanged.
 
 ## Help and feedback
 
 - [Support](https://wivnelo.github.io/i-md-reader/support.html) · [Privacy policy](https://wivnelo.github.io/i-md-reader/privacy.html) · [Report an issue](https://github.com/wivnelo/i-md-reader/issues)
 
-Version 0.4.0 adds Japanese, Korean and Traditional Chinese (five interface languages in total) and improves iCloud sync and reading-position restore. It is completely free on every platform, with no in-app purchases and no data collection. Mac 0.4.0 was released on 2026-11-13; iPhone and iPad 0.4.0 are being prepared for App Review, and the App Store version remains 0.3.0 until then. See [development status](docs/STATUS.md).
+Version 0.4.0 adds Japanese, Korean and Traditional Chinese (five interface languages in total) and improves iCloud sync and reading-position restore. It is completely free on every platform, with no in-app purchases and no data collection. Mac 0.4.0 was released on 2026-11-13; iPhone and iPad 0.4.0 were submitted for App Review the same day, and the App Store version remains 0.3.0 until it is released. See [development status](docs/STATUS.md).
