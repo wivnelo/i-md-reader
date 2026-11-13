@@ -6,7 +6,9 @@
 
 **删除范围：** `ReaderApp/PurchaseStore.swift`、`PurchaseViews.swift`、`PurchaseSheet.swift`、`ReaderApp/StoreKit/`（本地商店配置）、`ReaderCore` 的 `PurchaseAccess.swift`、`PurchaseDeadline.swift` 及其测试、`Tests/PurchaseStoreChecksTests`、`Tests/StoreKitIntegration`（独立宿主工程）、`docs/IAP.md`；工程与 `Package.swift` 中对应引用、两个 scheme 的 StoreKit 配置引用；字符串目录中仅付费界面使用的 68 个键（230 → 162，五语言齐全，`check-localizations.py` 0 错误）。`ReaderScreen.swift` 去掉锁定层、付费入口和启动拦截：小组件/Spotlight/快捷指令/文件打开改为直接打开文档；“•••”菜单只剩 GitHub 授权、iCloud 同步、离线缓存、隐私政策。随付费墙一并消失的有使用条款链接、付费墙大字号适配、状态栏同色底和说明文字改色。品牌、导航、置顶、配色等已确认内容未改。
 
-**测试（删除后）：** `swift test` ReaderCore 60/60（原 75，减少的 15 个为付费逻辑用例）、根包 51/51；Mac Release 以外的 Mac 构建（Debug，未签名）成功；整 App UI 测试改写为不依赖 StoreKit 的两个用例（导航与旋转；设置菜单三项可进入、无任何试用/购买/恢复入口、隐私政策在、`imdreader://open` 链接直接打开文档），“Reader QA - iPhone SE”与“Reader QA - iPad Air 11 M4”模拟器均 2/2 通过（`test-logs/free1`），SE 设置菜单截图已人工复核。未测：Pro Max、Duo、真机、五语言实际画面、小组件与 Spotlight 的真实入口（仅用链接代测）、原付费墙无障碍审计覆盖的内容不再适用且未补新的全 App 审计。固定回归门槛中与购买相关的条目作废，其余未因本次改动重新逐项验收。
+**测试（删除后）：** `swift test` ReaderCore 60/60（原 75，减少的 15 个为付费逻辑用例）、根包 51/51；Mac 端未签名 Debug 构建成功；整 App UI 测试改写为不依赖 StoreKit 的两个用例（导航与旋转；设置菜单三项可进入、无任何试用/购买/恢复入口、隐私政策在、`imdreader://open` 链接直接打开文档），“Reader QA - iPhone SE”与“Reader QA - iPad Air 11 M4”模拟器均 2/2 通过（`test-logs/free1`），SE 设置菜单截图已人工复核。未测：Pro Max、Duo、真机、五语言实际画面、小组件与 Spotlight 的真实入口（仅用链接代测）、原付费墙无障碍审计覆盖的内容不再适用且未补新的全 App 审计。固定回归门槛中与购买相关的条目作废，其余未因本次改动重新逐项验收。
+
+**TestFlight 0.4.0（57）上传 · 2026-11-13 20:42（UTC+8）：** 从已推送的 `cc26a43`（工作树干净）归档，命令行覆盖 App 与 Widget 构建号为 57、版本 0.4.0，工程默认 54 未改；归档产物核对：主程序未链接 StoreKit、无付费相关符号、包内无 `.storekit` 文件。上传一次，`xcodebuild` 返回 exit 0 / Upload succeeded / 正在处理。**未回读 App Store Connect**：处理是否完成、出口合规是否需再次回答、是否已进 Internal 组均未确认，不写成已可安装。
 
 **后台待办（账户持有人）：** App Store Connect 中两个“准备提交”的内购商品尚在，需自行删除或搁置；本轮未操作后台。已上传的 0.4.0（55）、（56）含付费墙，不应再用于测试。
 
@@ -128,7 +130,7 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 
 **外部状态：** 用户报告已完成协议/税务/银行检查与 TestFlight 重测、ASC 审核联系邮箱更新，本轮未回读 ASC，重测具体结果未知，不推断商品不可用原因。GitHub 只读确认 PR #8（支持页/首页邮箱、0.4.1 / 55）和 PR #2（隐私政策）仍 open，未合并；Pages 邮箱修正尚未随这两个 PR 上线。正式版仍为 0.3.0（53），/Applications 的 Mac App 也是该版本。
 
-**下一步：** 取得 TestFlight 重测现象与必要日志（真实设备、候选构建、同账号重装与 Sandbox 家庭的准确前提曾列入已删除的 IAP 文档）；处理独立的现有布局待决策；完成剩余整 App 固定门槛、辅助功能复核与真实 StoreKit/设备验收，再补 IAP 审核截图与商店材料。计划中的 0.4.1（55）须另行整合审查后准备分发，未因本地修复自动进入发布。实现说明及命令见 [IAP](IAP.md)；审核准备见 [app-store-preparation](app-store-preparation.md)。
+**下一步：** 取得 TestFlight 重测现象与必要日志（真实设备、候选构建、同账号重装与 Sandbox 家庭的准确前提曾列入已删除的 IAP 文档）；处理独立的现有布局待决策；完成剩余整 App 固定门槛、辅助功能复核与真实 StoreKit/设备验收，再补 IAP 审核截图与商店材料。计划中的 0.4.1（55）须另行整合审查后准备分发，未因本地修复自动进入发布。实现说明及命令见 IAP（文档已删除，见 Git 历史）；审核准备见 [app-store-preparation](app-store-preparation.md)。
 
 以下 0.4.0 开发分支记录为历史阶段描述；其中“尚未合 main/未创建商品/没有 Xcode”等不代表当前状态。
 
@@ -136,7 +138,7 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 
 本轮在 `feat/storekit-purchase`，起点 `be333408ae46837e7158c6633abaac2f2f7914ec`，按 KB main 合并提交 `3bc39f7`（PR #22） 第十一节与 4.3 接入「14 天全功能免费试用 + 到期后买断」。正式 0.3.0（53）仍免费；不改版本、不合 main、不创建 ASC 商品、不启动 App/安装/上传/发布。Mac 永远关闭收费，无购买界面；CloudKit 及其启动参数未改。
 
-- 已完成：两个已定非消耗型 ID；ReaderCore 五态纯逻辑与可注入缓存协议；生产 originalAppVersion 数字 build≤53 的老用户已定 B（sandbox/xcode 排除；取不到 AppTransaction 按新用户，不另存标记）；Keychain 独立本机缓存与最大已见时间；iOS 主动领取/买断/恢复、家庭共享买断与撤销、按 11.3 的锁定层（语言、版本、数据管理保留；Spotlight/快捷指令/小组件/深链落到购买页，解锁后恢复原文档/来源）、自动说明页、最后三天提示；五语言购买文案与本地 StoreKit 配置。方案、ASC 五语言清单及重装实测步骤见 [IAP](IAP.md)。
+- 已完成：两个已定非消耗型 ID；ReaderCore 五态纯逻辑与可注入缓存协议；生产 originalAppVersion 数字 build≤53 的老用户已定 B（sandbox/xcode 排除；取不到 AppTransaction 按新用户，不另存标记）；Keychain 独立本机缓存与最大已见时间；iOS 主动领取/买断/恢复、家庭共享买断与撤销、按 11.3 的锁定层（语言、版本、数据管理保留；Spotlight/快捷指令/小组件/深链落到购买页，解锁后恢复原文档/来源）、自动说明页、最后三天提示；五语言购买文案与本地 StoreKit 配置。方案、ASC 五语言清单及重装实测步骤见 IAP（文档已删除，见 Git 历史）。
 - 开关：iOS Release 默认启用；iOS DEBUG 仅 `-IMDPurchaseEnabled` 启用；非 iOS 永远关闭。**发版前必须先在 ASC 配好 lifetime 和 trial14d，否则 Release 会锁功能且无法试用/购买。**
 - 验证通过：Swift 6.1.2，直接复制实际 PurchaseAccess.swift 与 PurchaseAccessTests.swift 到 `/tmp/imd-purchase-checks` 的无依赖临时包，Debug/Release 各 10 项 swift-testing 全通过（非 App host）。覆盖五态、恰好14天、撤销、共享、离线/无缓存、老用户数字/环境排除、水印回拨、交易保留/缓存清空及内存协议往返。三个 iOS App 源文件以 arm64-apple-ios17.0 语法解析通过，不能等同 Apple SDK 类型检查；购买文案五语言、translated/comment/占位符、商品限长/价格/家庭共享、严格 UTF-8 和 diff 空白检查通过。
 - 完整 ReaderCore 测试未通过运行门槛：已尝试 `swift test --package-path ReaderCore --scratch-path /tmp/imd-reader-core-build --skip-update`，依赖可用后编译被现有 `OfflineCache.swift` 的 `no such module 'CryptoKit'` 阻塞（Linux）；未为此改业务代码或依赖。购买纯逻辑已隔离运行，不冒充全套通过。复现命令见 IAP。
