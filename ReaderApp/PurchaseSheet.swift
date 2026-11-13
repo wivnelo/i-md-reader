@@ -28,6 +28,10 @@ struct PurchaseSheet<HeaderActions: View>: View {
     }
 
     private var colors: ReaderColors { ReaderPalette.mist.colors(dark: colorScheme == .dark) }
+    // The centred three-line trial note fails the contrast audit in the light secondary (#66727a, 4.77:1).
+    private var noteColor: Color {
+        colorScheme == .dark ? colors.secondary : Color(red: 0x56 / 255, green: 0x61 / 255, blue: 0x69 / 255)
+    }
     private var needsProducts: Bool { store.product == nil || store.trialProduct == nil }
     private var unavailable: Bool { store.product == nil && !store.isLoadingProducts }
     private var trialUnavailable: Bool { store.product != nil && store.trialProduct == nil && !store.isLoadingProducts }
@@ -58,7 +62,7 @@ struct PurchaseSheet<HeaderActions: View>: View {
                     actions
                     if store.access != .unlockedLifetime {
                         Text("试用不会自动扣费。14 天后需购买永久解锁，才能继续打开文档；你的文件与资料库会保留。")
-                            .font(.footnote).foregroundStyle(colors.secondary)
+                            .font(.footnote).foregroundStyle(noteColor)
                             .multilineTextAlignment(.center)
                     }
                     footer
