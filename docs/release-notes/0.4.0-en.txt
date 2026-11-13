@@ -1,0 +1,7 @@
+• Adds Japanese, Korean and Traditional Chinese. Switch the app language anytime in Reading Appearance.
+• More reliable iCloud sync. Being signed out of iCloud or turning sync off no longer affects launch.
+• More accurate reading positions: after Split View or Stage Manager changes the window width, you return to the same paragraph.
+• Image notes in documents follow the selected language.
+• Other fixes.
+
+iMDReader remains completely free, with no in-app purchases and no data collection.
