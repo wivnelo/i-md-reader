@@ -1,5 +1,12 @@
 # iMDReader 开发与发行状态
 
+## macOS 0.4.0（58）正式发布 · 2026-11-13
+
+**[v0.4.0](https://github.com/wivnelo/i-md-reader/releases/tag/v0.4.0) 已发布为 Latest。** 用户授权 iOS 与 Mac 同时发布正式版。`release/0.4.x` 经 [PR #11](https://github.com/wivnelo/i-md-reader/pull/11) 以合并提交并入 main，标签源码 `b28675e`（作者均为 noreply）；工程构建号设为 58，与 TestFlight 58 一致。Mac 为 Universal（x86_64/arm64）Release，Developer ID 签名、硬化运行时、可信时间戳及严格验签通过，权限与 0.3.0 完全一致（沙盒、CloudKit 生产环境）；App 与 DMG 均获 Apple 公证 Accepted 并装订票据，Gatekeeper 判定 Notarized Developer ID；DMG 挂载内为 0.4.0（58）且通过 Gatekeeper。从公开链接重新下载的 DMG/ZIP 与 SHA256SUMS 一致，资产命名沿用 App 内更新检查的格式（`ReleaseUpdate` 测试 3/3）。本机 `/Applications` 仍为 0.3.0，未安装新版，也未实际启动公证后的 App。中英文更新说明见 `docs/release-notes/`。
+
+**iOS 0.4.0：** 构建 58 已在 TestFlight 经用户真机安装；提审需账户持有人在 App Store Connect 新建 0.4.0 版本、选择构建 58、上传 `test-logs/app-store-0.4.0/` 中 20 张截图（release 工作树，未入库）并填写更新说明后提交。本会话对 Chrome 只读，不代点；截至本节写入时尚未提交审核。
+
+
 ## 取消付费，0.4.0 保持免费 · 2026-11-13（已推送，未提审）
 
 **决定：** 用户于 2026-11-13 决定不做付费，要求删除全部付费功能代码后上传 TestFlight；“引流 API”设想本轮明确忽略，未做。此决定替代本文件及 `app-store-preparation.md` 中所有关于 14 天试用、买断、付费墙、内购商品和付费 App 协议的计划与待办，那些段落仅作历史记录。内购从未随正式版发布（公开正式版一直是不含付费的 0.3.0），没有需要兼容的已购用户。
