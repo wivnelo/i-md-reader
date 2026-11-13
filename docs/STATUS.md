@@ -1,5 +1,63 @@
 # iMDReader 开发与发行状态
 
+## 取消付费，0.4.0 保持免费 · 2026-11-13（已推送，未提审）
+
+**决定：** 用户于 2026-11-13 决定不做付费，要求删除全部付费功能代码后上传 TestFlight；“引流 API”设想本轮明确忽略，未做。此决定替代本文件及 `app-store-preparation.md` 中所有关于 14 天试用、买断、付费墙、内购商品和付费 App 协议的计划与待办，那些段落仅作历史记录。内购从未随正式版发布（公开正式版一直是不含付费的 0.3.0），没有需要兼容的已购用户。
+
+**删除范围：** `ReaderApp/PurchaseStore.swift`、`PurchaseViews.swift`、`PurchaseSheet.swift`、`ReaderApp/StoreKit/`（本地商店配置）、`ReaderCore` 的 `PurchaseAccess.swift`、`PurchaseDeadline.swift` 及其测试、`Tests/PurchaseStoreChecksTests`、`Tests/StoreKitIntegration`（独立宿主工程）、`docs/IAP.md`；工程与 `Package.swift` 中对应引用、两个 scheme 的 StoreKit 配置引用；字符串目录中仅付费界面使用的 68 个键（230 → 162，五语言齐全，`check-localizations.py` 0 错误）。`ReaderScreen.swift` 去掉锁定层、付费入口和启动拦截：小组件/Spotlight/快捷指令/文件打开改为直接打开文档；“•••”菜单只剩 GitHub 授权、iCloud 同步、离线缓存、隐私政策。随付费墙一并消失的有使用条款链接、付费墙大字号适配、状态栏同色底和说明文字改色。品牌、导航、置顶、配色等已确认内容未改。
+
+**测试（删除后）：** `swift test` ReaderCore 60/60（原 75，减少的 15 个为付费逻辑用例）、根包 51/51；Mac 端未签名 Debug 构建成功；整 App UI 测试改写为不依赖 StoreKit 的两个用例（导航与旋转；设置菜单三项可进入、无任何试用/购买/恢复入口、隐私政策在、`imdreader://open` 链接直接打开文档），“Reader QA - iPhone SE”与“Reader QA - iPad Air 11 M4”模拟器均 2/2 通过（`test-logs/free1`），SE 设置菜单截图已人工复核。未测：Pro Max、Duo、真机、五语言实际画面、小组件与 Spotlight 的真实入口（仅用链接代测）、原付费墙无障碍审计覆盖的内容不再适用且未补新的全 App 审计。固定回归门槛中与购买相关的条目作废，其余未因本次改动重新逐项验收。
+
+**TestFlight 0.4.0（57）上传 · 2026-11-13 20:42（UTC+8）：** 从已推送的 `cc26a43`（工作树干净）归档，命令行覆盖 App 与 Widget 构建号为 57、版本 0.4.0，工程默认 54 未改；归档产物核对：主程序未链接 StoreKit、无付费相关符号、包内无 `.storekit` 文件。上传一次，`xcodebuild` 返回 exit 0 / Upload succeeded / 正在处理。**未回读 App Store Connect**：处理是否完成、出口合规是否需再次回答、是否已进 Internal 组均未确认，不写成已可安装。
+
+**56、57 卡在出口合规 · 2026-11-13 21:1x：** 用户打开 Chrome 后只读回读 TestFlight 构建列表：56、57 均已处理完成，状态“缺少出口合规证明”，未进任何群组；55、54 为“准备提交”、在 Internal。手机 TestFlight 因此仍只有 55。本会话对浏览器只有只读权限，未点击“管理”。
+
+**出口合规声明写入配置（用户授权“你操作”）：** `ReaderApp/Info.plist` 增加 `ITSAppUsesNonExemptEncryption = false`，与账户持有人此前为 54、55 所选“使用非豁免类加密：否”一致，之后的构建不再需要逐个回答。依据：App 只调用系统提供的加密（HTTPS、Keychain、CryptoKit 的 SHA-256，以及离线缓存用的 CryptoKit AES-GCM），没有自带或第三方加密实现。若今后加入非系统加密，须改回并重新申报。
+
+**TestFlight 0.4.0（58）上传 · 2026-11-13 21:06（UTC+8）：** 从已推送的 `c0714ad` 归档，构建号覆盖为 58；包内核对版本 0.4.0、App 与 Widget 均为 58、`ITSAppUsesNonExemptEncryption = false`。上传一次，`xcodebuild` 返回 Upload succeeded / 正在处理。上传后只读回读 Chrome 中尚未刷新的构建列表：56、57 已变为“已失效”（非本会话操作），55、54 不变，58 尚未出现。**58 是否处理完成、是否免除合规问答、是否自动进入 Internal 均未确认。**
+
+**发布前回归（`3d4f14b`，App 代码与 58 相同，仅新增测试）· 2026-11-13：** 本地化检查 0 错误（162 键五语言齐全；删除的 68 个付费键在源码中无残留引用）；脚本测试 16/16；WebView 160 组组合通过；`swift test` 60/60、51/51；Mac 未签名 Debug 构建通过（删除付费后）。整 App UI 测试三项（五语言设置菜单、导航与旋转、设置三项与文档链接）：SE 3/3；iPad Air 11 首轮因本机负载极高（平均负载 130+，Spotlight 索引与浏览器占满 CPU）在“iCloud 同步”点击处事件超时，单独重跑 3/3。未测：Pro Max、Duo、真机深入交互、VoiceOver；固定回归门槛中的 Mac 专项（查找栏键盘、外观面板最短窗口）本轮未重做，Mac 端代码自 0.3.0 起仅有本地化与查找栏并发修复。
+
+**商店截图（0.4.0，未上传）：** 用合成的中英文示例文档（各 6 篇，仅截图时临时替换内置示例，跑完已恢复）在 iPhone 18 Pro（1206×2622）与 iPad Pro 13 英寸 M5 横屏（2752×2064）模拟器拍摄，状态栏统一 9:41、满格满电；每种语言、每种设备 5 张：阅读页、资料库层级、代码与表格、阅读外观面板、深色模式加文章目录，共 20 张，位于 `test-logs/app-store-0.4.0/`（未入库）。已逐类人工复核；已知瑕疵：iPad 状态栏日期按模拟器系统语言显示为中文（英文组同样），右下角有窗口缩放手柄弧线。
+
+**后台待办（账户持有人）：** App Store Connect 中两个“准备提交”的内购商品尚在，需自行删除或搁置；本轮未操作后台。已上传的 0.4.0（55）、（56）含付费墙，不应再用于测试。
+
+**0.4.0 相对公开正式版 0.3.0（53）的实际内容：** 新增日文、韩文、繁体中文（共五种语言，含 App 内语言选择、小组件与快捷指令文案）；iCloud 同步初始化加固（延迟创建容器，按权限与账户状态启用）；恢复阅读位置时窗口宽度变化后重新对位；阅读内容中图片说明的多语言；折叠屏内屏布局（收窄方案 A，Duo 默认姿态可用，内屏分支与折叠切换未验收）；Mac 查找栏的并发隔离修复。
+
+## 0.4.x 停止节点接手与 SE 对照复测 · 2026-11-13（本地，未提交、未发布）
+
+**节点：** 2026-11-12 20:47 研发全部叫停。`release/0.4.x` 远端为 `2a8b822`（main 之后 11 个提交，含使用条款链接、iPhone 品牌收窄方案 A、付费墙大字号适配、状态栏同色底及对应测试/文档），未合并、未开版本 PR、未打测试包；TestFlight 仍为 0.4.0（55），公开正式版仍为 0.3.0（53）。本地工作树此前停在内容相同的 `00680b1`，已指向 `2a8b822`。
+
+**本次实测（均在 `2a8b822`）：** `swift test` ReaderCore 75/75、根包 8/8 通过；webview 160 组未重跑。既有“Reader QA - iPhone SE”模拟器**不重置**连跑两轮整 App UI 测试（`test-logs/run11`、`run12`，未入库），两轮结果一致：4 个用例 3 过 1 败。
+
+- 清理步骤的“恢复购买”和试用购买两轮均正常完成，**未出现“登录 Apple 账户”对话框，也无 StoreKit 超时**。停止节点记录的 run7–run10 失败因此不是这批代码引入；与模拟器重置后的环境有关，具体是重置本身还是远程登录会话所致未验证（本次没有重置模拟器）。
+- 唯一失败为 `testAccessibilityAuditWithoutSpeech` 页脚审计的一条对比度：过期付费墙“试用不会自动扣费……”三行说明。该文字用现有次要色，雾蓝浅色为 `#66727a` / 纸色 `#fcfbf8`，标称 4.77:1（四套浅色 4.55–4.77，深色 6.16–6.68），高于 4.5:1 但贴边；同色同字号的“一次购买 · 无需订阅”“付款由 Apple 处理”未被报。停止节点推断的“坐标偏 102.5pt”第二条报错两轮均未出现。
+
+**限制：** 只测了 SE、英文、普通字号；iPad、Pro Max 沿用 11-12 的结果未重跑；真机、TestFlight 交易、VoiceOver 仍未验证。付费 App 协议是否已生效未回读。固定回归门槛未因本次复测扩大为已通过。
+
+**说明文字改色（用户 2026-11-13 确认方案 C）：** 看过 SE 实拍的现状 / 深灰 `#566169` / 墨色 `#30363b` 三张效果图后，用户选深灰。`PurchaseSheet.swift` 只把这一段说明在浅色模式下改为 `#566169`（纸色底 6.13:1），深色模式仍用次要色；调色板、其余两行灰字、字号、间距和文案不变。改后 `swift test` 75/75、8/8 通过；SE 不重置整 App UI 测试 4/4 通过（`test-logs/run15`，审计无发现）。此前一轮 `run14` 因强行中止上一轮后的残留进程导致测试进程异常退出，不计入结果。限制同上：仅 SE、英文、普通字号、浅色实测；深色未改也未重拍，iPad、Pro Max 及其余四语言未在改色后重跑。
+
+**改色后 iPad / Pro Max 补跑（`eac0b44`）：** “Reader QA - iPad Air 11 M4”不重置整套 4/4 通过（`test-logs/run16`）。Pro Max 用临时新建的 iPhone 18 Pro Max 模拟器（跑完已删除）：第一次整套 3 过 1 败，失败的是排在最前的审计用例，清理步骤“恢复购买”20 秒未返回、随后 `buyProduct` 报 StoreKit 内部错误，后 3 个用例同样步骤正常；第二台新建模拟器先单跑一个用例预热，该用例同样在首次 StoreKit 调用处失败（8 秒），紧接着整套 4/4 通过，两处审计均无发现（`run17`）。两台全新模拟器上都是**首个用例的首次 StoreKit 测试调用失败、之后恢复正常**，与停止节点“重置后失败”的现象一致；这是全新/重置模拟器的环境预热问题，不是本批代码或配色问题。两次均未见“登录 Apple 账户”对话框，该对话框的成因仍未复现。真机、其余四语言、深色及大字号在改色后仍未测。
+
+**测试稳定性修正（仅 `Tests/FullAppUITests`，App 代码未改）：**
+
+- 全新模拟器：四个用例的 StoreKit 会话创建合并为 `makeSession()`，先用一次丢弃的购买探测；失败则启动一次 App 并重建会话（最多 3 次）。只在原会话上等待重试无效（10 次全败，`run18`）。全新 iPhone 18 Pro Max 模拟器上首次探测失败后自动恢复，整套一次 4/4 通过（`run19`）；既有 SE 上其余 3 个用例通过（`run21`）。
+- 审计取样时机：改色后 SE 上页脚审计仍随机报同一段说明（整套 1 次失败，单用例 5 次中 1 次失败，`run21`、`run22`），截图确认颜色已是 `#566169`。在页脚审计前等待 1 秒让滚动停稳后，单用例连跑 10/10 通过（`run23`）。对照：同样等待 1 秒但临时换回原次要色 `#66727a`，5 次中 4 次失败（`run24`，跑完已恢复），所以改色确有必要，等待只消除剩余的取样波动。加等待后的整套未再完整重跑。
+
+**iPhone Duo 模拟器实测（iOS 27.1，默认姿态，`run20` 与 `test-logs/duo/probe1`）：** 现有整套 4 个用例在 Duo 上全部失败，但逐项排查后**未发现 App 功能问题**，失败均来自用例假设：
+
+- 窗口为 466×678pt。系统在右侧留出约 84pt 竖条放状态栏，并把返回、查找、目录、更多（列表页为加号）竖排在其下，顶栏只留标题和“阅读外观”。这是 Apple 文档说明的 iOS 27.1 SDK 标准行为（“Standard navigation and toolbar buttons now lay out vertically under the status bar”），不是 App 缺陷；用例按“导航栏首个按钮是返回/侧栏”查找因此不成立。
+- 首测截图里阅读页正文空白是截图时机：当时辅助功能树仍为“Opening document…”。调试版直接安装及探针用例等待 4 秒后，正文、标题、引用块、页脚均正常显示。
+- 列表页保留完整 `ReaderBrand`（图标 + iMDReader）在顶栏左侧，加号在右侧竖条；单栏导航、返回、重新打开示例文档正常。即此姿态下走的是 iPhone 单栏布局，品牌在列表页而非阅读区顶栏。
+- 付费墙“恢复购买”“使用条款”高度为 43.99999pt，被 ≥44 的断言判败，属浮点误差。
+- 未解释：过期付费墙顶部审计报了被遮住的阅读页页脚“Samples”“0%”对比度，其他机型未报。
+
+**Duo 未覆盖：** 折叠/展开切换、外屏、真正的横屏与分屏。模拟器的折叠和旋转只能在 Device Hub 界面手动操作，`XCUIDevice` 设置横屏后窗口尺寸不变；本机模拟器输入注入对 Duo 也未生效，所以没有验证收窄方案 A 的 regular×regular 分支（品牌移到阅读区顶栏）是否在某个姿态下触发及其观感。现有用例未改为兼容 Duo。结论：默认姿态可正常使用，方案 A 的内屏分支与折叠切换**仍未验收**。临时模拟器“IMD-QA Duo”保留。
+
+**TestFlight 0.4.0（56）上传 · 2026-11-13 20:10（UTC+8）：** 用户要求开发测试完成后上传 TestFlight 供本人安装测试；不含正式提审或上架授权。从已推送的 `94a0511`（工作树干净）执行 Release Archive，命令行覆盖 App 与 Widget 构建号为 56、版本保持 0.4.0，工程默认 54 未改；随后 App Store Connect 导出并上传一次，`xcodebuild` 返回 exit 0 / Upload succeeded / “Uploaded package is processing”。**本次未回读 App Store Connect**：处理是否完成、是否需要再次回答出口合规问答、是否已加入 Internal 组均未确认，不写成已可安装或已分发。相对 55 的变化为 main 之后的 `release/0.4.x` 全部提交（使用条款链接、iPhone 品牌收窄方案 A、付费墙大字号适配、状态栏同色底、说明文字改色等）。已知未验收项：iPhone Duo（见上）、真机、付费 App 协议生效后的真实商品加载。
+
+**待确认：** Duo 适配问题的处理范围与优先级；`release/0.4.x` 何时合并/出版本 PR。公开 main 另有 4 个 2026-10-28 文档提交带个人邮箱，清除需改写历史并强推，未处理。
+
 ## 最新商品排查与旧锁定页移除 · 2026-11-11
 
 用户截图证实 iPad 0.4.0（55）商品价格未加载，试用和购买不可开始。Chrome 只读核实：两个非消耗型商品均“准备提交”，ID 与代码一致、五语言齐、175 地区可售，当前买断美国价 $2.99/菲律宾 ₱199，试用免费；商务页免费 App 协议“有效”，**付费 App 协议为“新”、无生效日期**，要求账户持有人先更新法律实体信息。这是明确后台阻塞，不把用户此前已检查的报告等同于当前 Active；银行/税务有效状态尚未独立回读。已请用户本人处理，未代签、代填、修改商品或提审。协议生效后仍须复测并取得 StoreKit 日志，不能承诺只有这一处原因。
@@ -41,7 +99,9 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 
 **实际完成：** 商品加载和购买/恢复状态分开；加载不阻塞恢复，价格只按加载状态显示。空商品、缺试用商品、网络失败与 15 秒加载超时分开反馈；按钮禁用原因、购买/恢复/验证进度及等待提示五语言齐全。权益完整读取也限 15 秒，失败不擦除缓存；已验证事件先应用，快照滞后及旧快照覆盖撤销两类竞态有控制器测试。取消不再当错误展示。恢复等待 60 秒后明确提示仍在等待并可重试等待同一请求，迟到结果继续回写；不会重复调用 Apple 认证。购买窗口长时间等待只提示，不谎称交易已取消或解锁重复购买。诊断仅记录阶段、错误域/代码及缺失商品 ID。
 
-**规则与范围：** 14×24 小时、主动领取、到期锁定、老用户 build≤53 生产判断、买断家庭共享、试用不共享、Mac 不收费均未改；品牌/名称/工具栏、语言菜单、置顶、外观和导航代码未改。付费墙视觉已获用户明确确认并实施（见下）；语言选择器及 regular 宽度 iPhone 品牌迁移仍是独立待决策项，不能把付费墙确认扩展成这些改动的验收。
+**规则与范围：** 14×24 小时、主动领取、到期锁定、老用户 build≤53 生产判断、买断家庭共享、试用不共享、Mac 不收费均未改；品牌/名称/工具栏、语言菜单、置顶、外观和导航代码未改。付费墙视觉已获用户明确确认并实施（见下）；语言选择器与 regular 宽度 iPhone 品牌位置已由 Boss 于 2026-11-12 另行决定（见五语言本地化与折叠屏小节），不能把付费墙确认扩展成这些改动的验收。
+
+**使用条款链接 · 2026-11-12（本地开发，待 Mac 验证）：** Boss 选方案 A：付费墙页脚在“隐私政策”与“使用支持”之间新增“使用条款”，链接 Apple 标准 EULA（https://www.apple.com/legal/internet-services/itunes/dev/stdeula/），标识 `paywall.terms`；沿用现有 ViewThatFits，英文放不下一行时回退为既有竖排四行，未改页脚布局。新增 catalog key 五语言齐全，check-localizations.py 0 error（4 项既有警告）；日、韩、繁体由 AI 起草，未经母语审校。FullAppUITests 与 PaywallUITests 已有页脚路径补充 terms 存在且高度 ≥44 的断言，尚未在模拟器/真机运行；中英文页脚视觉待 Mac 检查。锁定层设置菜单无隐私/支持入口，解锁后设置的“使用支持”与 ReaderScreen 设置的“隐私政策”不属付费墙页脚，均未加使用条款。
 
 **当前验证：** Apple 平台 ReaderCore Debug/Release 各 75 项集合通过（各 1 项真实网络测试跳过）；根包既有状态 51 项集合通过（1 项真实网络跳过）；新增真实购买控制器注入测试 8 项通过，使用内存缓存，不访问真实购买账户。包含超时/不响应取消、迟到结果、重试、恢复单请求、恢复时商品仍加载、空/错商品、无记录/失败/取消、权益缓存保护、快照滞后和撤销竞态。Xcode 27.2 下 iOS Simulator Release（App/Widget）与 Mac Release 构建通过，正式 App 均未签名/安装/启动。本地化 230 个 key 五语言齐全，0 error、4 条既有启发式 warning；新增日韩繁译文未母语审校。
 
@@ -80,7 +140,7 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 
 **外部状态：** 用户报告已完成协议/税务/银行检查与 TestFlight 重测、ASC 审核联系邮箱更新，本轮未回读 ASC，重测具体结果未知，不推断商品不可用原因。GitHub 只读确认 PR #8（支持页/首页邮箱、0.4.1 / 55）和 PR #2（隐私政策）仍 open，未合并；Pages 邮箱修正尚未随这两个 PR 上线。正式版仍为 0.3.0（53），/Applications 的 Mac App 也是该版本。
 
-**下一步：** 取得 TestFlight 重测现象与必要日志（真实设备、候选构建、同账号重装与 Sandbox 家庭的准确前提已列入 IAP）；处理独立的现有布局待决策；完成剩余整 App 固定门槛、辅助功能复核与真实 StoreKit/设备验收，再补 IAP 审核截图与商店材料。计划中的 0.4.1（55）须另行整合审查后准备分发，未因本地修复自动进入发布。实现说明及命令见 [IAP](IAP.md)；审核准备见 [app-store-preparation](app-store-preparation.md)。
+**下一步：** 取得 TestFlight 重测现象与必要日志（真实设备、候选构建、同账号重装与 Sandbox 家庭的准确前提曾列入已删除的 IAP 文档）；处理独立的现有布局待决策；完成剩余整 App 固定门槛、辅助功能复核与真实 StoreKit/设备验收，再补 IAP 审核截图与商店材料。计划中的 0.4.1（55）须另行整合审查后准备分发，未因本地修复自动进入发布。实现说明及命令见 IAP（文档已删除，见 Git 历史）；审核准备见 [app-store-preparation](app-store-preparation.md)。
 
 以下 0.4.0 开发分支记录为历史阶段描述；其中“尚未合 main/未创建商品/没有 Xcode”等不代表当前状态。
 
@@ -88,7 +148,7 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 
 本轮在 `feat/storekit-purchase`，起点 `be333408ae46837e7158c6633abaac2f2f7914ec`，按 KB main 合并提交 `3bc39f7`（PR #22） 第十一节与 4.3 接入「14 天全功能免费试用 + 到期后买断」。正式 0.3.0（53）仍免费；不改版本、不合 main、不创建 ASC 商品、不启动 App/安装/上传/发布。Mac 永远关闭收费，无购买界面；CloudKit 及其启动参数未改。
 
-- 已完成：两个已定非消耗型 ID；ReaderCore 五态纯逻辑与可注入缓存协议；生产 originalAppVersion 数字 build≤53 的老用户已定 B（sandbox/xcode 排除；取不到 AppTransaction 按新用户，不另存标记）；Keychain 独立本机缓存与最大已见时间；iOS 主动领取/买断/恢复、家庭共享买断与撤销、按 11.3 的锁定层（语言、版本、数据管理保留；Spotlight/快捷指令/小组件/深链落到购买页，解锁后恢复原文档/来源）、自动说明页、最后三天提示；五语言购买文案与本地 StoreKit 配置。方案、ASC 五语言清单及重装实测步骤见 [IAP](IAP.md)。
+- 已完成：两个已定非消耗型 ID；ReaderCore 五态纯逻辑与可注入缓存协议；生产 originalAppVersion 数字 build≤53 的老用户已定 B（sandbox/xcode 排除；取不到 AppTransaction 按新用户，不另存标记）；Keychain 独立本机缓存与最大已见时间；iOS 主动领取/买断/恢复、家庭共享买断与撤销、按 11.3 的锁定层（语言、版本、数据管理保留；Spotlight/快捷指令/小组件/深链落到购买页，解锁后恢复原文档/来源）、自动说明页、最后三天提示；五语言购买文案与本地 StoreKit 配置。方案、ASC 五语言清单及重装实测步骤见 IAP（文档已删除，见 Git 历史）。
 - 开关：iOS Release 默认启用；iOS DEBUG 仅 `-IMDPurchaseEnabled` 启用；非 iOS 永远关闭。**发版前必须先在 ASC 配好 lifetime 和 trial14d，否则 Release 会锁功能且无法试用/购买。**
 - 验证通过：Swift 6.1.2，直接复制实际 PurchaseAccess.swift 与 PurchaseAccessTests.swift 到 `/tmp/imd-purchase-checks` 的无依赖临时包，Debug/Release 各 10 项 swift-testing 全通过（非 App host）。覆盖五态、恰好14天、撤销、共享、离线/无缓存、老用户数字/环境排除、水印回拨、交易保留/缓存清空及内存协议往返。三个 iOS App 源文件以 arm64-apple-ios17.0 语法解析通过，不能等同 Apple SDK 类型检查；购买文案五语言、translated/comment/占位符、商品限长/价格/家庭共享、严格 UTF-8 和 diff 空白检查通过。
 - 完整 ReaderCore 测试未通过运行门槛：已尝试 `swift test --package-path ReaderCore --scratch-path /tmp/imd-reader-core-build --skip-update`，依赖可用后编译被现有 `OfflineCache.swift` 的 `no such module 'CryptoKit'` 阻塞（Linux）；未为此改业务代码或依赖。购买纯逻辑已隔离运行，不冒充全套通过。复现命令见 IAP。
@@ -103,7 +163,7 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 验证：scripts/check-localizations.py（JSON、五语言完整、占位符一致、严格 UTF-8、区域与 reader.js/ReaderLanguage 覆盖；已装 OpenCC 做繁简探测）0 error；reader.js 用 Node 做五语言行为检查；ReaderLanguage 与 DocumentDates 在 Linux 用 Swift 6.1 独立编译并运行检查，其余 Swift 文件仅语法解析。**没有 Xcode，App 与 Widget 未编译，Swift 测试未在 Apple 平台运行，模拟器/真机的布局、语言切换、Siri 短语和 Widget 均未测。** 日、韩、繁体译文由 AI 起草，未经母语审校。固定回归门槛中语言、外观排版、Mac 查找与移动设置须在 Apple 平台回归后才能写成通过。机制与步骤见 [LOCALIZATION](LOCALIZATION.md)。
 
 - 语言名一律使用各语言自称（简体中文、繁體中文、English、日本語、한국어；Apple 惯例），校验脚本已将这五个 key 列入白名单。OpenCC 扫描 zh-Hant：除白名单中的「简体中文」外，未发现混入简体字。
-- 语言选择器保持菜单，是否改回分段等产品或 Boss 定，本分支不自行决定；备选分支 `feat/l10n-ja-ko-zh-hant-segmented` 已恢复分段（已推送、未开 PR）。五种语言加「跟随系统」共六个选项放进分段控件，iPhone 竖屏宽度可能不够（【推断】，未在真机或模拟器验证）。
+- 语言选择器保持菜单。**Boss 于 2026-11-12 决定保留下拉菜单，不改分段控件**，本次无代码改动；备选分支 `feat/l10n-ja-ko-zh-hant-segmented` 已恢复分段（已推送、未开 PR）。五种语言加「跟随系统」共六个选项放进分段控件，iPhone 竖屏宽度可能不够（【推断】，未在真机或模拟器验证）。
 - 三语言 App Store 商店元数据草稿按原要求不进本 PR，存放在仓库外；是否入库由产品定。
 
 ## iOS 0.3.0（53）正式发布 · 2026-11-11
@@ -114,8 +174,8 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 
 - 源码核对【已验证】：未设 UIRequiresFullScreen；iPad 四向、iPhone 三向；无 UIScreen.main；无按机型写死的尺寸。单/双栏另有固定断点：`adaptLayout` 在 `size.width < 900`、宽小于高、或 `horizontalSizeClass` 为 compact 时走单栏（regular 宽度下由此决定单栏还是双栏）。多窗口（UIApplicationSupportsMultipleScenes）按既有决定保持关闭，本分支未改。
 - 【推断/待 Mac 验证】NavigationSplitView 随窗口尺寸与 size class 在单/双栏间切换；选中文档存于 store，推断不随折叠/展开丢失，运行时未测。iPad 与 compact iPhone 的品牌位置推断与改动前一致，未运行验证。
-- 本分支唯一代码改动（现方案，品牌位置条件待 Boss 确认，代码先不动）：品牌位置原按 iPad/iPhone idiom 判断，改为 idiom 为 iPad 或水平 size class 为 regular。
-- 品牌位置两个备选方案，等 Boss 定：
+- **2026-11-12 Boss 决定采用收窄方案（方案 A）**：`release/0.4.x` 的 `usesRegularChrome` 已改为 idiom 为 iPad，或 iPhone 水平与垂直 size class 均为 regular；Plus/Max 横屏（regular×compact）保持已确认的 iPhone 工具栏。Duo、Plus/Max 横屏与 iPad 仍待 Mac/模拟器验证，尚未运行。
+- 品牌位置两个备选方案（历史记录，已按上条决定）：
   - 现方案（本分支）：iPhone 水平 size class 为 regular 即用 iPad 顶栏。Plus/Max 横屏一般为 regular 宽度（【推断】，待模拟器确认），品牌会从侧栏顶栏移到阅读区顶栏左侧，改变已确认的 iPhone 工具栏，与 AGENTS.md 冲突，须 Boss 确认。
   - 收窄方案（分支 `feat/adaptive-layout-narrow`，已推送、未开 PR）：仅当 iPhone 水平与垂直 size class 均为 regular（折叠屏展开内屏）时才用 iPad 布局。Plus/Max 横屏为 regular×compact，品牌位置与现网一致，不违反 AGENTS.md。该前提依据 Apple 公开说明：iPhone Duo 内屏为 regular×regular，外屏竖向 compact×regular、横向 compact×compact，见 [Prepare - iPhone Duo](https://developer.apple.com/iphone-duo/prepare/) 与 Tech Talk [Prepare your app for iPhone Duo](https://developer.apple.com/videos/play/tech-talks/111461/)。Boss 若选收窄方案，可将该分支快进进本 PR 分支。
 - 未在任何真机或模拟器测试。Apple 已公布 iPhone Duo，Xcode 27.1 提供 Duo 模拟器（出处同上）。Duo 模拟器及 iPad 调整窗口验证待 Mac 执行。
@@ -218,7 +278,7 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 ### 当时复现的问题（当前修复见页首）
 
 1. **P2：日期请求401被吞掉，GitHub会话失效但界面仍显示已授权。** `ReaderApp/ReaderStore.swift:740–744` 使用 `try?` 读取提交日期。若正文已读取、随后日期请求返回401，底层会撤销会话并清缓存，但Store没有走正文错误分支的 `clearRejectedGitHubCredential`。合成传输复现：`hasGitHubCredential=true`、原文仍在、没有授权失效提示；再打开另一篇仍停留原文并报 `Swift.CancellationError`。建议在日期任务中区分凭据拒绝与普通可忽略错误，并保护新会话不被旧回调清理；图片加载的同类401路径一起检查。可通过移除/重设授权恢复，未见令牌泄漏或源文件损坏，不定为P0。临时新增回归的4个期望失败，日志为 `auth-probe.log`。
-2. **P2：English下图片限制提示仍为中文。** `ReaderCore/Sources/ReaderCore/MarkdownRenderer.swift:86–87` 输出“图片需要所在文件夹的访问权限”和“暂不支持此图片地址”，但 `ReaderApp/Resources/reader.js:5–7` 只匹配两个已过时文案，未标记待翻译节点。隐藏WebKit以English执行当前脚本后，两条提示仍中文。建议使用稳定消息标识连接渲染器和翻译逻辑，并覆盖单文件相对图片/不支持图片地址及语言往返。
+2. **P2：English下图片限制提示仍为中文。** 2026-10-29当时属实：渲染器输出中文提示，`reader.js` 只匹配过时文案，隐藏WebKit以English执行后仍为中文。当前main已改为稳定 `data-reader-message` 标识，`reader.js` 按此为zh-Hans、zh-Hant、en、ja、ko五种App语言翻译；新增Node测试 `Tests/ReaderScriptChecks/resource-messages.test.mjs`。Mac端Swift测试与真实WebKit核对仍待执行。
 3. **P3：空Markdown或仅front matter文档不显示变更时间。** `ReaderApp/ReaderWebView.swift:113` 无判空调用 `box.nextElementSibling.getBoundingClientRect()`；正文没有元素时抛JavaScript异常，日期容器保持hidden。相同探针添加普通标题后正常显示。影响日期展示，不是原生App崩溃；建议无正文时仍填入日期，仅跳过滚动补偿。证据与第2项同在 `web-edge-probe.log`。
 
 本轮未覆盖：完整Mac界面人工点击/键盘/视觉矩阵、iPhone/iPad真机旋转与分栏、Intel及最低系统实际运行、完整无障碍和大文档/多图性能。构建另有既有 `MacFindField.Coordinator.submitSearch` 主Actor隔离告警，未据此声称运行故障。上述范围和历史待验项保持未测，不以用户此前总体验收或本轮编译通过代替。

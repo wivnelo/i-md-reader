@@ -117,7 +117,8 @@ struct ReaderWebView: ReaderWebRepresentable {
         """
     }
     /// Restores a saved position: values from 2 name a top-level article block plus the fraction within it;
-    /// values in 0...1 are the earlier whole-document ratio. Re-aligns as images above load until the reader interacts.
+    /// values in 0...1 are the earlier whole-document ratio. Re-aligns as images above load or the width changes
+    /// (Split View, Stage Manager, rotation) until the reader interacts.
     static func positionScript(_ value: Double) -> String {
         let value = value.isFinite ? value : 0
         guard value >= 2 else {
@@ -135,6 +136,7 @@ struct ReaderWebView: ReaderWebRepresentable {
           const settle = () => { settled = true; };
           ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(type => addEventListener(type, settle, { once: true, passive: true }));
           document.addEventListener('load', event => { if (!settled && event.target instanceof HTMLImageElement) apply(); }, true);
+          addEventListener('resize', () => { if (!settled) apply(); });
           setTimeout(settle, 10000);
         })();
         """

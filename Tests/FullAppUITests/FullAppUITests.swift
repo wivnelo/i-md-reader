@@ -1,8 +1,9 @@
 import XCTest
 import UIKit
-import StoreKitTest
 
 final class FullAppUITests: XCTestCase {
+    private static let launchArguments = ["-IMDDisableCloudKit", "-readingSampleRemoved", "NO", "-readerLanguage", "en", "-AppleLanguages", "(en)"]
+
     @MainActor private func record(_ name: String, app: XCUIApplication) {
         let tree = XCTAttachment(string: app.debugDescription)
         tree.name = name + "-accessibility-tree"
@@ -14,153 +15,20 @@ final class FullAppUITests: XCTestCase {
         add(screenshot)
     }
 
-    @MainActor private func reveal(_ element: XCUIElement, app: XCUIApplication) {
-        let scroll = app.scrollViews["paywall.content"]
-        for _ in 0..<10 {
-            if element.exists && scroll.frame.contains(element.frame) { return }
-            scroll.swipeUp()
-        }
-        XCTAssertTrue(element.isHittable)
-    }
-
-    @MainActor private func clearCachedTestPurchase(app: XCUIApplication) {
-        // Clearing StoreKit transactions does not clear the App's persistent Keychain grant.
-        // Use the actual restore flow, so the fixture needs no production bypass.
-        if !app.scrollViews["paywall.content"].waitForExistence(timeout: 3) {
-            if app.buttons["Trial and Purchase"].exists {
-                app.buttons["Trial and Purchase"].tap()
-            } else {
-                app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "App settings")).firstMatch.tap()
-                app.buttons["Unlocked"].tap()
-            }
-        }
-        XCTAssertTrue(app.scrollViews["paywall.content"].waitForExistence(timeout: 10))
-        let restore = app.buttons["paywall.restore"]
-        reveal(restore, app: app)
-        restore.tap()
-        XCTAssertTrue(app.staticTexts["There are no purchases to restore."].waitForExistence(timeout: 20))
-    }
-
-    @MainActor func testFullAppPurchaseGateAndNavigation() async throws {
-        let config = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "iMDReader", withExtension: "storekit"))
-        let session = try SKTestSession(contentsOf: config)
-        session.resetToDefaultState()
-        session.clearTransactions()
-        session.disableDialogs = true
-        session.storefront = "USA"
+    @MainActor private func launchReader() -> XCUIApplication? {
         let app = XCUIApplication()
-        app.launchArguments = ["-IMDPurchaseEnabled", "-IMDDisableCloudKit", "-readingSampleRemoved", "NO", "-readerLanguage", "en", "-AppleLanguages", "(en)"]
-        app.launch()
-        clearCachedTestPurchase(app: app)
-        app.terminate()
-        app.launch()
-        XCTAssertTrue(app.buttons["paywall.settings"].waitForExistence(timeout: 15))
-        XCTAssertFalse(app.buttons["paywall.close"].exists)
-        XCTAssertFalse(app.buttons["Trial and Purchase"].exists)
-        XCTAssertTrue(app.staticTexts["iMDReader"].exists)
-        record("fullapp-startup", app: app)
-        let restore = app.buttons["paywall.restore"]
-        reveal(restore, app: app)
-        restore.tap()
-        XCTAssertTrue(app.staticTexts["There are no purchases to restore."].waitForExistence(timeout: 20))
-        record("fullapp-paywall", app: app)
-        record("fullapp-locked", app: app)
-        XCTAssertFalse(app.webViews.firstMatch.isHittable)
-        XCTAssertTrue(app.buttons["App settings"].exists)
-        app.buttons["App settings"].tap()
-        record("fullapp-locked-settings", app: app)
-        for title in ["GitHub access", "iCloud sync", "Offline cache", "Manage Sources"] {
-            XCTAssertTrue(app.buttons[title].isEnabled)
-        }
-        app.buttons["Manage Sources"].tap()
-        XCTAssertTrue(app.navigationBars["Manage Sources"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.buttons["Remove Source"].exists)
-        record("fullapp-locked-source-manager", app: app)
-        app.navigationBars["Manage Sources"].buttons.firstMatch.tap()
-        for title in ["GitHub access", "iCloud sync", "Offline cache"] {
-            app.buttons["App settings"].tap()
-            app.buttons[title].tap()
-            XCTAssertTrue(app.navigationBars[title].waitForExistence(timeout: 10))
-            record("locked-" + title, app: app)
-            app.buttons["Done"].tap()
-        }
-        var link = URLComponents(string: "imdreader://open")!
-        link.queryItems = [URLQueryItem(name: "key", value: "E4072B41-1284-4D82-82BE-846370D11759|/长文滚动检查.md")]
-        // Deliver the link from a foreground system caller to the running app.
-        XCUIApplication(bundleIdentifier: try XCTUnwrap(Bundle.main.bundleIdentifier)).activate()
-        let opened = await UIApplication.shared.open(try XCTUnwrap(link.url))
-        XCTAssertTrue(opened)
-        app.activate()
-        XCTAssertTrue(app.buttons["paywall.settings"].waitForExistence(timeout: 10))
-        XCTAssertFalse(app.webViews.firstMatch.isHittable)
-        let trial = app.buttons["paywall.trial"]
-        reveal(trial, app: app)
-        trial.tap()
-        XCTAssertTrue(app.webViews.firstMatch.wait(for: \.isHittable, toEqual: true, timeout: 20))
-        XCTAssertTrue(app.webViews.staticTexts["长文滚动检查"].firstMatch.waitForExistence(timeout: 20))
-        record("fullapp-reading", app: app)
-    }
-    @MainActor private func audit(_ name: String, app: XCUIApplication) throws -> [String] {
-        var findings: [String] = []
-        try app.performAccessibilityAudit { issue in
-            findings.append("\(issue.auditType.rawValue): \(issue.compactDescription) — \(issue.element?.label ?? "no element") — frame=\(String(describing: issue.element?.frame)) — \(issue.detailedDescription)")
-            // Gather every finding; assert at the end, never silently filter warnings.
-            return true
-        }
-        let attachment = XCTAttachment(string: findings.isEmpty ? "No audit findings" : findings.joined(separator: "\n"))
-        attachment.name = name + "-audit"
-        attachment.lifetime = .keepAlways
-        add(attachment)
-        return findings
-    }
-
-    @MainActor func testAccessibilityAuditWithoutSpeech() async throws {
-        let config = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "iMDReader", withExtension: "storekit"))
-        let session = try SKTestSession(contentsOf: config)
-        session.resetToDefaultState()
-        session.clearTransactions()
-        session.disableDialogs = true
-        session.storefront = "USA"
-        let app = XCUIApplication()
-        app.launchArguments = ["-IMDPurchaseEnabled", "-IMDDisableCloudKit", "-readingSampleRemoved", "NO", "-readerLanguage", "en", "-AppleLanguages", "(en)"]
-        app.launch()
-        clearCachedTestPurchase(app: app)
-        try await session.buyProduct(identifier: "com.readerprototype.3z4gd8c2jp.ipadmarkdownreader.trial14d", options: [.purchaseDate(Date().addingTimeInterval(-15 * 86400))])
-        app.terminate()
-        app.launch()
-        guard app.buttons["paywall.settings"].waitForExistence(timeout: 10) else {
-            XCTFail("Expired access must display the new root paywall"); return
-        }
-        record("fullapp-expired-paywall", app: app)
-        let topFindings = try audit("fullapp-expired-paywall-top", app: app)
-        reveal(app.buttons["paywall.restore"], app: app)
-        XCTAssertGreaterThanOrEqual(app.buttons["paywall.restore"].frame.height, 44)
-        reveal(app.staticTexts["paywall.payment"], app: app)
-        record("fullapp-expired-paywall-footer", app: app)
-        let footerFindings = try audit("fullapp-expired-paywall-footer", app: app)
-        XCTAssertFalse(app.buttons["paywall.close"].exists)
-        XCTAssertFalse(app.webViews.firstMatch.isHittable)
-        XCTAssertTrue(topFindings.isEmpty && footerFindings.isEmpty,
-                      "See attached unfiltered accessibility audit findings")
-    }
-
-    @MainActor func testUnlockedNavigationAndRotation() async throws {
-        let config = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "iMDReader", withExtension: "storekit"))
-        let session = try SKTestSession(contentsOf: config)
-        session.resetToDefaultState()
-        session.clearTransactions()
-        session.disableDialogs = true
-        let app = XCUIApplication()
-        app.launchArguments = ["-IMDPurchaseEnabled", "-IMDDisableCloudKit", "-readingSampleRemoved", "NO", "-readerLanguage", "en", "-AppleLanguages", "(en)"]
-        app.launch()
-        try await session.buyProduct(identifier: "com.readerprototype.3z4gd8c2jp.ipadmarkdownreader.lifetime")
-        app.terminate()
+        app.launchArguments = Self.launchArguments
         app.launch()
         guard app.webViews.firstMatch.wait(for: \.isHittable, toEqual: true, timeout: 20) else {
-            record("unlocked-reading-missing", app: app)
-            XCTFail("Verified lifetime must expose the reader"); return
+            record("reading-missing", app: app)
+            XCTFail("The reader must open without any gate"); return nil
         }
-        record("unlocked-reading-portrait", app: app)
+        return app
+    }
+
+    @MainActor func testNavigationAndRotation() async throws {
+        guard let app = launchReader() else { return }
+        record("reading-portrait", app: app)
         let back = app.navigationBars.buttons.firstMatch
         let backLabel = back.label
         guard ["Back", "Sidebar", "Show Sidebar", "Toggle Sidebar"].contains(backLabel) else {
@@ -171,18 +39,23 @@ final class FullAppUITests: XCTestCase {
         XCTAssertTrue(sample.waitForExistence(timeout: 10))
         XCTAssertTrue(sample.isHittable)
         let portraitSize = app.frame.size
-        let isPhone = portraitSize.width < 600
         XCUIDevice.shared.orientation = .landscapeLeft
         XCTAssertTrue(app.wait(for: \.frame.size, toEqual: CGSize(width: portraitSize.height, height: portraitSize.width), timeout: 10))
         defer { XCUIDevice.shared.orientation = .portrait }
+        // Judge the landscape layout by the UI: a hidden list means a regular-width detail-only split (e.g. Pro Max).
+        let listShownAfterRotation = sample.wait(for: \.isHittable, toEqual: true, timeout: 5)
+        if !listShownAfterRotation {
+            let sidebar = app.navigationBars.buttons.firstMatch
+            XCTAssertTrue(["Sidebar", "Show Sidebar", "Toggle Sidebar"].contains(sidebar.label), "Inspect landscape sidebar control: " + sidebar.label)
+            sidebar.tap()
+        }
         XCTAssertTrue(sample.wait(for: \.isHittable, toEqual: true, timeout: 10))
-        if isPhone { XCTAssertFalse(app.webViews.firstMatch.isHittable) }
-        record("unlocked-library-landscape", app: app)
+        // Only a compact stack (portrait compact and list still shown, e.g. SE) hides the article.
+        if listShownAfterRotation && portraitSize.width < 600 { XCTAssertFalse(app.webViews.firstMatch.isHittable) }
+        record("library-landscape", app: app)
         XCUIDevice.shared.orientation = .portrait
         XCTAssertTrue(app.wait(for: \.frame.size, toEqual: portraitSize, timeout: 10))
-        if isPhone {
-            XCTAssertTrue(sample.wait(for: \.isHittable, toEqual: true, timeout: 10))
-        } else if !sample.isHittable {
+        if !sample.wait(for: \.isHittable, toEqual: true, timeout: 5) {
             // iPad may collapse the sidebar on rotation; that behavior is not being redesigned.
             app.navigationBars.buttons.firstMatch.tap()
         }
@@ -190,71 +63,59 @@ final class FullAppUITests: XCTestCase {
         sample.tap()
         XCTAssertTrue(app.webViews.firstMatch.wait(for: \.isHittable, toEqual: true, timeout: 10))
         XCTAssertTrue(app.webViews.staticTexts["为阅读留一点空间"].firstMatch.waitForExistence(timeout: 20))
-        record("unlocked-article-after-rotation", app: app)
+        record("article-after-rotation", app: app)
     }
 
-    @MainActor private func tapMenuOption(_ label: String, app: XCUIApplication) {
-        let option = app.buttons[label]
-        let menu = app.collectionViews.firstMatch
-        for _ in 0..<12 {
-            if option.exists && option.isHittable { option.tap(); return }
-            // Collection frames extend beyond the clipped native menu; drag in its top 200 points.
-            let origin = menu.coordinate(withNormalizedOffset: .zero)
-            origin.withOffset(CGVector(dx: menu.frame.width / 2, dy: 200))
-                .press(forDuration: 0.01, thenDragTo: origin.withOffset(CGVector(dx: menu.frame.width / 2, dy: 50)))
-        }
-        XCTFail("Menu option is not reachable: \(label)")
-    }
-
-    @MainActor func testExpiredRootPaywallSettingsAndLanguage() async throws {
-        let config = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "iMDReader", withExtension: "storekit"))
-        let session = try SKTestSession(contentsOf: config)
-        session.resetToDefaultState()
-        session.clearTransactions()
-        session.disableDialogs = true
-        session.storefront = "USA"
-        let app = XCUIApplication()
-        app.launchArguments = ["-IMDPurchaseEnabled", "-IMDDisableCloudKit", "-readingSampleRemoved", "NO", "-readerLanguage", "en", "-AppleLanguages", "(en)"]
-        app.launch()
-        clearCachedTestPurchase(app: app)
-        try await session.buyProduct(identifier: "com.readerprototype.3z4gd8c2jp.ipadmarkdownreader.trial14d", options: [.purchaseDate(Date().addingTimeInterval(-15 * 86400))])
-        app.terminate()
-        for theme in ["light", "dark"] {
-            let size = theme == "dark" ? UIContentSizeCategory.accessibilityExtraExtraExtraLarge.rawValue : UIContentSizeCategory.large.rawValue
-            app.launchArguments = ["-IMDPurchaseEnabled", "-IMDDisableCloudKit", "-readingSampleRemoved", "NO", "-AppleLanguages", "(en)", "-readerTheme", theme, "-UIPreferredContentSizeCategoryName", size]
+    @MainActor func testFiveLanguagesLocalizeSettings() async throws {
+        // language code, settings button, GitHub access, offline cache, privacy policy
+        let expected = [("zh-Hans", "应用设置", "GitHub 授权", "离线缓存", "隐私政策"),
+                        ("zh-Hant", "App 設定", "GitHub 授權", "離線快取", "隱私權政策"),
+                        ("en", "App settings", "GitHub access", "Offline cache", "Privacy Policy"),
+                        ("ja", "アプリ設定", "GitHub アクセス許可", "オフラインキャッシュ", "プライバシーポリシー"),
+                        ("ko", "앱 설정", "GitHub 접근 권한", "오프라인 캐시", "개인정보 처리방침")]
+        for (code, settingsLabel, github, cache, privacy) in expected {
+            let app = XCUIApplication()
+            app.launchArguments = ["-IMDDisableCloudKit", "-readingSampleRemoved", "NO", "-readerLanguage", code]
             app.launch()
-            XCTAssertTrue(app.buttons["paywall.settings"].waitForExistence(timeout: 15))
-            // Do not pin readerLanguage in launch arguments: it masks UI preference changes.
-            app.buttons["paywall.settings"].tap()
-            tapMenuOption("English", app: app)
-            XCTAssertFalse(app.buttons["paywall.close"].exists)
-            XCTAssertFalse(app.buttons["Trial and Purchase"].exists)
-            XCTAssertFalse(app.webViews.firstMatch.isHittable)
-            XCTAssertTrue(app.staticTexts["iMDReader"].exists)
-            record("new-root-expired-" + theme + "-top", app: app)
-            let manage = app.buttons["paywall.manage"]
-            reveal(manage, app: app)
-            manage.tap()
-            XCTAssertTrue(app.navigationBars["Manage Sources"].waitForExistence(timeout: 10))
-            app.navigationBars["Manage Sources"].buttons.firstMatch.tap()
-            reveal(app.buttons["paywall.restore"], app: app)
-            reveal(app.staticTexts["paywall.payment"], app: app)
-            record("new-root-expired-" + theme + "-footer", app: app)
-            app.buttons["paywall.settings"].tap()
-            record("new-root-settings-" + theme, app: app)
-            if theme == "light" {
-                for language in ["简体中文", "繁體中文", "English", "日本語", "한국어"] {
-                    XCTAssertTrue(app.buttons[language].exists)
-                }
-            }
-            tapMenuOption("简体中文", app: app)
-            XCTAssertTrue(app.buttons["paywall.settings"].waitForExistence(timeout: 10))
-            XCTAssertEqual(app.buttons["paywall.settings"].label, "应用设置")
-            app.buttons["paywall.settings"].tap()
-            tapMenuOption("English", app: app)
-            XCTAssertEqual(app.buttons["paywall.settings"].label, "App settings")
+            let settings = app.buttons[settingsLabel]
+            XCTAssertTrue(settings.waitForExistence(timeout: 20), code)
+            settings.tap()
+            XCTAssertTrue(app.buttons[github].waitForExistence(timeout: 5), code)
+            XCTAssertTrue(app.buttons[cache].exists, code)
+            XCTAssertTrue(app.descendants(matching: .any)[privacy].firstMatch.exists, code)
+            record("language-" + code, app: app)
             app.terminate()
         }
     }
 
+    @MainActor func testSettingsAndDocumentLink() async throws {
+        guard let app = launchReader() else { return }
+        let settings = app.buttons["App settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 10))
+        for title in ["GitHub access", "iCloud sync", "Offline cache"] {
+            settings.tap()
+            XCTAssertTrue(app.buttons[title].waitForExistence(timeout: 5), title)
+            if title == "GitHub access" {
+                record("settings-menu", app: app)
+                // No purchase, trial or restore entry remains in the settings menu.
+                for removed in ["Trial and Purchase", "Restore Purchases", "Unlocked"] {
+                    XCTAssertFalse(app.buttons[removed].exists, removed)
+                }
+                XCTAssertTrue(app.descendants(matching: .any)["Privacy Policy"].firstMatch.exists)
+            }
+            app.buttons[title].tap()
+            XCTAssertTrue(app.navigationBars[title].waitForExistence(timeout: 10), title)
+            record("settings-" + title, app: app)
+            app.buttons["Done"].tap()
+        }
+        var link = URLComponents(string: "imdreader://open")!
+        link.queryItems = [URLQueryItem(name: "key", value: "E4072B41-1284-4D82-82BE-846370D11759|/长文滚动检查.md")]
+        // Deliver the link from a foreground system caller to the running app.
+        XCUIApplication(bundleIdentifier: try XCTUnwrap(Bundle.main.bundleIdentifier)).activate()
+        let opened = await UIApplication.shared.open(try XCTUnwrap(link.url))
+        XCTAssertTrue(opened)
+        app.activate()
+        XCTAssertTrue(app.webViews.staticTexts["长文滚动检查"].firstMatch.waitForExistence(timeout: 20))
+        record("link-opened-document", app: app)
+    }
 }

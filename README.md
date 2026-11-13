@@ -40,4 +40,4 @@ Mac 推荐下载 `.dmg`，打开后将 iMDReader 拖入“应用程序”；也�
 
 - [使用支持](https://wivnelo.github.io/i-md-reader/support.html) · [隐私政策](https://wivnelo.github.io/i-md-reader/privacy.html) · [提交问题](https://github.com/wivnelo/i-md-reader/issues)
 
-正式下载仍为 0.3.0。iPhone/iPad 的 0.4.0 计划提供 14 天试用与一次性买断，Mac 保持免费；该版本目前仅在 TestFlight 内部测试，尚未提交审核或发布。真机上 App 内商品暂无法加载，试用和购买尚不能开始，需待付费 App 协议等后台事项完成后复测；源码中的最新修复尚未上传新的 TestFlight 构建。开发进展与验收边界见 [开发状态](docs/STATUS.md)，收费实现见 [IAP](docs/IAP.md)。
+正式下载仍为 0.3.0。0.4.0 在所有平台保持免费，不含试用、内购或任何付费内容（原计划的 14 天试用与买断已于 2026-11-13 取消，相关代码已移除）；该版本目前仅在 TestFlight 内部测试，尚未提交审核或发布。开发进展与验收边界见 [开发状态](docs/STATUS.md)。
