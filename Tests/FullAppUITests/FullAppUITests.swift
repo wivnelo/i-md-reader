@@ -66,6 +66,28 @@ final class FullAppUITests: XCTestCase {
         record("article-after-rotation", app: app)
     }
 
+    @MainActor func testFiveLanguagesLocalizeSettings() async throws {
+        // language code, settings button, GitHub access, offline cache, privacy policy
+        let expected = [("zh-Hans", "应用设置", "GitHub 授权", "离线缓存", "隐私政策"),
+                        ("zh-Hant", "App 設定", "GitHub 授權", "離線快取", "隱私權政策"),
+                        ("en", "App settings", "GitHub access", "Offline cache", "Privacy Policy"),
+                        ("ja", "アプリ設定", "GitHub アクセス許可", "オフラインキャッシュ", "プライバシーポリシー"),
+                        ("ko", "앱 설정", "GitHub 접근 권한", "오프라인 캐시", "개인정보 처리방침")]
+        for (code, settingsLabel, github, cache, privacy) in expected {
+            let app = XCUIApplication()
+            app.launchArguments = ["-IMDDisableCloudKit", "-readingSampleRemoved", "NO", "-readerLanguage", code]
+            app.launch()
+            let settings = app.buttons[settingsLabel]
+            XCTAssertTrue(settings.waitForExistence(timeout: 20), code)
+            settings.tap()
+            XCTAssertTrue(app.buttons[github].waitForExistence(timeout: 5), code)
+            XCTAssertTrue(app.buttons[cache].exists, code)
+            XCTAssertTrue(app.descendants(matching: .any)[privacy].firstMatch.exists, code)
+            record("language-" + code, app: app)
+            app.terminate()
+        }
+    }
+
     @MainActor func testSettingsAndDocumentLink() async throws {
         guard let app = launchReader() else { return }
         let settings = app.buttons["App settings"]
