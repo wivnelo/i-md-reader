@@ -1,5 +1,17 @@
 # iMDReader 开发与发行状态
 
+## 0.4.1（59）测试包：本机 Mac 与 TestFlight · 2026-11-14
+
+**范围：** 用户要求用当前 main（`167840c`，含代码文件阅读、HTTPS 图片、README 内嵌 HTML）替换本机 Mac 并上传 TestFlight，供 iPhone/iPad 试用。0.4.0（58）仍在 App Review，为免混淆，两端均以命令行覆盖为 **0.4.1（59）**，工程默认 0.4.0（58）未改；不含提审或公开发布。
+
+**Mac：** Universal Release 归档（Apple Development 签名以携带 iCloud 权限，团队 ID 取自本机发行导出配置），按发行方式以 Developer ID 导出；严格验签通过，权限为沙盒 + iCloud 生产环境。**未公证**（本机构建无隔离属性，可直接运行；外发会被 Gatekeeper 拦截）。替换 `/Applications/iMDReader.app` 后启动 30 秒无崩溃、无新崩溃报告，CloudKit 同步引擎正常初始化；资料库在 App 外，保留。旧 0.4.0 副本移入废纸篓。另生成同一 App 的新样式本地 DMG（`~/Downloads/iMDReader-0.4.1-59-local.dmg`，不入库）。
+
+**TestFlight：** iOS 归档（App 与小组件均 0.4.1（59），`ITSAppUsesNonExemptEncryption = false`）上传一次，Upload succeeded；Chrome 回读 TestFlight 构建列表为“版本 0.4.1 / 59 / 准备提交”，已在 Internal 群组，90 天后过期。iPhone/iPad 安装与真机试用待用户完成。
+
+**DMG 安装窗口重新设计：** `scripts/build-mac-dmg.sh` 改为先建可写镜像，放入 `design/dmg/background.tiff`（1x/2x，由 `design/dmg/render-background.swift` 用 AppKit 绘制：浅色渐变、iMDReader 名称与标语、蓝色虚线箭头、中英文“拖到‘应用程序’即可安装”），再由访达脚本固定窗口（660×400 内容区、隐藏工具栏/状态栏/路径栏、图标 112pt，App 居左、“应用程序”居右），最后压缩为 UDZO 并校验；临时挂载的 App 副本会自动注销登记。`design/dmg/preview.jpg` 为实际窗口截图。需要本机已允许 Claude/终端控制“访达”（首次构建时系统询问）；DMG 仍需按发行流程签名公证后才可公开分发。未测：深色模式下窗口（背景图固定为浅色，图标文字为系统色）、Intel 机。
+
+**清理：** 归档、导出、DerivedData 和临时挂载均已移入废纸篓并注销登记；系统登记中只剩 `/Applications/iMDReader.app` 与用户挂载的 0.4.0 安装盘。
+
 ## 代码文件阅读与网络图片（已合并 main，未发版）· 2026-11-14
 
 **用户决定：** 加入编程语言阅读，第一版只做“能打开、语法高亮、带行号”，代码目录（函数/类型列表）以后再议；保留 iMDReader 名称，代码阅读定位为“读仓库”的配套功能，Markdown 仍是主角；美观、稳定、快速为第一标准。README 内嵌 HTML 中的网络图片放开；HTML 写的标题不进文章目录。两项改动一起回归后合并，随下一版发布。

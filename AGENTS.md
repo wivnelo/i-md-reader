@@ -1,6 +1,6 @@
 # iMDReader 已确认产品约束
 
-- 当前正式Mac为0.4.0（58，2026-11-13）；本机`/Applications`为0.4.0（58），日常从`/Applications/iMDReader.app`启动；不要将工程构建副本固定到Dock。开发/QA构建与正式版共用应用标识，会被系统误开（2026-11-14“闪退”即旧调试版）：每次构建、测试或发布后直接清理产物，Mac副本先`lsregister -u`；保留`build/releases/`。历史构建缓存和旧App副本已清理，当前产物/移动51审核材料及历史诊断归档位置见docs/STATUS.md；不沿用已删除的DerivedData路径。
+- 当前正式Mac为0.4.0（58，2026-11-13）；本机`/Applications`为本地测试版0.4.1（59，2026-11-14，Developer ID签名、未公证），日常从`/Applications/iMDReader.app`启动；不要将工程构建副本固定到Dock。开发/QA构建与正式版共用应用标识，会被系统误开（2026-11-14“闪退”即旧调试版）：每次构建、测试或发布后直接清理产物，Mac副本先`lsregister -u`；保留`build/releases/`。历史构建缓存和旧App副本已清理，当前产物/移动51审核材料及历史诊断归档位置见docs/STATUS.md；不沿用已删除的DerivedData路径。
 
 - 2026-10-29用户授权修复已复现的2项P2与1项P3，并只发布Mac0.2.2（52）；其他已确认界面/功能不变，移动端不安装、上传或发布。此明确授权替代旧冻结规则对此三项修复的限制；当前发布结果见docs/STATUS.md。
 
