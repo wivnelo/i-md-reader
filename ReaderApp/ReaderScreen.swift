@@ -67,7 +67,15 @@ struct ReaderScreen: View {
         UIDevice.current.userInterfaceIdiom == .pad
             || (horizontalSizeClass == .regular && verticalSizeClass == .regular)
     }
+    /// Immersive reading hides the sidebar, so it only applies while two columns can
+    /// show. Folding a foldable collapses the split view but can leave `visibility` at
+    /// `.all`; without the size-class check the button lingers and pushes "•••" out of
+    /// the short landscape toolbar.
+    private var showsImmersiveToggle: Bool {
+        horizontalSizeClass != .compact && visibility != .detailOnly
+    }
     #else
+    private var showsImmersiveToggle: Bool { visibility != .detailOnly }
     @State private var findText = ""
     @State private var findFocusRequest = 0
     #endif
@@ -365,7 +373,7 @@ struct ReaderScreen: View {
                         .accessibilityLabel("阅读外观")
                         .popover(isPresented: $showAppearance) { appearancePanel }
                     #endif
-                    if visibility != .detailOnly {
+                    if showsImmersiveToggle {
                         Button("沉浸阅读", systemImage: "arrow.up.left.and.arrow.down.right") { visibility = .detailOnly }
                     }
                     Menu {
