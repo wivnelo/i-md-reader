@@ -1,6 +1,19 @@
 # iMDReader 开发与发行状态
 
-## README 内嵌 HTML 渲染（分支 `fix/render-readme-html`，未合并、未发版）· 2026-11-14
+## 代码文件阅读与网络图片（已合并 main，未发版）· 2026-11-14
+
+**用户决定：** 加入编程语言阅读，第一版只做“能打开、语法高亮、带行号”，代码目录（函数/类型列表）以后再议；保留 iMDReader 名称，代码阅读定位为“读仓库”的配套功能，Markdown 仍是主角；美观、稳定、快速为第一标准。README 内嵌 HTML 中的网络图片放开；HTML 写的标题不进文章目录。两项改动一起回归后合并，随下一版发布。
+
+**代码文件阅读（`feat/code-reading`）：** 资料库原本就列出所有文件、非 Markdown 置灰；现在已识别的源码、配置和纯文本文件变为可点（图标 `doc.plaintext`），资料库外观和“•••”菜单不变，未新增开关。按扩展名映射到内置 highlight.js 常用语言包（Swift、Objective-C、C/C++、C#、Java、Kotlin、Go、Rust、Python、Ruby、PHP、Perl、Lua、R、JS/TS、CSS/SCSS/Less、HTML/XML/plist、JSON、YAML、TOML/INI、Shell、SQL、GraphQL、Diff、Makefile、VB.NET）；TXT/LOG/CSV/TSV 及无扩展名的 LICENSE、README、Makefile、Dockerfile 等以纯文本显示。整份文件为一个只读代码块：左侧行号固定不随横向滚动、长行横向滚动不折行、复用现有配色/字号/明暗与“复制”；200 KB 内整份着色，更大只显示带行号原文；超过 2 MB 或含 NUL 字节的二进制提示不显示。本地文件夹、GitHub 来源、离线缓存、文件选择器、系统“打开方式”（Alternate，不抢默认）和文档内相对链接均可打开。代码文件阅读宽度放宽到 1180px，窄屏两侧留白收窄。新增五语言提示 5 条、替换 3 条。新文件 `ReadableKind.swift`（类型表，无 Markdown 依赖，供 WebKit 检查单独编译）与 `ReadableFile.swift`（渲染）。
+
+**网络图片（并入 PR #15）：** Markdown 与 README HTML 中的 HTTPS 图片直接从所在网站加载（含单独打开的文件），不发送来源页信息（referrer），WebView 数据存储本就不持久，不保留 Cookie；页面策略仅放行 `https:` 图片，HTTP 及其他协议仍显示“暂不支持此图片地址”；加载失败的网络图片显示为五语言提示“图片无法加载”而非破图标。隐私政策补充说明，生效日期改为 2026-11-14。README HTML 渲染详见下一节。
+
+**联合回归（`integration/0.4.1` = 两分支合并）：** `swift test` ReaderCore 71/71（含代码阅读 6 组、HTML 5 组）、根包 51/51；脚本 16/16；WebKit 160 组；本地化 0 错误；Mac 未签名构建成功。SE 与 iPad Air 11 模拟器：原有三项 UI 测试 3/3（首轮因上一轮临时样例遗留的“上次文档”已删除、启动弹“找不到文件”而失败，卸载测试 App 清数据后通过）；临时探针实拍 README HTML 头部（居中图标/标题/链接、两个 shields.io HTTPS 徽章、`<details>`）明暗两种、从文档链接与资料库打开 Swift/JS/JSON 文件、明暗代码视图，截图已人工复核；SE 上点击代码文件到显示约 4 秒（含测试框架等待，本机当时负载偏高，非严格性能数据）。未测：Mac 上代码文件实际画面、Pro Max、Duo、真机、VoiceOver、GitHub 远程代码文件与离线缓存实开、2 MB 边界与二进制提示的界面（仅单元测试）。
+
+**已知现象（既有行为，未改）：** 上次打开的文件被删除后，下次启动会弹“找不到文件”提示。
+
+
+## README 内嵌 HTML 渲染（PR #15 已合并 main，未发版）· 2026-11-14
 
 **问题与根因：** 用户用 Mac 0.4.0 打开 Nivlet 的 `README.zh-CN.md`，开头 GitHub 常见的 `<p align="center">`、`<img>`、`<h1>`、`<a>`、`<sub>` 头部整段显示为灰底等宽源码。原因不在 CSP 或清洗：`MarkdownRenderer` 对 swift-markdown 的 `HTMLBlock` 直接输出 `<pre class="raw-html">` + 转义源码，`InlineHTML` 也被转义成文字，因此所有原生 HTML 都按代码显示。
 

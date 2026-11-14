@@ -48,6 +48,8 @@ Access to a single file does not grant access to its parent folder. Add the fold
 - Headings, tables, task lists, quotes, images, and code blocks, with syntax highlighting (including MATLAB) and one-tap copy.
 - In-document search and an outline. Reading positions are remembered by paragraph, so you return to the same place on another device or after the window width changes.
 - Text size from 12 to 26 pt, light, dark, or system appearance, and four reading palettes.
+- HTML common in READMEs (centered headers, badges, `<details>` and more) renders safely the way GitHub does, and HTTPS images load directly.
+- Glance at source and config files in a repository (Swift, Python, JavaScript/TypeScript, Go, Rust, the C family, JSON, YAML and more): read-only, with line numbers and syntax highlighting.
 
 ### Sources
 
