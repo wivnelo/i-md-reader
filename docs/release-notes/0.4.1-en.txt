@@ -1,0 +1,9 @@
+• Read code files: source, config and plain-text files open directly, with syntax highlighting and line numbers.
+• HTTPS images in documents now load, and HTML in READMEs (centered headings, badges, images, collapsible sections) displays the way GitHub shows it.
+• Adds Japanese, Korean and Traditional Chinese. Switch the app language anytime in Reading Appearance.
+• More reliable iCloud sync. Being signed out of iCloud or turning sync off no longer affects launch.
+• More accurate reading positions: after Split View or Stage Manager changes the window width, you return to the same paragraph.
+• Better toolbar behavior when folding and unfolding iPhone Duo.
+• Other fixes.
+
+iMDReader remains completely free, with no in-app purchases and no data collection.
