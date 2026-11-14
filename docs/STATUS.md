@@ -1,5 +1,19 @@
 # iMDReader 开发与发行状态
 
+## 0.4.1（60）发布：Mac 正式版、iOS 待提交 · 2026-11-14
+
+**用户要求：** 检查 iPhone Duo 适配（无真机，只看模拟器），并把此版本作为新版本上线各端。
+
+**iPhone Duo 检查（“IMD-QA Duo”，iOS 27.1）：** 这次通过 Device Hub 的“折叠/半开/展开”和“旋转”按钮补测了此前缺的姿态（模拟器工具的触控注入对 Duo 无效，点击改由 Device Hub 窗口代发）。外屏竖/横、半开（书本姿态）、内屏竖/横均正常：外屏走 iPhone 单栏，竖排工具条（iOS 27.1 标准）；内屏横屏按方案 A 用 iPad 式工具栏，边栏按钮与品牌在阅读区顶栏左侧、加号在边栏顶栏，双栏可开合；内屏竖屏边栏为浮层，与 iPad 竖屏一致；折叠/展开时文档与阅读位置保持。**发现并修复一处缺陷：** 内屏双栏时展开边栏后折叠，“沉浸阅读”按钮残留在外屏工具条（`columnVisibility` 仍为 `.all`），外屏横屏高度不足时把“•••”应用设置挤出工具条。改为仅在非 compact 宽度显示该按钮（`ReaderScreen.showsImmersiveToggle`），Mac 不变。修复后复测：外屏横屏工具条为搜索/目录/•••；内屏双栏仍有沉浸阅读按钮；iPad Air 11 横屏工具栏不变。未测：Duo 真机、外屏的代码文件页与外观面板细节、VoiceOver。
+
+**版本与测试：** [PR #18](https://github.com/wivnelo/i-md-reader/pull/18) 合并为 `850db40`（修复 + 工程版本 0.4.1（60）+ `docs/release-notes/0.4.1-*.txt`）。`swift test` ReaderCore 71/71、根包 51/51；本地化检查 0 错误。
+
+**Mac：** [v0.4.1](https://github.com/wivnelo/i-md-reader/releases/tag/v0.4.1) 已发布为 Latest（标签 `850db40`）。Universal Release，Developer ID 签名带可信时间戳；App 与 DMG 均 Apple 公证 Accepted、装订票据，Gatekeeper 为 Notarized Developer ID；DMG 使用新拖拽安装窗口，挂载内为 0.4.1（60）。公开下载的 DMG/ZIP 与 SHA256SUMS 一致，资产命名沿用更新检查格式。本机 `/Applications` 已换为该公证版，启动 25 秒无崩溃。
+
+**iOS：** 0.4.1（60）上传成功，TestFlight 已处理并在 Internal。App Store Connect 回读时 0.4.0 已为“可分发”（已上架，非本会话操作），因此未撤审；新建 0.4.1 版本，选构建 60，中英文“此版本的新增内容”取自 `docs/release-notes/0.4.1-*.txt`（因 iOS 用户从 0.3.0 直接升级，内容含 0.4.0 项），中英文描述按当前功能重写（五语言、iCloud 同步、小组件/Spotlight/快捷指令、代码文件、HTTPS 图片），截图沿用 0.4.0 的四栏各 5 张，手动发布、非分阶段、保留评分；已保存，**“添加以供审核”待用户本人点击**。推广文本仍为空。
+
+**网站与 README：** 版本、下载链接与新功能区更新为 Mac 0.4.1 / App Store 0.4.0 / 0.4.1 即将推出。
+
 ## 0.4.1（59）测试包：本机 Mac 与 TestFlight · 2026-11-14
 
 **范围：** 用户要求用当前 main（`167840c`，含代码文件阅读、HTTPS 图片、README 内嵌 HTML）替换本机 Mac 并上传 TestFlight，供 iPhone/iPad 试用。0.4.0（58）仍在 App Review，为免混淆，两端均以命令行覆盖为 **0.4.1（59）**，工程默认 0.4.0（58）未改；不含提审或公开发布。
