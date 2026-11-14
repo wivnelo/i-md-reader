@@ -213,7 +213,8 @@ private func stamp(_ seconds: TimeInterval, _ device: String) -> SyncStamp {
 
     let entry = try #require(store.readingHistory.first)
     #expect(entry.key == key && entry.title == "Merkle Trees" && entry.source == "Notes")
-    #expect(entry.excerpt.contains("Hashes <b>combine</b> & verify.") && !entry.excerpt.contains("<p>"))
+    // Inline HTML now renders (bold), so the plain-text excerpt carries its text without tags.
+    #expect(entry.excerpt.contains("Hashes combine & verify.") && !entry.excerpt.contains("<p>") && !entry.excerpt.contains("<b>"))
     store.recordProgress(0.5, documentKey: key, anchor: 3.2)
     #expect(store.readingHistory.first?.progress == 0.5)
 

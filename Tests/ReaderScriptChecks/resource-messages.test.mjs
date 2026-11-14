@@ -46,8 +46,9 @@ function load(language, ids) {
 
 test('renderer marks folder-access and unsupported-image notes with stable identifiers', () => {
   const folder = note('folder-access');      // ![local](image.png) with allowRelativeImages: false
-  const unsupported = note('unsupported-image'); // ![remote](https://example.com/image.png)
-  assert.equal(folder.guard, 'allowRelativeImages');
+  const unsupported = note('unsupported-image'); // ![remote](http://example.com/image.png)
+  // HTTPS images bypass the folder grant; relative ones still need it.
+  assert.equal(folder.guard, 'allowRelativeImages || Self.isRemoteImage(source)');
   assert.match(unsupported.guard, /safeDestination\(image\.source, image: true\)/);
   assert.equal(folder.fallback, expected['zh-Hans'][0]);
   assert.equal(unsupported.fallback, expected['zh-Hans'][1]);

@@ -48,7 +48,7 @@ import JavaScriptCore
 @Test @MainActor func resourceMessagesUseRendererIdentifiersAcrossLanguageChanges() throws {
     let renderer = MarkdownRenderer()
     let folder = renderer.render("![local](image.png)", allowRelativeImages: false).body
-    let unsupported = renderer.render("![remote](https://example.com/image.png)").body
+    let unsupported = renderer.render("![remote](http://example.com/image.png)").body
     #expect(folder.contains("data-reader-message=\"folder-access\""))
     #expect(unsupported.contains("data-reader-message=\"unsupported-image\""))
     #expect(renderer.render("").body.isEmpty)

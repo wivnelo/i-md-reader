@@ -1,5 +1,21 @@
 # iMDReader 开发与发行状态
 
+## README 内嵌 HTML 渲染（分支 `fix/render-readme-html`，未合并、未发版）· 2026-11-14
+
+**问题与根因：** 用户用 Mac 0.4.0 打开 Nivlet 的 `README.zh-CN.md`，开头 GitHub 常见的 `<p align="center">`、`<img>`、`<h1>`、`<a>`、`<sub>` 头部整段显示为灰底等宽源码。原因不在 CSP 或清洗：`MarkdownRenderer` 对 swift-markdown 的 `HTMLBlock` 直接输出 `<pre class="raw-html">` + 转义源码，`InlineHTML` 也被转义成文字，因此所有原生 HTML 都按代码显示。
+
+**改动：** 新增 `ReaderCore/RawHTML.swift`（只切分文本/标签、解码属性中的字符引用，畸形输入一律降为文本）；`MarkdownRenderer` 按 GitHub 白名单思路重新序列化，从不原样透传源码。
+- 放行标签：`p div span h1–h6 img a strong em b i u s del ins sub sup small mark br hr picture source details summary kbd code pre samp var table thead tbody tfoot caption tr th td ul ol li dl dt dd blockquote q abbr cite`；其他未知标签去掉标签保留文字。
+- 连同内容一起丢弃：`script style iframe object form textarea select noscript template title svg math applet frameset noembed noframes xmp plaintext`；`embed/input/link/meta/base` 等不在白名单，直接丢弃。
+- 放行属性（按元素限定并校验取值）：`title`；`align`（left/center/right/justify，img 另含 top/middle/bottom）；`valign`；`width/height`（数字、%或px）；`colspan/rowspan`；`ol start`；`details open`；`a href`；`img/source srcset`；`source media/type`。`on*`、`style`、`class`、`id` 等全部丢弃。
+- `img src`/`srcset` 与 `a href` 复用 Markdown 原生图片/链接同一套校验：图片仍只接受相对路径（本地文件夹、GitHub、离线缓存同一 `reader-resource` 加载链，GIF 可用），远程/`data:` 图片显示与 Markdown 相同的“暂不支持此图片地址”，无文件夹权限显示同一提示；链接只放行相对路径、http(s)、mailto，相对 `.md` 走现有内部链接逻辑，外链由系统浏览器打开。`safeDestination` 额外按浏览器方式识别带前导空格的协议（如 `" javascript:"`），此前 Markdown 链接同样会漏判，仅收紧恶意输入。
+- 嵌套安全：每个 Markdown 容器是一个作用域，结束标签不能关闭作用域外的元素（`</article>`、`</div>` 不会破坏阅读器结构），段落/单元格内未闭合的行内标签在容器结束时补齐；`div/details/table/列表/blockquote` 允许跨多个块包住 Markdown（GitHub 常见的 `<details>`…Markdown…`</details>`、`<div align="center">`…`</div>`）。
+- CSS：删除不再使用的 `.raw-html`；HTML 图片用 `.html-image` 改为行内（可被 `align="center"` 居中、徽章可并排），Markdown 原生图片样式不变；新增 `kbd` 小样式。品牌、工具栏、导航、配色、目录、代码高亮、表格未改。
+
+**测试：** `swift test` ReaderCore 65/65（新增 5 组：Nivlet 头部样例、恶意输入 `<script>`/`<img onerror>`/`<a href="javascript:">`/实体编码协议/`data:`/`style`/`iframe`/`svg`、图片规则与 `picture/srcset`、跨块容器与越界结束标签、文本与实体）；根包 51/51（Spotlight 摘要用例原断言“行内 HTML 原样出现”，改为渲染后的纯文本“Hashes combine & verify.”）；`node --test` 16/16；`check-reader-webview.sh` 160 组通过；`check-localizations.py` 0 错误（4 条既有警告）。**Mac 实际画面：** 以独立标识 `local.imdreader.htmlqa`、无 iCloud 权限的 Debug 构建（隔离容器，不触及正式版数据与 LaunchServices 正式标识），把 Nivlet README 及其图片副本放入该构建的示例目录后打开：深色与浅色下图标、标题、标语、链接行、小字均居中，GIF 显示并播放，下面的 Markdown 标题与表格正常；“使用指南”相对链接打开 `documentation/USAGE.md`；恶意样例无脚本执行、无 iframe/样式注入，`javascript:` 链接降为文字，`<details>` 可展开、`kbd` 显示正常；重开文档时阅读位置恢复正常。截图人工复核后未入库。QA 构建已 `lsregister -u` 并删除。
+
+**限制/未测：** iPhone/iPad 未构建未看画面（共用同一渲染代码）；GitHub 来源与离线缓存只经同一代码路径推断，未实际打开远程仓库；远程图片（如 shields.io 徽章）与 Markdown 一致仍显示“不支持”提示，未放开；`<picture><source media="(prefers-color-scheme: dark)">` 跟随系统外观而非 App 内明暗设置；原生 HTML 标题不进入文章目录、不生成锚点（与 GitHub 一致，未加）；含 HTML 块的文档顶层块数变化，此前保存的阅读位置可能小幅偏移；标题内行内 HTML 的目录文字沿用旧行为（显示源码标签）。浅色首次打开时曾出现一次窗口在后台时正文空白，滚动后即正常，未与改动前版本对比确认是否既有现象。固定回归门槛：本次只影响正文渲染，阅读区布局/品牌/功能按钮/语言/外观面板/置顶/查找/移动配色均未改代码，未逐项重测。
+
 ## macOS 0.4.0（58）正式发布 · 2026-11-13
 
 **[v0.4.0](https://github.com/wivnelo/i-md-reader/releases/tag/v0.4.0) 已发布为 Latest。** 用户授权 iOS 与 Mac 同时发布正式版。`release/0.4.x` 经 [PR #11](https://github.com/wivnelo/i-md-reader/pull/11) 以合并提交并入 main，标签源码 `b28675e`（作者均为 noreply）；工程构建号设为 58，与 TestFlight 58 一致。Mac 为 Universal（x86_64/arm64）Release，Developer ID 签名、硬化运行时、可信时间戳及严格验签通过，权限与 0.3.0 完全一致（沙盒、CloudKit 生产环境）；App 与 DMG 均获 Apple 公证 Accepted 并装订票据，Gatekeeper 判定 Notarized Developer ID；DMG 挂载内为 0.4.0（58）且通过 Gatekeeper。从公开链接重新下载的 DMG/ZIP 与 SHA256SUMS 一致，资产命名沿用 App 内更新检查的格式（`ReleaseUpdate` 测试 3/3）。发布时本机 `/Applications` 仍为 0.3.0；之后用户自行换装 0.4.0（58），见下文 11-14 记录。中英文更新说明见 `docs/release-notes/`。
