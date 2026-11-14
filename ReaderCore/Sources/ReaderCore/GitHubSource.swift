@@ -64,7 +64,7 @@ public struct GitHubLink: Sendable, Equatable {
         guard components.count <= 16 else { throw GitHubReadError.invalidPath }
         if kind == .document {
             guard components.count >= 2,
-                  LocalDocuments.markdownExtensions.contains((components.last! as NSString).pathExtension.lowercased()) else {
+                  ReadableFile.isReadable(named: components.last!) else {
                 throw GitHubReadError.invalidURL
             }
         }
@@ -181,13 +181,18 @@ public struct GitHubReader: Sendable {
         }
     }
 
+    /// Read a Markdown or recognized source/plain-text file at the pinned commit.
     public func markdown(_ location: GitHubLocation, path: String? = nil) async throws -> String {
         let path = path ?? location.path
-        guard LocalDocuments.markdownExtensions.contains((path as NSString).pathExtension.lowercased()) else { throw ReaderError.unsupportedFile }
-        let data = try await request(location.link, endpoint: ["contents"] + (try segments(path)), ref: location.commit,
-                                     accept: "application/vnd.github.raw+json", limit: 10 * 1_024 * 1_024)
-        guard let text = String(data: data, encoding: .utf8) else { throw ReaderError.invalidEncoding }
-        return text
+        guard let kind = ReadableFile.kind(named: (path as NSString).lastPathComponent) else { throw ReaderError.unsupportedFile }
+        let isCode = kind != .markdown
+        let data: Data
+        do {
+            data = try await request(location.link, endpoint: ["contents"] + (try segments(path)), ref: location.commit,
+                                     accept: "application/vnd.github.raw+json",
+                                     limit: isCode ? ReadableFile.codeSizeLimit : 10 * 1_024 * 1_024)
+        } catch GitHubReadError.responseTooLarge where isCode { throw ReaderError.codeTooLarge }
+        return try LocalDocuments.text(from: data, isCode: isCode)
     }
 
     /// Read raster assets from the same immutable commit as the document.

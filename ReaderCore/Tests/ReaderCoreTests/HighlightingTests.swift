@@ -20,8 +20,11 @@ import JavaScriptCore
       {dataset:{language:'python'},textContent:'for x in range(3): print("Hello")',innerHTML:'untouched'},
       {dataset:{language:'swift'},textContent:'let name = "Hello"',innerHTML:'untouched'},
       {dataset:{language:'unsupported-example'},textContent:'<script>do not execute</script>',innerHTML:'untouched'},
-      {dataset:{language:'matlab'},textContent:'x'.repeat(20001),innerHTML:'untouched'}
+      {dataset:{language:'matlab'},textContent:'x'.repeat(20001),innerHTML:'untouched'},
+      {dataset:{language:'swift'},textContent:'let x = "a"\n'.repeat(3000),innerHTML:'untouched',inFile:true},
+      {dataset:{language:'swift'},textContent:'let x = "a"\n'.repeat(20000),innerHTML:'untouched',inFile:true}
     ];
+    blocks.forEach(function(block){ block.closest = function(){ return block.inFile ? {} : null; }; });
     var document = {
       documentElement:{dataset:{uiLanguage:'en'}},
       querySelectorAll:function(selector){return selector === 'pre code[data-language]' ? blocks : [];}
@@ -40,6 +43,9 @@ import JavaScriptCore
     #expect(context.evaluateScript("blocks[0].innerHTML.includes('&lt;script&gt;')")?.toBool() == true)
     #expect(context.evaluateScript("blocks[3].innerHTML")?.toString() == "untouched")
     #expect(context.evaluateScript("blocks[4].innerHTML")?.toString() == "untouched")
+    // A whole source file may exceed the 20 KB block budget up to 200 KB; beyond that it stays plain.
+    #expect(context.evaluateScript("blocks[5].innerHTML.includes('hljs-keyword')")?.toBool() == true)
+    #expect(context.evaluateScript("blocks[6].innerHTML")?.toString() == "untouched")
     let rendered = MarkdownRenderer().render("```MATLAB\ndisp('<script>');\n```")
     #expect(rendered.body.contains("data-language=\"matlab\""))
     #expect(!rendered.body.contains("<script>"))

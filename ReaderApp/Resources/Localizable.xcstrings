@@ -1924,41 +1924,6 @@
         }
       }
     },
-    "此链接不是 Markdown 文档。": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This link is not a Markdown document."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此链接不是 Markdown 文档。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此連結不是 Markdown 文件。"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このリンクは Markdown 書類ではありません。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "이 링크는 Markdown 문서가 아닙니다."
-          }
-        }
-      }
-    },
     "本地文件夹授权已失效，已移除 App 中的来源；原始文件未删除。": {
       "extractionState": "manual",
       "localizations": {
@@ -2270,41 +2235,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "이 링크는 접근 권한이 있는 폴더의 범위를 벗어납니다. 해당 폴더를 별도로 추가하세요."
-          }
-        }
-      }
-    },
-    "此版本只打开 Markdown 文档和本地图片。": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This version opens only Markdown documents and local images."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此版本只打开 Markdown 文档和本地图片。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此版本僅能開啟 Markdown 文件與本機圖片。"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このバージョンでは Markdown 書類とローカル画像のみ開けます。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "이 버전에서는 Markdown 문서와 로컬 이미지만 열 수 있습니다."
           }
         }
       }
@@ -3348,40 +3278,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "상대 경로의 이미지나 문서 링크를 열려면 먼저 상위 폴더를 추가하세요."
-          }
-        }
-      }
-    },
-    "请选择 Markdown 文件（.md 或 .markdown）。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose a Markdown file (.md or .markdown)."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "请选择 Markdown 文件（.md 或 .markdown）。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "請選取 Markdown 檔案（.md 或 .markdown）。"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Markdown ファイル（.md または .markdown）を選択してください。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Markdown 파일(.md 또는 .markdown)을 선택하세요."
           }
         }
       }
@@ -5619,6 +5515,181 @@
           "stringUnit": {
             "state": "translated",
             "value": "이용 불가"
+          }
+        }
+      }
+    },
+    "此文件类型暂不支持阅读。": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此文件类型暂不支持阅读。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This file type can't be opened yet."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此檔案類型暫不支援閱讀。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このファイルの種類はまだ開けません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 파일 형식은 아직 열 수 없습니다."
+          }
+        }
+      }
+    },
+    "代码文件超过 2 MB，暂不显示。": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "代码文件超过 2 MB，暂不显示。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code files larger than 2 MB aren't shown."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "程式碼檔案超過 2 MB，暫不顯示。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2 MB を超えるコードファイルは表示できません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2MB를 초과하는 코드 파일은 표시하지 않습니다."
+          }
+        }
+      }
+    },
+    "这不是文本文件，无法阅读。": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这不是文本文件，无法阅读。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This isn't a text file and can't be read."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這不是文字檔案，無法閱讀。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テキストファイルではないため表示できません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "텍스트 파일이 아니어서 읽을 수 없습니다."
+          }
+        }
+      }
+    },
+    "请选择 Markdown 或代码文件。": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请选择 Markdown 或代码文件。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a Markdown or code file."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請選取 Markdown 或程式碼檔案。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown またはコードファイルを選択してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown 또는 코드 파일을 선택하세요."
+          }
+        }
+      }
+    },
+    "此链接不是可阅读的文档。": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此链接不是可阅读的文档。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This link isn't a readable document."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此連結不是可閱讀的文件。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このリンクは表示できる書類ではありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 링크는 읽을 수 있는 문서가 아닙니다."
           }
         }
       }

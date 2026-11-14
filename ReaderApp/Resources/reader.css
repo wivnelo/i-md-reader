@@ -33,6 +33,12 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em;bac
 .copy{font:inherit;color:inherit;background:transparent;border:0;min-height:44px;min-width:44px;padding:8px;cursor:pointer}
 pre{margin:0;padding:18px;overflow-x:auto;font-size:.86em;line-height:1.7;white-space:pre;overflow-wrap:normal}
 pre code{padding:0;background:none;font-size:1em}
+.codefile{margin:4px 0 0}
+article:has(.codefile){max-width:1180px}
+.codefile-scroll{display:flex;align-items:flex-start;overflow-x:auto}
+.codefile pre{overflow:visible}
+.codefile .gutter{position:sticky;left:0;z-index:1;flex:none;padding-left:14px;padding-right:12px;text-align:right;color:var(--secondary);background:var(--soft);border-right:1px solid var(--line);font-variant-numeric:tabular-nums;-webkit-user-select:none;user-select:none}
+.codefile .source{flex:1 0 auto;padding-left:16px}
 .table-scroll{overflow-x:auto;margin:18px 0}
 table{border-collapse:collapse;min-width:100%;font-size:.88em;text-align:left}
 th,td{padding:12px 18px;border-bottom:1px solid var(--line);min-width:110px}
@@ -45,6 +51,7 @@ kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em;bord
 ::selection{background:var(--selection)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 @media(max-width:600px){article{padding:26px 26px 56px}
+article:has(.codefile){padding-left:12px;padding-right:12px}
 h1{font-size:1.5em}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}

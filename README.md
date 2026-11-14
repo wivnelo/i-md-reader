@@ -48,6 +48,8 @@ Mac 推荐下载 `.dmg`，打开后将 iMDReader 拖入“应用程序”；也�
 - 标题、表格、任务列表、引用、图片和代码块，支持代码高亮（含 MATLAB）与一键复制。
 - 文内查找、文章目录，阅读位置按段落记住，换设备或改变窗口宽度后回到原处。
 - 字号 12–26pt、浅色 / 深色 / 跟随系统，四套阅读配色。
+- README 中常见的 HTML（居中标题、徽章、`<details>` 折叠等）按 GitHub 方式安全渲染，HTTPS 网络图片直接显示。
+- 顺手查看仓库里的源码和配置文件（Swift、Python、JavaScript/TypeScript、Go、Rust、C 系、JSON、YAML 等）：只读、带行号与语法高亮。
 
 ### 来源
 

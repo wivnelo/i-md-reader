@@ -18,5 +18,6 @@ fixture += source[start:end].replace('private var datesScript', 'var datesScript
 (qa / 'DateScript.swift').write_text(fixture)
 PY
 swiftc -swift-version 6 -parse-as-library "$repo/ReaderCore/Sources/ReaderCore/LocalDocuments.swift" \
+  "$repo/ReaderCore/Sources/ReaderCore/ReadableKind.swift" \
   "$qa/DateScript.swift" "$repo/Tests/ReaderWebViewChecks/main.swift" -o "$qa/WebViewChecks"
 "$qa/WebViewChecks" "$resources" "$output"
