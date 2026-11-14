@@ -786,8 +786,9 @@ struct OpenDocument {
                             throw error
                         }
                     }
+                    let name = (path as NSString).lastPathComponent
                     rendered = await Task.detached(priority: .userInitiated) {
-                        MarkdownRenderer().render(text)
+                        ReadableFile.render(text, name: name)
                     }.value
                 } else {
                 let local = try await Task.detached(priority: .userInitiated) {
@@ -796,7 +797,7 @@ struct OpenDocument {
                         var coordinationError: NSError?
                         var result: Result<(RenderedDocument, DocumentDates), Error>?
                         NSFileCoordinator().coordinate(readingItemAt: url, options: [], error: &coordinationError) { coordinatedURL in
-                            result = Result { (MarkdownRenderer().render(try LocalDocuments.read(coordinatedURL, root: access.url)), DocumentDates.local(coordinatedURL)) }
+                            result = Result { (ReadableFile.render(try LocalDocuments.read(coordinatedURL, root: access.url), name: url.lastPathComponent), DocumentDates.local(coordinatedURL)) }
                         }
                         if let coordinationError { throw coordinationError }
                         guard let result else { throw CocoaError(.fileReadUnknown) }
@@ -934,8 +935,8 @@ struct OpenDocument {
     /// Receive either a document picker grant or a system open-in-place URL.
     /// The security scope is held on the FILE, never its ungranted parent.
     func openFileURL(_ input: URL, existingID: UUID? = nil) {
-        guard input.isFileURL, LocalDocuments.markdownExtensions.contains(input.pathExtension.lowercased()) else {
-            error = "请选择 Markdown 文件（.md 或 .markdown）。"
+        guard input.isFileURL, ReadableFile.isReadable(input) else {
+            error = "请选择 Markdown 或代码文件。"
             return
         }
         handledIncomingFile = true
@@ -966,7 +967,7 @@ struct OpenDocument {
                             output = Result {
                                 let text = try LocalDocuments.read(coordinated, root: coordinated)
                                 let bookmark = try url.bookmarkData(options: ReaderBookmarkOptions.creation, includingResourceValuesForKeys: nil, relativeTo: nil)
-                                return (MarkdownRenderer().render(text, allowRelativeImages: false), bookmark, DocumentDates.local(coordinated))
+                                return (ReadableFile.render(text, name: url.lastPathComponent, allowRelativeImages: false), bookmark, DocumentDates.local(coordinated))
                             }
                         }
                         if let coordinationError { throw coordinationError }

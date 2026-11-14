@@ -203,12 +203,12 @@ struct ReaderWebView: ReaderWebRepresentable {
                 }
                 do {
                     let target = try LocalDocuments.resourceURL(url, root: parent.document.access.url)
-                    if LocalDocuments.markdownExtensions.contains(target.pathExtension.lowercased()) {
+                    if ReadableFile.isReadable(target) {
                         var components = URLComponents(url: target, resolvingAgainstBaseURL: false)
                         components?.fragment = url.fragment(percentEncoded: false)
                         parent.onInternalLink(components?.url ?? target)
                     }
-                    else { parent.onError("此链接不是 Markdown 文档。") }
+                    else { parent.onError("此链接不是可阅读的文档。") }
                 } catch { parent.onError(error.localizedDescription) }
             } else if ["http", "https", "mailto"].contains(url.scheme?.lowercased() ?? "") {
                 #if os(macOS)

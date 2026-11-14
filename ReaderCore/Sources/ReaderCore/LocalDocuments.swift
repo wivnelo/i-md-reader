@@ -1,13 +1,15 @@
 import Foundation
 
 public enum ReaderError: LocalizedError {
-    case outsideRoot, unsupportedFile, tooLarge, invalidEncoding
+    case outsideRoot, unsupportedFile, tooLarge, invalidEncoding, codeTooLarge, notText
     public var errorDescription: String? {
         switch self {
         case .outsideRoot: "链接超出已授权文件夹，请单独添加该文件夹。"
-        case .unsupportedFile: "此版本只打开 Markdown 文档和本地图片。"
+        case .unsupportedFile: "此文件类型暂不支持阅读。"
         case .tooLarge: "文档超过原型的 10 MB 保护上限。"
         case .invalidEncoding: "无法识别文档编码，请使用 UTF-8 或 UTF-16。"
+        case .codeTooLarge: "代码文件超过 2 MB，暂不显示。"
+        case .notText: "这不是文本文件，无法阅读。"
         }
     }
 }
@@ -61,6 +63,8 @@ public struct FileNode: Identifiable, Sendable {
     public var id: String { url.path }
     public var name: String { url.lastPathComponent }
     public var isMarkdown: Bool { !isDirectory && LocalDocuments.markdownExtensions.contains(url.pathExtension.lowercased()) }
+    /// Markdown or a recognized source/plain-text file.
+    public var isReadable: Bool { !isDirectory && ReadableFile.isReadable(url) }
     public init(url: URL, isDirectory: Bool) { self.url = url; self.isDirectory = isDirectory }
 }
 
@@ -126,17 +130,25 @@ public enum LocalDocuments {
 
     public static func read(_ url: URL, root: URL) throws -> String {
         let url = try confined(url, to: root)
-        guard markdownExtensions.contains(url.pathExtension.lowercased()) else { throw ReaderError.unsupportedFile }
+        guard let kind = ReadableFile.kind(of: url) else { throw ReaderError.unsupportedFile }
+        let limit = kind == .markdown ? 10 * 1024 * 1024 : ReadableFile.codeSizeLimit
+        let tooLarge = kind == .markdown ? ReaderError.tooLarge : ReaderError.codeTooLarge
         let size = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
-        guard size <= 10 * 1024 * 1024 else { throw ReaderError.tooLarge }
+        guard size <= limit else { throw tooLarge }
         // A bounded stream also handles a file growing between the size check and read.
         let handle = try FileHandle(forReadingFrom: url)
         defer { try? handle.close() }
-        let data = try handle.read(upToCount: 10 * 1024 * 1024 + 1) ?? Data()
-        guard data.count <= 10 * 1024 * 1024 else { throw ReaderError.tooLarge }
+        let data = try handle.read(upToCount: limit + 1) ?? Data()
+        guard data.count <= limit else { throw tooLarge }
+        return try text(from: data, isCode: kind != .markdown)
+    }
+
+    /// Decode UTF-8/UTF-16 text; a NUL byte in a non-UTF-16 source file means binary content.
+    public static func text(from data: Data, isCode: Bool) throws -> String {
+        let utf16 = data.starts(with: [0xff, 0xfe]) || data.starts(with: [0xfe, 0xff])
+        if isCode, !utf16, data.prefix(8_192).contains(0) { throw ReaderError.notText }
         if let text = String(data: data, encoding: .utf8) { return text }
-        if data.starts(with: [0xff, 0xfe]) || data.starts(with: [0xfe, 0xff]),
-           let text = String(data: data, encoding: .utf16) { return text }
+        if utf16, let text = String(data: data, encoding: .utf16) { return text }
         throw ReaderError.invalidEncoding
     }
 }

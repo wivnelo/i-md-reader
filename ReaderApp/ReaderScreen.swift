@@ -8,11 +8,11 @@ import ReaderCore
 
 struct ReaderScreen: View {
     // Other installed apps can register the same extension under another UTI.
-    // Include every system-resolved Markdown type; the store still validates the
-    // actual extension before reading, rather than trusting a third-party UTI.
+    // Include every system-resolved type for a readable extension; the store still
+    // validates the actual extension before reading, rather than trusting a third-party UTI.
     private static var markdownPickerTypes: [UTType] {
         var types = [UTType(importedAs: "net.daringfireball.markdown")]
-        for ext in ["md", "markdown"] {
+        for ext in ReadableFile.allExtensions {
             types += UTType.types(tag: ext, tagClass: .filenameExtension, conformingTo: nil)
         }
         return Array(Set(types))
@@ -926,14 +926,14 @@ private struct TreeDirectory: View {
                             let selected = store.selectedKey == store.key(source: source, url: node.url)
                             Button { onOpenDocument(); store.open(node.url, source: source) } label: {
                                 HStack(spacing: 10) {
-                                    Image(systemName: node.isMarkdown ? "doc.text" : "doc").foregroundStyle(.secondary)
+                                    Image(systemName: node.isMarkdown ? "doc.text" : node.isReadable ? "doc.plaintext" : "doc").foregroundStyle(.secondary)
                                     Text(node.name).lineLimit(1).truncationMode(.middle)
                                     Spacer(minLength: 0)
                                 }.font(SidebarTypography.row).padding(.leading, CGFloat(min(level + 1, 5) * 14 + 32)).padding(.trailing, 12)
                                     .frame(minHeight: 44).contentShape(Rectangle())
                             }.buttonStyle(.plain)
-                                .disabled(!node.isMarkdown)
-                                .foregroundStyle(node.isMarkdown ? .primary : .tertiary)
+                                .disabled(!node.isReadable)
+                                .foregroundStyle(node.isReadable ? .primary : .tertiary)
                                 .background(selected ? selection : .clear, in: RoundedRectangle(cornerRadius: 9))
                                 .accessibilityAddTraits(selected ? .isSelected : [])
                                 .accessibilityHint(node.url.path)

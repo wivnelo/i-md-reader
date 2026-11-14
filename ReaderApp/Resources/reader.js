@@ -41,10 +41,12 @@
   };
   addEventListener('scroll', () => { clearTimeout(timer); timer = setTimeout(report, 350); }, { passive: true });
   addEventListener('pagehide', report);
-  // Color only explicitly supported languages near the viewport. Never guess a grammar for long blocks.
+  // Color only explicitly supported languages near the viewport. Never guess a grammar for long blocks;
+  // a whole source file gets a larger budget and otherwise stays plain, numbered text.
   const highlight = code => {
     const language = code.dataset.language;
-    if (!window.hljs || !language || !hljs.getLanguage(language) || code.textContent.length > 20000) return;
+    const limit = code.closest('.codefile') ? 200000 : 20000;
+    if (!window.hljs || !language || !hljs.getLanguage(language) || code.textContent.length > limit) return;
     try { code.innerHTML = hljs.highlight(code.textContent, { language, ignoreIllegals: true }).value; } catch (_) { /* Keep escaped plain text. */ }
   };
   if ('IntersectionObserver' in window) {
