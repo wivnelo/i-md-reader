@@ -99,9 +99,10 @@ private struct SafeHTML {
             guard let destination = safeDestination(link.destination, image: false) else { return scoped(node) }
             return "<a href=\"\(escape(destination))\">\(scoped(node))</a>"
         case let image as Markdown.Image:
-            guard allowRelativeImages else { return "<span class=\"resource-note\" data-reader-message=\"folder-access\">图片需要所在文件夹的访问权限</span>" }
             guard let source = safeDestination(image.source, image: true) else { return "<span class=\"resource-note\" data-reader-message=\"unsupported-image\">暂不支持此图片地址</span>" }
-            return "<img src=\"\(escape(source))\" alt=\"\(escape(image.plainText))\" loading=\"lazy\">"
+            // HTTPS images load directly from their host; relative ones need the containing folder's grant.
+            guard allowRelativeImages || Self.isRemoteImage(source) else { return "<span class=\"resource-note\" data-reader-message=\"folder-access\">图片需要所在文件夹的访问权限</span>" }
+            return "<img src=\"\(escape(source))\" alt=\"\(escape(image.plainText))\" loading=\"lazy\" referrerpolicy=\"no-referrer\">"
         case is ThematicBreak: return "<hr>"
         case is LineBreak: return "<br>"
         case is SoftBreak: return "\n"
@@ -236,9 +237,13 @@ private struct SafeHTML {
               !value.unicodeScalars.contains(where: { CharacterSet.controlCharacters.contains($0) }) else { return nil }
         // Browsers ignore surrounding spaces, so detect the scheme as they would (URLComponents rejects " javascript:").
         if let scheme = value.trimmingCharacters(in: .whitespaces).prefixMatch(of: /([A-Za-z][A-Za-z0-9+.\-]*):/)?.1 {
-            return !image && ["http", "https", "mailto"].contains(scheme.lowercased()) ? value : nil
+            let scheme = scheme.lowercased()
+            return image ? (scheme == "https" ? value : nil) : (["http", "https", "mailto"].contains(scheme) ? value : nil)
         }
         return value
+    }
+    static func isRemoteImage(_ value: String) -> Bool {
+        value.trimmingCharacters(in: .whitespaces).lowercased().hasPrefix("https:")
     }
     func escape(_ value: String) -> String {
         value.replacingOccurrences(of: "&", with: "&amp;").replacingOccurrences(of: "<", with: "&lt;")

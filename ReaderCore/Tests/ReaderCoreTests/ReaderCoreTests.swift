@@ -33,7 +33,9 @@ import Testing
     #expect(!result.body.contains("private metadata"))
     #expect(!result.body.contains("<script>"))
     #expect(!result.body.contains("href=\"javascript:"))
-    #expect(!result.body.contains("src=\"https:"))
+    // HTTPS images load directly from their host without sending a referrer.
+    #expect(result.body.contains(#"<img src="https://example.com/a.png" alt="remote" loading="lazy" referrerpolicy="no-referrer">"#))
+    #expect(!MarkdownRenderer().render("![plain](http://example.com/a.png)").body.contains("<img"))
     #expect(result.body.contains("&lt;img onerror=evil()&gt;"))
     #expect(result.body.contains("href=\"notes/下一篇.md\""))
 }

@@ -45,7 +45,7 @@ private let readmeHeader = """
     #expect(!html.contains("raw-html"))
     #expect(!html.contains("&lt;p"))
     #expect(!html.contains("<pre"))
-    #expect(html.contains(#"<img class="html-image" width="128" src="assets/nivlet-icon.png" alt="Nivlet 应用图标" loading="lazy">"#))
+    #expect(html.contains(#"<img class="html-image" width="128" src="assets/nivlet-icon.png" alt="Nivlet 应用图标" loading="lazy" referrerpolicy="no-referrer">"#))
     #expect(html.contains(#"<h1 align="center">Nivlet for Mac</h1>"#))
     #expect(html.contains(#"<p align="center">"#))
     #expect(html.contains("<strong>常用的小事，交给菜单栏。</strong><br>"))
@@ -53,7 +53,7 @@ private let readmeHeader = """
     #expect(html.contains(#"<a href="documentation/USAGE.md">使用指南</a>"#))
     #expect(html.contains(#"<a href="README.md">English</a>"#))
     #expect(html.contains("<sub>免费开源 · macOS 13.0+ · Apple Silicon</sub>"))
-    #expect(html.contains(#"<a href="docs/assets/demos/overview-zh.gif"><img class="html-image" width="720" src="docs/assets/demos/overview-zh.gif" alt="演示" loading="lazy"></a><br>"#))
+    #expect(html.contains(#"<a href="docs/assets/demos/overview-zh.gif"><img class="html-image" width="720" src="docs/assets/demos/overview-zh.gif" alt="演示" loading="lazy" referrerpolicy="no-referrer"></a><br>"#))
     // Markdown after the HTML keeps its heading and table of contents entry.
     #expect(html.contains(#"<h2 id="功能">功能</h2>"#))
     #expect(MarkdownRenderer().render(readmeHeader).headings.map(\.title) == ["功能"])
@@ -84,7 +84,7 @@ private let readmeHeader = """
         #expect(!html.contains(needle), "\(needle)")
     }
     #expect(html.contains("<div>ok</div>"))
-    #expect(html.contains(#"<img class="html-image" src="x.png" alt="i" loading="lazy">"#))
+    #expect(html.contains(#"<img class="html-image" src="x.png" alt="i" loading="lazy" referrerpolicy="no-referrer">"#))
     #expect(html.components(separatedBy: #"data-reader-message="unsupported-image""#).count - 1 == 2)
     #expect(html.contains("js space entity"))
     #expect(html.contains("data vb abs"))
@@ -93,8 +93,11 @@ private let readmeHeader = """
 
 @Test func relativeImagesFollowMarkdownImageRules() {
     let remote = body(#"<img src="https://example.com/badge.svg" alt="badge">"#)
-    #expect(remote == #"<span class="resource-note" data-reader-message="unsupported-image">暂不支持此图片地址</span>"# + "\n")
-    #expect(body("![badge](https://example.com/badge.svg)") == "<p>\(remote.dropLast())</p>")
+    #expect(remote == #"<img class="html-image" src="https://example.com/badge.svg" alt="badge" loading="lazy" referrerpolicy="no-referrer">"# + "\n")
+    #expect(body("![badge](https://example.com/badge.svg)") == #"<p><img src="https://example.com/badge.svg" alt="badge" loading="lazy" referrerpolicy="no-referrer"></p>"#)
+    // A standalone file (no folder grant) still shows HTTPS images; plain HTTP stays unsupported.
+    #expect(body("![badge](https://example.com/badge.svg)", allowRelativeImages: false).contains("<img src=\"https://example.com/badge.svg\""))
+    #expect(body(#"<img src="http://example.com/badge.svg">"#).contains(#"data-reader-message="unsupported-image""#))
     #expect(body(#"<p><img src="local.gif"></p>"#, allowRelativeImages: false).contains(#"data-reader-message="folder-access""#))
     let picture = body("""
     <picture>
@@ -103,8 +106,8 @@ private let readmeHeader = """
       <img src="logo.png" srcset="logo.png 1x, logo@2x.png 2x" alt="logo" width="50%" height="9e9">
     </picture>
     """)
-    #expect(picture.contains(#"<source media="(prefers-color-scheme: dark)" srcset="logo-dark.png 1x, logo@2x.png 2x">"#))
-    #expect(picture.contains(#"<img class="html-image" srcset="logo.png 1x, logo@2x.png 2x" width="50%" src="logo.png" alt="logo" loading="lazy">"#))
+    #expect(picture.contains(#"<source media="(prefers-color-scheme: dark)" srcset="logo-dark.png 1x, https://x.example/a.png 2x, logo@2x.png 2x">"#))
+    #expect(picture.contains(#"<img class="html-image" srcset="logo.png 1x, logo@2x.png 2x" width="50%" src="logo.png" alt="logo" loading="lazy" referrerpolicy="no-referrer">"#))
     #expect(!picture.contains("javascript"))
     #expect(!picture.contains("9e9"))
     #expect(picture.hasSuffix("</picture>\n"))

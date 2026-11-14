@@ -68,7 +68,7 @@ struct ReaderWebView: ReaderWebRepresentable {
         let html = """
         <!doctype html><html lang="zh-CN" data-theme="\(theme)" data-ui-language="\(language)" style="\(palette.colors(dark: dark).cssVariables)"><head>
         <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src reader-resource:; style-src 'unsafe-inline'; script-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+        <meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src reader-resource: https:; style-src 'unsafe-inline'; script-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'">
         <style>\(css)</style></head><body style="font-size:\(fontSize)px"><article><div id="reader-file-dates" class="file-dates" hidden></div>\(document.rendered.body)</article></body></html>
         """
         var base = URLComponents()
