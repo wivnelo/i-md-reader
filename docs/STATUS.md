@@ -26,7 +26,7 @@
 
 **DMG 安装窗口重新设计：** `scripts/build-mac-dmg.sh` 改为先建可写镜像，放入 `design/dmg/background.tiff`（1x/2x，由 `design/dmg/render-background.swift` 用 AppKit 绘制：浅色渐变、iMDReader 名称与标语、蓝色虚线箭头、中英文“拖到‘应用程序’即可安装”），再由访达脚本固定窗口（660×400 内容区、隐藏工具栏/状态栏/路径栏、图标 112pt，App 居左、“应用程序”居右），最后压缩为 UDZO 并校验；临时挂载的 App 副本会自动注销登记。`design/dmg/preview.jpg` 为实际窗口截图。需要本机已允许 Claude/终端控制“访达”（首次构建时系统询问）；DMG 仍需按发行流程签名公证后才可公开分发。未测：深色模式下窗口（背景图固定为浅色，图标文字为系统色）、Intel 机。
 
-**清理：** 归档、导出、DerivedData 和临时挂载均已移入废纸篓并注销登记；系统登记中只剩 `/Applications/iMDReader.app` 与用户挂载的 0.4.0 安装盘。
+**清理：** 归档、导出、DerivedData 和临时挂载均已移入废纸篓并注销登记。2026-11-15 补清：剩余 iMDReader DerivedData、Xcode Organizer 中的移动51分发归档、11台 iMDReader 专用 QA/截图/付费墙模拟器（含 IMD-QA Duo），以及系统模拟器内的 iMDReader 测试副本均已删除或移入废纸篓，失效登记（废纸篓旧App、已删除的 Codex `validation/` 路径、安装盘）已注销；系统登记中只剩 `/Applications/iMDReader.app` 与 App Store 0.4.0 系统占位。本地仅保留 `build/releases/v0.3.0/`。
 
 ## 代码文件阅读与网络图片（已合并 main，未发版）· 2026-11-14
 
@@ -293,7 +293,7 @@ Chrome 回读：0.4.0（55）已处理完成，但状态为“缺少出口合规
 | --- | --- |
 | 当前`workspace/`、原私有副本及`backup/` | 继续开发及恢复既有未提交成果；业务源码摘要核对未变 |
 | `validation/release-0.2.2-52/` | 当前Mac正式DMG/ZIP、校验和、dSYM、公开历史bundle及发布/回归证据；已清掉重复下载副本与解包App |
-| `validation/iMDReader51-distribution.xcarchive`、`AppStoreExport51/` | 已提交移动51的分发归档、符号和IPA；IPA摘要再次匹配 |
+| `validation/iMDReader51-distribution.xcarchive`、`AppStoreExport51/` | 已提交移动51的分发归档、符号和IPA；IPA摘要再次匹配（历史记录：该目录已删除，Organizer副本于2026-11-15删除） |
 | `validation/store-screenshots51/final-upload/`、`app-store51-evidence/` | 已选定的8张商店图、上传/问卷及待跟进Apple支持证据；迁移后逐文件摘要一致 |
 | `validation/historical-validation-through-51.tar.gz` | 163份历史诊断/报告压缩归档，逐文件校验后移除散落原件；下方旧日志路径对应归档内路径 |
 | `validation/update-launch-20261029/`、`cleanup-20261029/` | 私有Dock备份、启动修正及清理清单/核验记录，不入公开仓库 |
