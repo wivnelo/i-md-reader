@@ -15,7 +15,7 @@
 | 平台 | 版本 | 系统要求 |
 | --- | --- | --- |
 | **Mac** | [0.4.1 正式版](https://github.com/wivnelo/i-md-reader/releases/tag/v0.4.1)（2026-11-14） | macOS 14 或更高版本，Apple Silicon 与 Intel |
-| **iPhone / iPad** | [App Store 0.4.0](https://apps.apple.com/app/id6827371085)；0.4.1 即将提交审核 | iOS / iPadOS 17 或更高版本 |
+| **iPhone / iPad** | [App Store 0.4.1](https://apps.apple.com/app/id6827371085) | iOS / iPadOS 17 或更高版本 |
 
 Mac 推荐下载 `.dmg`，打开后将 iMDReader 拖入“应用程序”；也可下载 ZIP。发行包已通过 Developer ID 签名、Apple 公证和 Gatekeeper 检查。更新时先退出 iMDReader，直接替换即可，资料库会保留；若 Dock 仍打开旧版，移除旧图标，再从“应用程序”重新固定。
 
@@ -73,4 +73,4 @@ Mac 推荐下载 `.dmg`，打开后将 iMDReader 拖入“应用程序”；也�
 
 [使用支持](https://wivnelo.github.io/i-md-reader/support.html) · [隐私政策](https://wivnelo.github.io/i-md-reader/privacy.html) · [提交问题](https://github.com/wivnelo/i-md-reader/issues)
 
-**0.4.1 更新：** 新增代码文件阅读（语法高亮、行号）；文档中的 HTTPS 图片直接显示，README 里的 HTML 按 GitHub 方式呈现；改进 iPhone Duo 折叠与展开时的工具栏；Mac 安装包换用新的拖拽安装窗口。0.4.0 已带来日本語、한국어和繁體中文三种新界面语言，以及更稳定的 iCloud 同步。Mac 0.4.1 已于 2026-11-14 发布；iPhone / iPad 商店当前为 0.4.0，0.4.1 即将提交审核。开发进展与验收边界见 [开发状态](docs/STATUS.md)。
+**0.4.1 更新：** 新增代码文件阅读（语法高亮、行号）；文档中的 HTTPS 图片直接显示，README 里的 HTML 按 GitHub 方式呈现；改进 iPhone Duo 折叠与展开时的工具栏；Mac 安装包换用新的拖拽安装窗口。0.4.0 已带来日本語、한국어和繁體中文三种新界面语言，以及更稳定的 iCloud 同步。Mac 0.4.1 已于 2026-11-14 发布；iPhone / iPad 0.4.1 已在 App Store 上架（2026-11-19 核验）。开发进展与验收边界见 [开发状态](docs/STATUS.md)。
