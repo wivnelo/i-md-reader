@@ -15,7 +15,7 @@
 | Platform | Version | Requirements |
 | --- | --- | --- |
 | **Mac** | [0.4.1](https://github.com/wivnelo/i-md-reader/releases/tag/v0.4.1) (2026-11-14) | macOS 14 or later, Apple Silicon and Intel |
-| **iPhone / iPad** | [App Store 0.4.0](https://apps.apple.com/app/id6827371085); 0.4.1 is about to be submitted | iOS / iPadOS 17 or later |
+| **iPhone / iPad** | [App Store 0.4.1](https://apps.apple.com/app/id6827371085) | iOS / iPadOS 17 or later |
 
 On Mac, download the `.dmg`, open it, and drag iMDReader to Applications. A ZIP is also available. The release is Developer ID signed, notarized by Apple, and checked with Gatekeeper. To update, quit iMDReader and replace the app; your library is kept. If the Dock still opens an older copy, remove that Dock item and pin iMDReader from Applications again.
 
@@ -73,4 +73,4 @@ Access to a single file does not grant access to its parent folder. Add the fold
 
 [Support](https://wivnelo.github.io/i-md-reader/support.html) · [Privacy policy](https://wivnelo.github.io/i-md-reader/privacy.html) · [Report an issue](https://github.com/wivnelo/i-md-reader/issues)
 
-**What's new in 0.4.1:** read code files with syntax highlighting and line numbers; HTTPS images in documents load, and HTML in READMEs displays the way GitHub shows it; better toolbar behavior when folding and unfolding iPhone Duo; a new drag-to-install window for the Mac DMG. Version 0.4.0 added Japanese, Korean, and Traditional Chinese and more reliable iCloud sync. Mac 0.4.1 was released on 2026-11-14; the App Store currently has 0.4.0 for iPhone and iPad, and 0.4.1 is about to be submitted. See [development status](docs/STATUS.md).
+**What's new in 0.4.1:** read code files with syntax highlighting and line numbers; HTTPS images in documents load, and HTML in READMEs displays the way GitHub shows it; better toolbar behavior when folding and unfolding iPhone Duo; a new drag-to-install window for the Mac DMG. Version 0.4.0 added Japanese, Korean, and Traditional Chinese and more reliable iCloud sync. Mac 0.4.1 was released on 2026-11-14; iPhone and iPad 0.4.1 is available on the App Store (verified 2026-11-19). See [development status](docs/STATUS.md).
